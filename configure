@@ -3362,6 +3362,7 @@ pkg_config_default=pkg-config
 ranlib_default="ranlib"
 strip_default="strip"
 version_script='--version-script'
+objformat="elf32"
 x86asmexe_default="nasm"
 windres_default="windres"
 nvcc_default="nvcc"
@@ -4884,12 +4885,10 @@ case "$arch" in
     ;;
     x86)
         check_64bit x86_32 x86_64 'sizeof(void *) > 4'
-        # Treat x32 as x64 for now. Note it also needs spic=$shared
-        test "$subarch" = "x86_32" && check_cpp_condition stddef.h 'defined(__x86_64__)' &&
-            subarch=x86_64
-        if test "$subarch" = "x86_64"; then
-            spic=$shared
-        fi
+        test "$subarch" = "x86_64" && enable x86_64 && objformat=elf64
+        test "$subarch" = "x86_32" && enable x86_32 && check_cpp_condition stddef.h 'defined(__x86_64__)' &&
+            subarch=x86_64 && enable x86_64 && disable x86_32 && objformat=elfx32
+        enabled x86_64 && enabled shared && enable_weak pic
     ;;
     ppc)
         check_cc <<EOF && subarch="ppc64"
@@ -4900,8 +4899,6 @@ esac
 
 enable $subarch
 enabled spic && enable_weak pic
-
-enabled x86_64 && objformat=elf64 || objformat="elf32"
 
 # OS specific
 case $target_os in
