@@ -5089,13 +5089,10 @@ case "$arch" in
     ;;
     x86)
         check_64bit x86_32 x86_64
-        # Treat x32 as x64 for now. Note it also needs pic if shared
+        enabled x86_64 && objformat=elf64
         test "$subarch" = "x86_32" && test_cpp_condition stddef.h 'defined(__x86_64__)' &&
-            subarch=x86_64 && enable x86_64 && disable x86_32
-        if enabled x86_64; then
-            enabled shared && enable_weak pic
-            objformat=elf64
-        fi
+            subarch=x86_64 && enable x86_64 && disable x86_32 && objformat=elfx32
+        enabled x86_64 && enabled shared && enable_weak pic
     ;;
 esac
 
