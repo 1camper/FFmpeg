@@ -27,18 +27,50 @@
 typedef struct xmm_reg { uint64_t a, b; } xmm_reg;
 typedef struct ymm_reg { uint64_t a, b, c, d; } ymm_reg;
 
-#if ARCH_X86_64
+#if ARCH_X86_64 && defined __ILP32__
+#    define ABI_X32 1
+#else
+#    define ABI_X32 0
+#endif
+
+#if ABI_X32
+#    define FF_OPSIZE "l"
+#    define FF_PTROP "k"
+#    define FF_MAXOP "q"
+#    define FF_REG_a "eax"
+#    define FF_REG_b "ebx"
+#    define FF_REG_c "ecx"
+#    define FF_REG_d "edx"
+#    define FF_REG_D "edi"
+#    define FF_REG_S "esi"
+#    define FF_REG_8 "r8d"
+#    define FF_PTR_SIZE "4"
+typedef int64_t x86_reg;
+
+/* FF_REG_SP is defined in Solaris sys headers, so use FF_REG_sp */
+#    define FF_REG_sp "rsp"
+#    define FF_REG_BP "rbp"
+#    define FF_REGBP   ebp
+#    define FF_REGa    eax
+#    define FF_REGb    ebx
+#    define FF_REGc    ecx
+#    define FF_REGd    edx
+#    define FF_REGSP   rsp
+#    define FF_REG8    r8d
+#elif ARCH_X86_64
 #    define FF_OPSIZE "q"
+#    define FF_PTROP "q"
+#    define FF_MAXOP "q"
 #    define FF_REG_a "rax"
 #    define FF_REG_b "rbx"
 #    define FF_REG_c "rcx"
 #    define FF_REG_d "rdx"
 #    define FF_REG_D "rdi"
 #    define FF_REG_S "rsi"
+#    define FF_REG_8 "r8"
 #    define FF_PTR_SIZE "8"
 typedef int64_t x86_reg;
 
-/* FF_REG_SP is defined in Solaris sys headers, so use FF_REG_sp */
 #    define FF_REG_sp "rsp"
 #    define FF_REG_BP "rbp"
 #    define FF_REGBP   rbp
@@ -47,10 +79,13 @@ typedef int64_t x86_reg;
 #    define FF_REGc    rcx
 #    define FF_REGd    rdx
 #    define FF_REGSP   rsp
+#    define FF_REG8    r8
 
 #elif ARCH_X86_32
 
 #    define FF_OPSIZE "l"
+#    define FF_PTROP "k"
+#    define FF_MAXOP "k"
 #    define FF_REG_a "eax"
 #    define FF_REG_b "ebx"
 #    define FF_REG_c "ecx"
