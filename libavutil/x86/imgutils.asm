@@ -22,8 +22,15 @@
 
 SECTION .text
 
+;-----------------------------------------------------------------------------
+; void ff_image_copy_plane_uc_from_sse4(uint8_t *dst, ptrdiff_t dst_linesize,
+;                                  const uint8_t *src, ptrdiff_t src_linesize,
+;                                  ptrdiff_t bytewidth, int height);
+;-----------------------------------------------------------------------------
 INIT_XMM sse4
-cglobal image_copy_plane_uc_from, 6, 7, 4, dst, dst_linesize, src, src_linesize, bw, height, rowpos
+cglobal image_copy_plane_uc_from, 6, 7, 4, "p", dst, "p-", dst_linesize, \
+                                           "p", src, "p-", src_linesize, \
+                                           "p+", bw, "d", height, rowpos
     add dstq, bwq
     add srcq, bwq
     neg bwq
