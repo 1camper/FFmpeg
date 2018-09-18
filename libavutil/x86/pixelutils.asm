@@ -30,7 +30,8 @@ SECTION .text
 ;                               const uint8_t *src2, ptrdiff_t stride2);
 ;-------------------------------------------------------------------------------
 INIT_MMX mmx
-cglobal pixelutils_sad_8x8, 4,4,0, src1, stride1, src2, stride2
+cglobal pixelutils_sad_8x8, 4,4,0, "p", src1, "p-", stride1, \
+                                   "p", src2, "p-", stride2
     pxor        m7, m7
     pxor        m6, m6
 %rep 4
@@ -52,8 +53,8 @@ cglobal pixelutils_sad_8x8, 4,4,0, src1, stride1, src2, stride2
     paddw       m2, m3
     paddw       m0, m2
     paddw       m6, m0
-    lea         src1q, [src1q + 2*stride1q]
-    lea         src2q, [src2q + 2*stride2q]
+    lea         src1p, [src1q + 2*stride1q]
+    lea         src2p, [src2q + 2*stride2q]
 %endrep
     psrlq       m0, m6, 32
     paddw       m6, m0
@@ -68,7 +69,8 @@ cglobal pixelutils_sad_8x8, 4,4,0, src1, stride1, src2, stride2
 ;                                  const uint8_t *src2, ptrdiff_t stride2);
 ;-------------------------------------------------------------------------------
 INIT_MMX mmxext
-cglobal pixelutils_sad_8x8, 4,4,0, src1, stride1, src2, stride2
+cglobal pixelutils_sad_8x8, 4,4,0, "p", src1, "p-", stride1, \
+                                   "p", src2, "p-", stride2
     pxor        m2, m2
 %rep 4
     mova        m0, [src1q]
@@ -77,8 +79,8 @@ cglobal pixelutils_sad_8x8, 4,4,0, src1, stride1, src2, stride2
     psadbw      m1, [src2q + stride2q]
     paddw       m2, m0
     paddw       m2, m1
-    lea         src1q, [src1q + 2*stride1q]
-    lea         src2q, [src2q + 2*stride2q]
+    lea         src1p, [src1q + 2*stride1q]
+    lea         src2p, [src2q + 2*stride2q]
 %endrep
     movd        eax, m2
     RET
@@ -88,7 +90,8 @@ cglobal pixelutils_sad_8x8, 4,4,0, src1, stride1, src2, stride2
 ;                                    const uint8_t *src2, ptrdiff_t stride2);
 ;-------------------------------------------------------------------------------
 INIT_MMX mmxext
-cglobal pixelutils_sad_16x16, 4,4,0, src1, stride1, src2, stride2
+cglobal pixelutils_sad_16x16, 4,4,0, "p", src1, "p-", stride1, \
+                                     "p", src2, "p-", stride2
     pxor        m2, m2
 %rep 16
     mova        m0, [src1q]
@@ -97,8 +100,8 @@ cglobal pixelutils_sad_16x16, 4,4,0, src1, stride1, src2, stride2
     psadbw      m1, [src2q + 8]
     paddw       m2, m0
     paddw       m2, m1
-    add         src1q, stride1q
-    add         src2q, stride2q
+    add         src1p, stride1p
+    add         src2p, stride2p
 %endrep
     movd        eax, m2
     RET
@@ -108,7 +111,8 @@ cglobal pixelutils_sad_16x16, 4,4,0, src1, stride1, src2, stride2
 ;                                 const uint8_t *src2, ptrdiff_t stride2);
 ;-------------------------------------------------------------------------------
 INIT_XMM sse2
-cglobal pixelutils_sad_16x16, 4,4,5, src1, stride1, src2, stride2
+cglobal pixelutils_sad_16x16, 4,4,5, "p", src1, "p-", stride1, \
+                                     "p", src2, "p-", stride2
     movu        m4, [src1q]
     movu        m2, [src2q]
     movu        m1, [src1q + stride1q]
@@ -117,8 +121,8 @@ cglobal pixelutils_sad_16x16, 4,4,5, src1, stride1, src2, stride2
     psadbw      m1, m3
     paddw       m4, m1
 %rep 7
-    lea         src1q, [src1q + 2*stride1q]
-    lea         src2q, [src2q + 2*stride2q]
+    lea         src1p, [src1q + 2*stride1q]
+    lea         src2p, [src2q + 2*stride2q]
     movu        m0, [src1q]
     movu        m2, [src2q]
     movu        m1, [src1q + stride1q]
@@ -139,15 +143,16 @@ cglobal pixelutils_sad_16x16, 4,4,5, src1, stride1, src2, stride2
 ;-------------------------------------------------------------------------------
 %macro SAD_XMM_16x16 1
 INIT_XMM sse2
-cglobal pixelutils_sad_%1_16x16, 4,4,3, src1, stride1, src2, stride2
+cglobal pixelutils_sad_%1_16x16, 4,4,3, "p", src1, "p-", stride1, \
+                                        "p", src2, "p-", stride2
     mov%1       m2, [src2q]
     psadbw      m2, [src1q]
     mov%1       m1, [src2q + stride2q]
     psadbw      m1, [src1q + stride1q]
     paddw       m2, m1
 %rep 7
-    lea         src1q, [src1q + 2*stride1q]
-    lea         src2q, [src2q + 2*stride2q]
+    lea         src1p, [src1q + 2*stride1q]
+    lea         src2p, [src2q + 2*stride2q]
     mov%1       m0, [src2q]
     psadbw      m0, [src1q]
     mov%1       m1, [src2q + stride2q]
