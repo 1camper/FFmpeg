@@ -56,7 +56,7 @@
         const uint8_t *py = src[0] +               y * srcStride[0]; \
         const uint8_t *pu = src[1] +   (y >> vshift) * srcStride[1]; \
         const uint8_t *pv = src[2] +   (y >> vshift) * srcStride[2]; \
-        x86_reg index = -h_size / 2;                                 \
+        intptr_t index = -h_size / 2;                                \
 
 #define YUV2RGB_INITIAL_LOAD          \
     __asm__ volatile (                \

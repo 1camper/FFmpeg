@@ -76,7 +76,7 @@ static void ff_snow_horizontal_compose97i_sse2(IDWTELEM *b, IDWTELEM *temp, int 
         IDWTELEM * const dst = b+w2;
 
         i = 0;
-        for(; (((x86_reg)&dst[i]) & 0x1F) && i<w_r; i++){
+        for(; (((ptrdiff_t)&dst[i]) & 0x1F) && i<w_r; i++){
             dst[i] = dst[i] - (b[i] + b[i + 1]);
         }
         for(; i<w_r-15; i+=16){
@@ -149,7 +149,7 @@ static void ff_snow_horizontal_compose97i_sse2(IDWTELEM *b, IDWTELEM *temp, int 
         IDWTELEM * const src = b+w2;
 
         i = 0;
-        for(; (((x86_reg)&temp[i]) & 0x1F) && i<w_r; i++){
+        for(; (((ptrdiff_t)&temp[i]) & 0x1F) && i<w_r; i++){
             temp[i] = src[i] - ((-W_AM*(b[i] + b[i+1]))>>W_AS);
         }
         for(; i<w_r-7; i+=8){
@@ -438,7 +438,7 @@ static void ff_snow_horizontal_compose97i_mmx(IDWTELEM *b, IDWTELEM *temp, int w
         "movdqa %%"s3", %%"t3" \n\t"
 
 static void ff_snow_vertical_compose97i_sse2(IDWTELEM *b0, IDWTELEM *b1, IDWTELEM *b2, IDWTELEM *b3, IDWTELEM *b4, IDWTELEM *b5, int width){
-    x86_reg i = width;
+    ptrdiff_t i = width;
 
     while(i & 0x1F)
     {
@@ -536,7 +536,7 @@ static void ff_snow_vertical_compose97i_sse2(IDWTELEM *b0, IDWTELEM *b1, IDWTELE
 
 
 static void ff_snow_vertical_compose97i_mmx(IDWTELEM *b0, IDWTELEM *b1, IDWTELEM *b2, IDWTELEM *b3, IDWTELEM *b4, IDWTELEM *b5, int width){
-    x86_reg i = width;
+    ptrdiff_t i = width;
     while(i & 15)
     {
         i--;
@@ -608,7 +608,7 @@ static void ff_snow_vertical_compose97i_mmx(IDWTELEM *b0, IDWTELEM *b1, IDWTELEM
 #if HAVE_6REGS
 #define snow_inner_add_yblock_sse2_header \
     IDWTELEM * * dst_array = sb->line + src_y;\
-    x86_reg tmp;\
+    ptrdiff_t tmp;\
     __asm__ volatile(\
              "mov  %7, %%"FF_REG_c"          \n\t"\
              "mov  %6, %2                    \n\t"\
@@ -670,7 +670,7 @@ static void ff_snow_vertical_compose97i_mmx(IDWTELEM *b0, IDWTELEM *b1, IDWTELEM
              "jnz 1b                         \n\t"\
              :"+m"(dst8),"+m"(dst_array),"=&r"(tmp)\
              :\
-             "rm"((x86_reg)(src_x<<1)),"m"(obmc),"a"(block),"m"(b_h),"m"(src_stride):\
+             "rm"((ptrdiff_t)(src_x<<1)),"m"(obmc),"a"(block),"m"(b_h),"m"(src_stride):\
              XMM_CLOBBERS("%xmm0", "%xmm1", "%xmm2", "%xmm3", "%xmm4", "%xmm5", "%xmm6", "%xmm7", )\
              "%"FF_REG_c"","%"FF_REG_S"","%"FF_REG_D"","%"FF_REG_d"");
 
@@ -688,8 +688,8 @@ static void ff_snow_vertical_compose97i_mmx(IDWTELEM *b0, IDWTELEM *b1, IDWTELEM
              "dec %2                         \n\t"\
              snow_inner_add_yblock_sse2_end_common2
 
-static void inner_add_yblock_bw_8_obmc_16_bh_even_sse2(const uint8_t *obmc, const x86_reg obmc_stride, uint8_t * * block, int b_w, x86_reg b_h,
-                      int src_x, int src_y, x86_reg src_stride, slice_buffer * sb, int add, uint8_t * dst8){
+static void inner_add_yblock_bw_8_obmc_16_bh_even_sse2(const uint8_t *obmc, const ptrdiff_t obmc_stride, uint8_t * * block, int b_w, ptrdiff_t b_h,
+                      int src_x, int src_y, ptrdiff_t src_stride, slice_buffer * sb, int add, uint8_t * dst8){
 snow_inner_add_yblock_sse2_header
 snow_inner_add_yblock_sse2_start_8("xmm1", "xmm5", "3", "0")
 snow_inner_add_yblock_sse2_accum_8("2", "8")
@@ -736,8 +736,8 @@ snow_inner_add_yblock_sse2_accum_8("0", "136")
 snow_inner_add_yblock_sse2_end_8
 }
 
-static void inner_add_yblock_bw_16_obmc_32_sse2(const uint8_t *obmc, const x86_reg obmc_stride, uint8_t * * block, int b_w, x86_reg b_h,
-                      int src_x, int src_y, x86_reg src_stride, slice_buffer * sb, int add, uint8_t * dst8){
+static void inner_add_yblock_bw_16_obmc_32_sse2(const uint8_t *obmc, const ptrdiff_t obmc_stride, uint8_t * * block, int b_w, ptrdiff_t b_h,
+                      int src_x, int src_y, ptrdiff_t src_stride, slice_buffer * sb, int add, uint8_t * dst8){
 snow_inner_add_yblock_sse2_header
 snow_inner_add_yblock_sse2_start_16("xmm1", "xmm5", "3", "0")
 snow_inner_add_yblock_sse2_accum_16("2", "16")
@@ -762,7 +762,7 @@ snow_inner_add_yblock_sse2_end_16
 
 #define snow_inner_add_yblock_mmx_header \
     IDWTELEM * * dst_array = sb->line + src_y;\
-    x86_reg tmp;\
+    ptrdiff_t tmp;\
     __asm__ volatile(\
              "mov  %7, %%"FF_REG_c"          \n\t"\
              "mov  %6, %2                    \n\t"\
@@ -819,11 +819,11 @@ snow_inner_add_yblock_sse2_end_16
              "jnz 1b                         \n\t"\
              :"+m"(dst8),"+m"(dst_array),"=&r"(tmp)\
              :\
-             "rm"((x86_reg)(src_x<<1)),"m"(obmc),"a"(block),"m"(b_h),"m"(src_stride):\
+             "rm"((intptr_t)(src_x<<1)),"m"(obmc),"a"(block),"m"(b_h),"m"(src_stride):\
              "%"FF_REG_c"","%"FF_REG_S"","%"FF_REG_D"","%"FF_REG_d"");
 
-static void inner_add_yblock_bw_8_obmc_16_mmx(const uint8_t *obmc, const x86_reg obmc_stride, uint8_t * * block, int b_w, x86_reg b_h,
-                      int src_x, int src_y, x86_reg src_stride, slice_buffer * sb, int add, uint8_t * dst8){
+static void inner_add_yblock_bw_8_obmc_16_mmx(const uint8_t *obmc, const ptrdiff_t obmc_stride, uint8_t * * block, int b_w, ptrdiff_t b_h,
+                      int src_x, int src_y, ptrdiff_t src_stride, slice_buffer * sb, int add, uint8_t * dst8){
 snow_inner_add_yblock_mmx_header
 snow_inner_add_yblock_mmx_start("mm1", "mm5", "3", "0", "0")
 snow_inner_add_yblock_mmx_accum("2", "8", "0")
@@ -833,8 +833,8 @@ snow_inner_add_yblock_mmx_mix("0", "0")
 snow_inner_add_yblock_mmx_end("16")
 }
 
-static void inner_add_yblock_bw_16_obmc_32_mmx(const uint8_t *obmc, const x86_reg obmc_stride, uint8_t * * block, int b_w, x86_reg b_h,
-                      int src_x, int src_y, x86_reg src_stride, slice_buffer * sb, int add, uint8_t * dst8){
+static void inner_add_yblock_bw_16_obmc_32_mmx(const uint8_t *obmc, const ptrdiff_t obmc_stride, uint8_t * * block, int b_w, ptrdiff_t b_h,
+                      int src_x, int src_y, ptrdiff_t src_stride, slice_buffer * sb, int add, uint8_t * dst8){
 snow_inner_add_yblock_mmx_header
 snow_inner_add_yblock_mmx_start("mm1", "mm5", "3", "0", "0")
 snow_inner_add_yblock_mmx_accum("2", "16", "0")

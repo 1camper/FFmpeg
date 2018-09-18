@@ -103,7 +103,7 @@ static int RENAME(dct_quantize)(MpegEncContext *s,
                             int16_t *block, int n,
                             int qscale, int *overflow)
 {
-    x86_reg last_non_zero_p1;
+    intptr_t last_non_zero_p1;
     int level=0, q; //=0 is because gcc says uninitialized ...
     const uint16_t *qmat, *bias;
     LOCAL_ALIGNED_16(int16_t, temp_block, [64]);

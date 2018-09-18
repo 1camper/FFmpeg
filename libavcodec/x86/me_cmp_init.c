@@ -279,7 +279,7 @@ DECLARE_ASM_CONST(8, uint64_t, round_tab)[3] = {
 static inline void sad8_1_mmx(uint8_t *blk1, uint8_t *blk2,
                               ptrdiff_t stride, int h)
 {
-    x86_reg len = -stride * h;
+    ptrdiff_t len = -stride * h;
     __asm__ volatile (
         ".p2align 4                     \n\t"
         "1:                             \n\t"
@@ -315,7 +315,7 @@ static inline void sad8_1_mmx(uint8_t *blk1, uint8_t *blk2,
 static inline void sad8_2_mmx(uint8_t *blk1a, uint8_t *blk1b, uint8_t *blk2,
                               ptrdiff_t stride, int h)
 {
-    x86_reg len = -stride * h;
+    ptrdiff_t len = -stride * h;
     __asm__ volatile (
         ".p2align 4                     \n\t"
         "1:                             \n\t"
@@ -354,7 +354,7 @@ static inline void sad8_2_mmx(uint8_t *blk1a, uint8_t *blk1b, uint8_t *blk2,
 static inline void sad8_4_mmx(uint8_t *blk1, uint8_t *blk2,
                               ptrdiff_t stride, int h)
 {
-    x86_reg len = -stride * h;
+    ptrdiff_t len = -stride * h;
     __asm__ volatile (
         "movq  (%1, %%"FF_REG_a"), %%mm0\n\t"
         "movq 1(%1, %%"FF_REG_a"), %%mm2\n\t"
