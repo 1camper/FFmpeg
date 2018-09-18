@@ -38,6 +38,7 @@
 
 #elif HAVE_INLINE_ASM
 
+#if ARCH_X86_64_32 && CONFIG_PIC
 /* ebx saving is necessary for PIC. gcc seems unable to see it alone */
 #define cpuid(index, eax, ebx, ecx, edx)                        \
     __asm__ volatile (                                          \
@@ -46,6 +47,12 @@
         "xchg   %%"FF_REG_b", %%"FF_REG_S                       \
         : "=a" (eax), "=S" (ebx), "=c" (ecx), "=d" (edx)        \
         : "0" (index), "2"(0))
+#else
+#define cpuid(index, eax, ebx, ecx, edx)                        \
+    __asm__ volatile ("cpuid"                                   \
+        : "=a" (eax), "=b" (ebx), "=c" (ecx), "=d" (edx)        \
+        : "0" (index), "2"(0))
+#endif
 
 #define xgetbv(index, eax, edx)                                 \
     __asm__ (".byte 0x0f, 0x01, 0xd0" : "=a"(eax), "=d"(edx) : "c" (index))
