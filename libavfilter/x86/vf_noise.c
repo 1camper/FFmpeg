@@ -28,7 +28,7 @@
 static void line_noise_mmx(uint8_t *dst, const uint8_t *src,
                            const int8_t *noise, int len, int shift)
 {
-    x86_reg mmx_len= len & (~7);
+    intptr_t mmx_len= len & (~7);
     noise += shift;
 
     __asm__ volatile(
@@ -57,7 +57,7 @@ static void line_noise_mmx(uint8_t *dst, const uint8_t *src,
 static void line_noise_avg_mmx(uint8_t *dst, const uint8_t *src,
                                       int len, const int8_t * const *shift)
 {
-    x86_reg mmx_len = len & (~7);
+    intptr_t mmx_len = len & (~7);
 
     __asm__ volatile(
             "mov %5, %%"FF_REG_a"           \n\t"
@@ -100,7 +100,7 @@ static void line_noise_avg_mmx(uint8_t *dst, const uint8_t *src,
 static void line_noise_mmxext(uint8_t *dst, const uint8_t *src,
                               const int8_t *noise, int len, int shift)
 {
-    x86_reg mmx_len = len & (~7);
+    intptr_t mmx_len = len & (~7);
     noise += shift;
 
     __asm__ volatile(

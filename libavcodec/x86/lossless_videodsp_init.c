@@ -52,8 +52,8 @@ static void add_median_pred_cmov(uint8_t *dst, const uint8_t *top,
                                  const uint8_t *diff, ptrdiff_t w,
                                  int *left, int *left_top)
 {
-    x86_reg w2 = -w;
-    x86_reg x;
+    ptrdiff_t w2 = -w;
+    int *x;
     int l  = *left     & 0xff;
     int tl = *left_top & 0xff;
     int t;

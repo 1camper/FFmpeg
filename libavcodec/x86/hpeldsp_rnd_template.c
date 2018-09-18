@@ -56,7 +56,7 @@ av_unused static void DEF(put, pixels8_x2)(uint8_t *block, const uint8_t *pixels
         "subl   $4, %0                  \n\t"
         "jnz    1b                      \n\t"
         :"+g"(h), "+S"(pixels), "+D"(block)
-        :"r"((x86_reg)line_size)
+        :"r"(line_size)
         :FF_REG_a, "memory");
 }
 
@@ -102,7 +102,7 @@ av_unused static void DEF(put, pixels16_x2)(uint8_t *block, const uint8_t *pixel
         "subl   $4, %0                  \n\t"
         "jnz    1b                      \n\t"
         :"+g"(h), "+S"(pixels), "+D"(block)
-        :"r"((x86_reg)line_size)
+        :"r"(line_size)
         :FF_REG_a, "memory");
 }
 
@@ -131,7 +131,7 @@ av_unused static void DEF(put, pixels8_y2)(uint8_t *block, const uint8_t *pixels
         "subl   $4, %0                  \n\t"
         "jnz    1b                      \n\t"
         :"+g"(h), "+S"(pixels), "+D"(block)
-        :"r"((x86_reg)line_size)
+        :"r"(line_size)
         :FF_REG_a, "memory");
 }
 
@@ -158,7 +158,7 @@ av_unused static void DEF(avg, pixels16_x2)(uint8_t *block, const uint8_t *pixel
             "subl   $1, %0              \n\t"
             "jnz    1b                  \n\t"
             :"+g"(h), "+S"(pixels), "+D"(block)
-            :"r"((x86_reg)line_size)
+            :"r"(line_size)
             :"memory");
 }
 
@@ -197,6 +197,6 @@ av_unused static void DEF(avg, pixels8_y2)(uint8_t *block, const uint8_t *pixels
         "subl   $4, %0                  \n\t"
         "jnz    1b                      \n\t"
         :"+g"(h), "+S"(pixels), "+D"(block)
-        :"r"((x86_reg)line_size)
+        :"r"(line_size)
         :FF_REG_a, "memory");
 }

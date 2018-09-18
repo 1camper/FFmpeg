@@ -45,7 +45,7 @@ static void sub_median_pred_mmxext(uint8_t *dst, const uint8_t *src1,
                                    const uint8_t *src2, intptr_t w,
                                    int *left, int *left_top)
 {
-    x86_reg i = 0;
+    intptr_t i = 0;
     uint8_t l, lt;
 
     __asm__ volatile (
@@ -70,7 +70,7 @@ static void sub_median_pred_mmxext(uint8_t *dst, const uint8_t *src1,
         "cmp %4, %0                     \n\t"
         " jb 1b                         \n\t"
         : "+r" (i)
-        : "r" (src1), "r" (src2), "r" (dst), "r" ((x86_reg) w));
+        : "r" (src1), "r" (src2), "r" (dst), "r" (w));
 
     l  = *left;
     lt = *left_top;

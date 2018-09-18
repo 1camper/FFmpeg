@@ -164,7 +164,7 @@ static void cavs_idct8_add_sse2(uint8_t *dst, int16_t *block, ptrdiff_t stride)
         VOP(%%mm1, %%mm2, %%mm3, %%mm4, %%mm5, %%mm0, OP, ADD, MUL1, MUL2)\
         \
         : "+a"(src), "+c"(dst)\
-        : "S"((x86_reg)srcStride), "r"((x86_reg)dstStride)\
+        : "S"(srcStride), "r"(dstStride)\
           NAMED_CONSTRAINTS_ADD(ADD,MUL1,MUL2)\
         : "memory"\
      );\
@@ -180,7 +180,7 @@ static void cavs_idct8_add_sse2(uint8_t *dst, int16_t *block, ptrdiff_t stride)
             VOP(%%mm3, %%mm4, %%mm5, %%mm0, %%mm1, %%mm2, OP, ADD, MUL1, MUL2)\
             \
            : "+a"(src), "+c"(dst)\
-           : "S"((x86_reg)srcStride), "r"((x86_reg)dstStride)\
+           : "S"(srcStride), "r"(dstStride)\
              NAMED_CONSTRAINTS_ADD(ADD,MUL1,MUL2)\
            : "memory"\
         );\
@@ -233,7 +233,7 @@ static void OPNAME ## cavs_qpel8_h_ ## MMX(uint8_t *dst, const uint8_t *src, ptr
         "decl %2                    \n\t"\
         " jnz 1b                    \n\t"\
         : "+a"(src), "+c"(dst), "+m"(h)\
-        : "d"((x86_reg)srcStride), "S"((x86_reg)dstStride)\
+        : "d"(srcStride), "S"(dstStride)\
           NAMED_CONSTRAINTS_ADD(ff_pw_4,ff_pw_5)\
         : "memory"\
     );\

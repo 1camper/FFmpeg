@@ -256,7 +256,7 @@ static void yuv2yuvX_sse3(const int16_t *filter, int filterSize,
             "por       %%xmm4, %%xmm3  \n\t"
             MAIN_FUNCTION
               :: "g" (filter),
-              "r" (dest-offset), "g" ((x86_reg)(dstW+offset)), "m" (offset),
+              "r" (dest-offset), "g" ((intptr_t)(dstW+offset)), "m" (offset),
               "m"(filterSize), "m"(((uint64_t *) dither)[0])
               : XMM_CLOBBERS("%xmm0" , "%xmm1" , "%xmm2" , "%xmm3" , "%xmm4" , "%xmm5" , "%xmm7" ,)
                 "%"FF_REG_d, "%"FF_REG_S, "%"FF_REG_c
@@ -266,7 +266,7 @@ static void yuv2yuvX_sse3(const int16_t *filter, int filterSize,
             "movq          %5, %%xmm3   \n\t"
             MAIN_FUNCTION
               :: "g" (filter),
-              "r" (dest-offset), "g" ((x86_reg)(dstW+offset)), "m" (offset),
+              "r" (dest-offset), "g" ((intptr_t)(dstW+offset)), "m" (offset),
               "m"(filterSize), "m"(((uint64_t *) dither)[0])
               : XMM_CLOBBERS("%xmm0" , "%xmm1" , "%xmm2" , "%xmm3" , "%xmm4" , "%xmm5" , "%xmm7" ,)
                 "%"FF_REG_d, "%"FF_REG_S, "%"FF_REG_c

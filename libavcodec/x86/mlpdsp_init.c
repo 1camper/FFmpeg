@@ -134,8 +134,8 @@ static void mlp_filter_channel_x86(int32_t *state, const int32_t *coeff,
                                    unsigned int filter_shift, int32_t mask,
                                    int blocksize, int32_t *sample_buffer)
 {
-    const void *firjump = firtable[firorder];
-    const void *iirjump = iirtable[iirorder];
+    x86_reg firjump = (uintptr_t)firtable[firorder];
+    x86_reg iirjump = (uintptr_t)iirtable[iirorder];
 
     blocksize = -blocksize;
 

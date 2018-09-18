@@ -126,7 +126,7 @@ static void draw_edges_mmx(uint8_t *buf, int wrap, int width, int height,
             "cmp               %3, %0       \n\t"
             "jb                1b           \n\t"
             : "+r" (ptr)
-            : "r" ((x86_reg) wrap), "r" ((x86_reg) width),
+            : "r" ((intptr_t) wrap), "r" ((intptr_t) width),
               "r" (ptr + wrap * height));
     } else if (w == 16) {
         __asm__ volatile (
@@ -147,7 +147,7 @@ static void draw_edges_mmx(uint8_t *buf, int wrap, int width, int height,
             "cmp               %3, %0           \n\t"
             "jb                1b               \n\t"
             : "+r"(ptr)
-            : "r"((x86_reg)wrap), "r"((x86_reg)width), "r"(ptr + wrap * height)
+            : "r"((intptr_t)wrap), "r"((intptr_t)width), "r"(ptr + wrap * height)
             );
     } else {
         av_assert1(w == 4);
@@ -166,7 +166,7 @@ static void draw_edges_mmx(uint8_t *buf, int wrap, int width, int height,
             "cmp               %3, %0       \n\t"
             "jb                1b           \n\t"
             : "+r" (ptr)
-            : "r" ((x86_reg) wrap), "r" ((x86_reg) width),
+            : "r" ((intptr_t) wrap), "r" ((intptr_t) width),
               "r" (ptr + wrap * height));
     }
 
@@ -185,8 +185,8 @@ static void draw_edges_mmx(uint8_t *buf, int wrap, int width, int height,
                 "cmp        %4, %0              \n\t"
                 "jb         1b                  \n\t"
                 : "+r" (ptr)
-                : "r" ((x86_reg) buf - (x86_reg) ptr - w),
-                  "r" ((x86_reg) - wrap), "r" ((x86_reg) - wrap * 3),
+                : "r" ((intptr_t) buf - (intptr_t) ptr - w),
+                  "r" ((intptr_t) - wrap), "r" ((intptr_t) - wrap * 3),
                   "r" (ptr + width + 2 * w));
         }
     }
@@ -205,8 +205,8 @@ static void draw_edges_mmx(uint8_t *buf, int wrap, int width, int height,
                 "cmp        %4, %0              \n\t"
                 "jb         1b                  \n\t"
                 : "+r" (ptr)
-                : "r" ((x86_reg) last_line - (x86_reg) ptr - w),
-                  "r" ((x86_reg) wrap), "r" ((x86_reg) wrap * 3),
+                : "r" ((intptr_t) last_line - (intptr_t) ptr - w),
+                  "r" ((intptr_t) wrap), "r" ((intptr_t) wrap * 3),
                   "r" (ptr + width + 2 * w));
         }
     }

@@ -93,7 +93,7 @@ av_unused STATIC void DEF(put, pixels8_xy2)(uint8_t *block, const uint8_t *pixel
         "subl   $2, %0                  \n\t"
         "jnz    1b                      \n\t"
         :"+g"(h), "+S"(pixels)
-        :"D"(block), "r"((x86_reg)line_size)
+        :"D"(block), "r"(line_size)
         :FF_REG_a, "memory");
 }
 
@@ -170,6 +170,6 @@ av_unused STATIC void DEF(avg, pixels8_xy2)(uint8_t *block, const uint8_t *pixel
         "subl   $2, %0                  \n\t"
         "jnz    1b                      \n\t"
         :"+g"(h), "+S"(pixels)
-        :"D"(block), "r"((x86_reg)line_size)
+        :"D"(block), "r"(line_size)
         :FF_REG_a, "memory");
 }

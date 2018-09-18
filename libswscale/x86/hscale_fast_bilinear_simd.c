@@ -31,13 +31,13 @@ av_cold int ff_init_hscaler_mmxext(int dstW, int xInc, uint8_t *filterCode,
                                        int numSplits)
 {
     uint8_t *fragmentA;
-    x86_reg imm8OfPShufW1A;
-    x86_reg imm8OfPShufW2A;
-    x86_reg fragmentLengthA;
+    intptr_t imm8OfPShufW1A;
+    intptr_t imm8OfPShufW2A;
+    intptr_t fragmentLengthA;
     uint8_t *fragmentB;
-    x86_reg imm8OfPShufW1B;
-    x86_reg imm8OfPShufW2B;
-    x86_reg fragmentLengthB;
+    intptr_t imm8OfPShufW1B;
+    intptr_t imm8OfPShufW2B;
+    intptr_t fragmentLengthB;
     int fragmentPos;
 
     int xpos, i;
@@ -140,9 +140,9 @@ av_cold int ff_init_hscaler_mmxext(int dstW, int xInc, uint8_t *filterCode,
             int d                  = ((xpos + xInc * 3) >> 16) - xx;
             int inc                = (d + 1 < 4);
             uint8_t *fragment      = inc ? fragmentB : fragmentA;
-            x86_reg imm8OfPShufW1  = inc ? imm8OfPShufW1B : imm8OfPShufW1A;
-            x86_reg imm8OfPShufW2  = inc ? imm8OfPShufW2B : imm8OfPShufW2A;
-            x86_reg fragmentLength = inc ? fragmentLengthB : fragmentLengthA;
+            intptr_t imm8OfPShufW1  = inc ? imm8OfPShufW1B : imm8OfPShufW1A;
+            intptr_t imm8OfPShufW2  = inc ? imm8OfPShufW2B : imm8OfPShufW2A;
+            intptr_t fragmentLength = inc ? fragmentLengthB : fragmentLengthA;
             int maxShift           = 3 - (d + inc);
             int shift              = 0;
 
