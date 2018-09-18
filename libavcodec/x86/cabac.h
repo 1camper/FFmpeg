@@ -56,11 +56,16 @@
 #define BRANCHLESS_GET_CABAC_UPDATE(ret, retq, low, range, tmp) \
         "cmp    "low"       , "tmp"                        \n\t"\
         "cmova  %%ecx       , "range"                      \n\t"\
-        "sbb    %%rcx       , %%rcx                        \n\t"\
+        "sbb    %%"FF_REG_c", %%"FF_REG_c"                 \n\t"\
         "and    %%ecx       , "tmp"                        \n\t"\
-        "xor    %%rcx       , "retq"                       \n\t"\
+        "xor    %%"FF_REG_c", "retq"                       \n\t"\
         "sub    "tmp"       , "low"                        \n\t"
 #else /* HAVE_FAST_CMOV */
+#if ARCH_X86_X64
+#define BRANCHLESS_GET_CABAC_UPDATE_SLOW_CMOV_RET_SIGN_EXTEND  "movslq "ret" , "retq" \n\t"
+#else
+#define BRANCHLESS_GET_CABAC_UPDATE_SLOW_CMOV_RET_SIGN_EXTEND
+#endif
 #define BRANCHLESS_GET_CABAC_UPDATE(ret, retq, low, range, tmp) \
 /* P4 Prescott has crappy cmov,sbb,64-bit shift so avoid them */ \
         "sub    "low"       , "tmp"                        \n\t"\
@@ -72,7 +77,7 @@
         "and    "tmp"       , %%ecx                        \n\t"\
         "sub    %%ecx       , "low"                        \n\t"\
         "xor    "tmp"       , "ret"                        \n\t"\
-        "movslq "ret"       , "retq"                       \n\t"
+        BRANCHLESS_GET_CABAC_UPDATE_SLOW_CMOV_RET_SIGN_EXTEND
 #endif /* HAVE_FAST_CMOV */
 
 #define BRANCHLESS_GET_CABAC(ret, retq, statep, low, lowword, range, rangeq, tmp, tmpbyte, byte, end, norm_off, lps_off, mlps_off, tables) \
@@ -80,7 +85,7 @@
         "mov    "range"     , "tmp"                                     \n\t"\
         "and    $0xC0       , "range"                                   \n\t"\
         "lea    ("ret", "range", 2), %%ecx                              \n\t"\
-        "movzbl "lps_off"("tables", %%rcx), "range"                     \n\t"\
+        "movzbl "lps_off"("tables", %%"FF_REG_c"), "range"              \n\t"\
         "sub    "range"     , "tmp"                                     \n\t"\
         "mov    "tmp"       , %%ecx                                     \n\t"\
         "shl    $17         , "tmp"                                     \n\t"\
@@ -102,7 +107,7 @@
         "shr    $15         , %%ecx                                     \n\t"\
         "bswap  "tmp"                                                   \n\t"\
         "shr    $15         , "tmp"                                     \n\t"\
-        "movzbl "norm_off"("tables", %%rcx), %%ecx                      \n\t"\
+        "movzbl "norm_off"("tables", %%"FF_REG_c"), %%ecx               \n\t"\
         "sub    $0xFFFF     , "tmp"                                     \n\t"\
         "neg    %%ecx                                                   \n\t"\
         "add    $7          , %%ecx                                     \n\t"\
@@ -190,8 +195,8 @@ static av_always_inline int get_cabac_inline_x86(CABACContext *c,
 #endif
 
     __asm__ volatile(
-        BRANCHLESS_GET_CABAC("%0", "%q0", "(%4)", "%1", "%w1",
-                             "%2", "%q2", "%3", "%b3",
+        BRANCHLESS_GET_CABAC("%0", "%"FF_PTROP"0", "(%4)", "%1", "%w1",
+                             "%2", "%"FF_PTROP"2", "%3", "%b3",
                              "%c6(%5)", "%c7(%5)",
                              AV_STRINGIFY(H264_NORM_SHIFT_OFFSET),
                              AV_STRINGIFY(H264_LPS_RANGE_OFFSET),
@@ -213,7 +218,7 @@ static av_always_inline int get_cabac_inline_x86(CABACContext *c,
 #define get_cabac_bypass_sign get_cabac_bypass_sign_x86
 static av_always_inline int get_cabac_bypass_sign_x86(CABACContext *c, int val)
 {
-    x86_reg tmp;
+    intptr_t tmp;
     __asm__ volatile(
         "movl        %c6(%2), %k1       \n\t"
         "movl        %c3(%2), %%eax     \n\t"
@@ -259,7 +264,7 @@ static av_always_inline int get_cabac_bypass_sign_x86(CABACContext *c, int val)
 #define get_cabac_bypass get_cabac_bypass_x86
 static av_always_inline int get_cabac_bypass_x86(CABACContext *c)
 {
-    x86_reg tmp;
+    intptr_t tmp;
     int res;
     __asm__ volatile(
         "movl        %c6(%2), %k1       \n\t"
