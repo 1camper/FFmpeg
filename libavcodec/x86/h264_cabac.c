@@ -45,12 +45,12 @@
 #define decode_significance decode_significance_x86
 static int decode_significance_x86(CABACContext *c, int max_coeff,
                                    uint8_t *significant_coeff_ctx_base,
-                                   int *index, x86_reg last_off){
+                                   int *index, intptr_t last_off){
     void *end= significant_coeff_ctx_base + max_coeff - 1;
     int minusstart= -(intptr_t)significant_coeff_ctx_base;
     int minusindex= 4-(intptr_t)index;
     int bit;
-    x86_reg coeff_count;
+    int coeff_count;
 
 #ifdef BROKEN_RELOCATIONS
     void *tables;
@@ -65,8 +65,8 @@ static int decode_significance_x86(CABACContext *c, int max_coeff,
     __asm__ volatile(
         "3:                                     \n\t"
 
-        BRANCHLESS_GET_CABAC("%4", "%q4", "(%1)", "%3", "%w3",
-                             "%5", "%q5", "%k0", "%b0",
+        BRANCHLESS_GET_CABAC("%4", "%"FF_PTROP"4", "(%1)", "%3", "%w3",
+                             "%5", "%"FF_PTROP"5", "%k0", "%b0",
                              "%c11(%6)", "%c12(%6)",
                              AV_STRINGIFY(H264_NORM_SHIFT_OFFSET),
                              AV_STRINGIFY(H264_LPS_RANGE_OFFSET),
@@ -77,8 +77,8 @@ static int decode_significance_x86(CABACContext *c, int max_coeff,
         " jz 4f                                 \n\t"
         "add  %10, %1                           \n\t"
 
-        BRANCHLESS_GET_CABAC("%4", "%q4", "(%1)", "%3", "%w3",
-                             "%5", "%q5", "%k0", "%b0",
+        BRANCHLESS_GET_CABAC("%4", "%"FF_PTROP"4", "(%1)", "%3", "%w3",
+                             "%5", "%"FF_PTROP"5", "%k0", "%b0",
                              "%c11(%6)", "%c12(%6)",
                              AV_STRINGIFY(H264_NORM_SHIFT_OFFSET),
                              AV_STRINGIFY(H264_LPS_RANGE_OFFSET),
@@ -124,9 +124,9 @@ static int decode_significance_8x8_x86(CABACContext *c,
                                        int *index, uint8_t *last_coeff_ctx_base, const uint8_t *sig_off){
     int minusindex= 4-(intptr_t)index;
     int bit;
-    x86_reg coeff_count;
-    x86_reg last=0;
-    x86_reg state;
+    intptr_t coeff_count;
+    intptr_t last=0;
+    intptr_t state;
 
 #ifdef BROKEN_RELOCATIONS
     void *tables;
@@ -146,8 +146,8 @@ static int decode_significance_8x8_x86(CABACContext *c,
         "movzb (%0, %6), %6                     \n\t"
         "add %9, %6                             \n\t"
 
-        BRANCHLESS_GET_CABAC("%4", "%q4", "(%6)", "%3", "%w3",
-                             "%5", "%q5", "%k0", "%b0",
+        BRANCHLESS_GET_CABAC("%4", "%"FF_PTROP"4", "(%6)", "%3", "%w3",
+                             "%5", "%"FF_PTROP"5", "%k0", "%b0",
                              "%c12(%7)", "%c13(%7)",
                              AV_STRINGIFY(H264_NORM_SHIFT_OFFSET),
                              AV_STRINGIFY(H264_LPS_RANGE_OFFSET),
@@ -159,14 +159,14 @@ static int decode_significance_8x8_x86(CABACContext *c,
         " jz 4f                                 \n\t"
 
 #ifdef BROKEN_RELOCATIONS
-        "movzb %c14(%15, %q6), %6\n\t"
+        "movzb %c14(%15, %"FF_PTROP"6), %6\n\t"
 #else
         "movzb "MANGLE(ff_h264_cabac_tables)"+%c14(%6), %6\n\t"
 #endif
         "add %11, %6                            \n\t"
 
-        BRANCHLESS_GET_CABAC("%4", "%q4", "(%6)", "%3", "%w3",
-                             "%5", "%q5", "%k0", "%b0",
+        BRANCHLESS_GET_CABAC("%4", "%"FF_PTROP"4", "(%6)", "%3", "%w3",
+                             "%5", "%"FF_PTROP"5", "%k0", "%b0",
                              "%c12(%7)", "%c13(%7)",
                              AV_STRINGIFY(H264_NORM_SHIFT_OFFSET),
                              AV_STRINGIFY(H264_LPS_RANGE_OFFSET),
