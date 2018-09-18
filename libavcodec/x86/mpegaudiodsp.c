@@ -67,7 +67,7 @@ DECLARE_ALIGNED(16, static float, mdct_win_sse)[2][4][4*40];
 static void apply_window(const float *buf, const float *win1,
                          const float *win2, float *sum1, float *sum2, int len)
 {
-    x86_reg count = - 4*len;
+    intptr_t count = - 4*len;
     const float *win1a = win1+len;
     const float *win2a = win2+len;
     const float *bufa  = buf+len;

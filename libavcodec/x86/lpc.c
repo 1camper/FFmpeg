@@ -36,8 +36,8 @@ static void lpc_apply_welch_window_sse2(const int32_t *data, int len,
 {
     double c = 2.0 / (len-1.0);
     int n2 = len>>1;
-    x86_reg i = -n2*sizeof(int32_t);
-    x86_reg j =  n2*sizeof(int32_t);
+    intptr_t i = -n2*sizeof(int32_t);
+    intptr_t j =  n2*sizeof(int32_t);
     __asm__ volatile(
         "movsd   %4,     %%xmm7                \n\t"
         "movapd  "MANGLE(pd_1)", %%xmm6        \n\t"
@@ -84,11 +84,11 @@ static void lpc_compute_autocorr_sse2(const double *data, int len, int lag,
 {
     int j;
 
-    if((x86_reg)data & 15)
+    if((intptr_t)data & 15)
         data++;
 
     for(j=0; j<lag; j+=2){
-        x86_reg i = -len*sizeof(double);
+        intptr_t i = -len*sizeof(double);
         if(j == lag-2) {
             __asm__ volatile(
                 "movsd    "MANGLE(pd_1)", %%xmm0    \n\t"

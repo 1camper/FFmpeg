@@ -115,7 +115,7 @@ static void RENAME(yuv2yuvX)(const int16_t *filter, int filterSize,
         "mov                        (%%"FF_REG_d"), %%"FF_REG_S"  \n\t"\
         "jb                                  1b                   \n\t"\
         :: "g" (filter),
-           "r" (dest-offset), "g" ((x86_reg)(dstW+offset)), "m" (offset)
+           "r" (dest-offset), "g" ((intptr_t)(dstW+offset)), "m" (offset)
         : "%"FF_REG_d, "%"FF_REG_S, "%"FF_REG_c
     );
 }
@@ -344,9 +344,9 @@ static void RENAME(yuv2rgb32_X_ar)(SwsContext *c, const int16_t *lumFilter,
                                    int chrFilterSize, const int16_t **alpSrc,
                                    uint8_t *dest, int dstW, int dstY)
 {
-    x86_reg dummy=0;
-    x86_reg dstW_reg = dstW;
-    x86_reg uv_off = c->uv_offx2;
+    intptr_t dummy=0;
+    intptr_t dstW_reg = dstW;
+    intptr_t uv_off = c->uv_offx2;
 
     if (CONFIG_SWSCALE_ALPHA && c->needAlpha) {
         YSCALEYUV2PACKEDX_ACCURATE
@@ -377,9 +377,9 @@ static void RENAME(yuv2rgb32_X)(SwsContext *c, const int16_t *lumFilter,
                                 int chrFilterSize, const int16_t **alpSrc,
                                 uint8_t *dest, int dstW, int dstY)
 {
-    x86_reg dummy=0;
-    x86_reg dstW_reg = dstW;
-    x86_reg uv_off = c->uv_offx2;
+    intptr_t dummy=0;
+    intptr_t dstW_reg = dstW;
+    intptr_t uv_off = c->uv_offx2;
 
     if (CONFIG_SWSCALE_ALPHA && c->needAlpha) {
         YSCALEYUV2PACKEDX
@@ -406,9 +406,9 @@ static void RENAME(yuv2bgr32_X)(SwsContext *c, const int16_t *lumFilter,
                                 int chrFilterSize, const int16_t **alpSrc,
                                 uint8_t *dest, int dstW, int dstY)
 {
-    x86_reg dummy=0;
-    x86_reg dstW_reg = dstW;
-    x86_reg uv_off = c->uv_offx2;
+    intptr_t dummy=0;
+    intptr_t dstW_reg = dstW;
+    intptr_t uv_off = c->uv_offx2;
 
     if (CONFIG_SWSCALE_ALPHA && c->needAlpha) {
         YSCALEYUV2PACKEDX
@@ -463,9 +463,9 @@ static void RENAME(yuv2rgb565_X_ar)(SwsContext *c, const int16_t *lumFilter,
                                     int chrFilterSize, const int16_t **alpSrc,
                                     uint8_t *dest, int dstW, int dstY)
 {
-    x86_reg dummy=0;
-    x86_reg dstW_reg = dstW;
-    x86_reg uv_off = c->uv_offx2;
+    intptr_t dummy=0;
+    intptr_t dstW_reg = dstW;
+    intptr_t uv_off = c->uv_offx2;
 
     YSCALEYUV2PACKEDX_ACCURATE
     YSCALEYUV2RGBX
@@ -487,9 +487,9 @@ static void RENAME(yuv2rgb565_X)(SwsContext *c, const int16_t *lumFilter,
                                  int chrFilterSize, const int16_t **alpSrc,
                                  uint8_t *dest, int dstW, int dstY)
 {
-    x86_reg dummy=0;
-    x86_reg dstW_reg = dstW;
-    x86_reg uv_off = c->uv_offx2;
+    intptr_t dummy=0;
+    intptr_t dstW_reg = dstW;
+    intptr_t uv_off = c->uv_offx2;
 
     YSCALEYUV2PACKEDX
     YSCALEYUV2RGBX
@@ -540,9 +540,9 @@ static void RENAME(yuv2rgb555_X_ar)(SwsContext *c, const int16_t *lumFilter,
                                     int chrFilterSize, const int16_t **alpSrc,
                                     uint8_t *dest, int dstW, int dstY)
 {
-    x86_reg dummy=0;
-    x86_reg dstW_reg = dstW;
-    x86_reg uv_off = c->uv_offx2;
+    intptr_t dummy=0;
+    intptr_t dstW_reg = dstW;
+    intptr_t uv_off = c->uv_offx2;
 
     YSCALEYUV2PACKEDX_ACCURATE
     YSCALEYUV2RGBX
@@ -564,9 +564,9 @@ static void RENAME(yuv2rgb555_X)(SwsContext *c, const int16_t *lumFilter,
                                  int chrFilterSize, const int16_t **alpSrc,
                                  uint8_t *dest, int dstW, int dstY)
 {
-    x86_reg dummy=0;
-    x86_reg dstW_reg = dstW;
-    x86_reg uv_off = c->uv_offx2;
+    intptr_t dummy=0;
+    intptr_t dstW_reg = dstW;
+    intptr_t uv_off = c->uv_offx2;
 
     YSCALEYUV2PACKEDX
     YSCALEYUV2RGBX
@@ -698,9 +698,9 @@ static void RENAME(yuv2bgr24_X_ar)(SwsContext *c, const int16_t *lumFilter,
                                    int chrFilterSize, const int16_t **alpSrc,
                                    uint8_t *dest, int dstW, int dstY)
 {
-    x86_reg dummy=0;
-    x86_reg dstW_reg = dstW;
-    x86_reg uv_off = c->uv_offx2;
+    intptr_t dummy=0;
+    intptr_t dstW_reg = dstW;
+    intptr_t uv_off = c->uv_offx2;
 
     YSCALEYUV2PACKEDX_ACCURATE
     YSCALEYUV2RGBX
@@ -723,9 +723,9 @@ static void RENAME(yuv2bgr24_X)(SwsContext *c, const int16_t *lumFilter,
                                 int chrFilterSize, const int16_t **alpSrc,
                                 uint8_t *dest, int dstW, int dstY)
 {
-    x86_reg dummy=0;
-    x86_reg dstW_reg = dstW;
-    x86_reg uv_off = c->uv_offx2;
+    intptr_t dummy=0;
+    intptr_t dstW_reg = dstW;
+    intptr_t uv_off = c->uv_offx2;
 
     YSCALEYUV2PACKEDX
     YSCALEYUV2RGBX
@@ -766,9 +766,9 @@ static void RENAME(yuv2yuyv422_X_ar)(SwsContext *c, const int16_t *lumFilter,
                                      int chrFilterSize, const int16_t **alpSrc,
                                      uint8_t *dest, int dstW, int dstY)
 {
-    x86_reg dummy=0;
-    x86_reg dstW_reg = dstW;
-    x86_reg uv_off = c->uv_offx2;
+    intptr_t dummy=0;
+    intptr_t dstW_reg = dstW;
+    intptr_t uv_off = c->uv_offx2;
 
     YSCALEYUV2PACKEDX_ACCURATE
     /* mm2=B, %%mm4=G, %%mm5=R, %%mm7=0 */
@@ -787,9 +787,9 @@ static void RENAME(yuv2yuyv422_X)(SwsContext *c, const int16_t *lumFilter,
                                   int chrFilterSize, const int16_t **alpSrc,
                                   uint8_t *dest, int dstW, int dstY)
 {
-    x86_reg dummy=0;
-    x86_reg dstW_reg = dstW;
-    x86_reg uv_off = c->uv_offx2;
+    intptr_t dummy=0;
+    intptr_t dstW_reg = dstW;
+    intptr_t uv_off = c->uv_offx2;
 
     YSCALEYUV2PACKEDX
     /* mm2=B, %%mm4=G, %%mm5=R, %%mm7=0 */
@@ -893,12 +893,12 @@ static void RENAME(yuv2rgb32_2)(SwsContext *c, const int16_t *buf[2],
         const int16_t *abuf0 = abuf[0], *abuf1 = abuf[1];
 #if ARCH_X86_64
         __asm__ volatile(
-            YSCALEYUV2RGB(%%r8, %5)
-            YSCALEYUV2RGB_YA(%%r8, %5, %6, %7)
+            YSCALEYUV2RGB(%%FF_REG8, %5)
+            YSCALEYUV2RGB_YA(%%FF_REG8, %5, %6, %7)
             "psraw                  $3, %%mm1       \n\t" /* abuf0[eax] - abuf1[eax] >>7*/
             "psraw                  $3, %%mm7       \n\t" /* abuf0[eax] - abuf1[eax] >>7*/
             "packuswb            %%mm7, %%mm1       \n\t"
-            WRITEBGR32(%4, DSTW_OFFSET"(%5)", %%r8, %%mm2, %%mm4, %%mm5, %%mm1, %%mm0, %%mm7, %%mm3, %%mm6)
+            WRITEBGR32(%4, DSTW_OFFSET"(%5)", %%FF_REG8, %%mm2, %%mm4, %%mm5, %%mm1, %%mm0, %%mm7, %%mm3, %%mm6)
             :: "c" (buf0), "d" (buf1), "S" (ubuf0), "D" (ubuf1), "r" (dest),
                "a" (&c->redDither),
                "r" (abuf0), "r" (abuf1)

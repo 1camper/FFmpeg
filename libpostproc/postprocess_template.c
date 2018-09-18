@@ -206,7 +206,7 @@ static inline int RENAME(vertClassify)(const uint8_t src[], int stride, PPContex
         "movd %%mm4, %1                         \n\t"
 
         : "=r" (numEq), "=r" (dcOk)
-        : "r" (src), "r" ((x86_reg)stride), "m" (c->pQPb)
+        : "r" (src), "r" ((intptr_t)stride), "m" (c->pQPb)
         : "%"FF_REG_a
         );
 
@@ -351,7 +351,7 @@ static inline void RENAME(doVertLowPass)(uint8_t *src, int stride, PPContext *c)
         "sub %1, %0                             \n\t"
 
         :
-        : "r" (src), "r" ((x86_reg)stride), "m" (c->pQPb)
+        : "r" (src), "r" ((intptr_t)stride), "m" (c->pQPb)
         : "%"FF_REG_a, "%"FF_REG_c
     );
 #else //TEMPLATE_PP_MMXEXT || TEMPLATE_PP_3DNOW
@@ -489,7 +489,7 @@ static inline void RENAME(vertX1Filter)(uint8_t *src, int stride, PPContext *co)
         "movq %%mm0, (%%"FF_REG_c", %1, 2)      \n\t" // line 7
 
         :
-        : "r" (src), "r" ((x86_reg)stride), "m" (co->pQPb)
+        : "r" (src), "r" ((intptr_t)stride), "m" (co->pQPb)
           NAMED_CONSTRAINTS_ADD(b01)
         : "%"FF_REG_a, "%"FF_REG_c
     );
@@ -755,7 +755,7 @@ static inline void RENAME(doVertDefFilter)(uint8_t src[], int stride, PPContext 
         "movq %%mm2, (%0, %1, 4)                \n\t"
 
         :
-        : "r" (src), "r" ((x86_reg)stride), "m" (c->pQPb)
+        : "r" (src), "r" ((intptr_t)stride), "m" (c->pQPb)
           NAMED_CONSTRAINTS_ADD(b80,b00,b01)
         : "%"FF_REG_a, "%"FF_REG_c
     );
@@ -1043,7 +1043,7 @@ static inline void RENAME(doVertDefFilter)(uint8_t src[], int stride, PPContext 
         "movq %%mm0, (%0, %1)                   \n\t"
 
         : "+r" (src)
-        : "r" ((x86_reg)stride), "m" (c->pQPb), "r"(tmp)
+        : "r" ((intptr_t)stride), "m" (c->pQPb), "r"(tmp)
           NAMED_CONSTRAINTS_ADD(w05,w20)
         : "%"FF_REG_a
     );
@@ -1315,7 +1315,7 @@ DERING_CORE((%%FF_REGd, %1, 2),(%0, %1, 8)       ,%%mm0,%%mm2,%%mm4,%%mm1,%%mm3,
 DERING_CORE((%0, %1, 8)       ,(%%FF_REGd, %1, 4),%%mm2,%%mm4,%%mm0,%%mm3,%%mm5,%%mm1,%%mm6,%%mm7)
 
         "1:                        \n\t"
-        : : "r" (src), "r" ((x86_reg)stride), "m" (c->pQPb), "m"(c->pQPb2), "q"(tmp)
+        : : "r" (src), "r" ((intptr_t)stride), "m" (c->pQPb), "m"(c->pQPb2), "q"((x86_reg)tmp)
           NAMED_CONSTRAINTS_ADD(deringThreshold,b00,b02,b08)
         : "%"FF_REG_a, "%"FF_REG_d, "%"FF_REG_sp
     );
@@ -1471,7 +1471,7 @@ static inline void RENAME(deInterlaceInterpolateLinear)(uint8_t src[], int strid
         PAVGB(%%mm0, %%mm1)
         "movq %%mm1, (%%"FF_REG_c", %1, 2)      \n\t"
 
-        : : "r" (src), "r" ((x86_reg)stride)
+        : : "r" (src), "r" ((intptr_t)stride)
         : "%"FF_REG_a, "%"FF_REG_c
     );
 #else
@@ -1559,7 +1559,7 @@ DEINT_CUBIC((%%FF_REGa, %1), (%0, %1, 4)    , (%%FF_REGd)       , (%%FF_REGd, %1
 DEINT_CUBIC((%0, %1, 4)    , (%%FF_REGd, %1), (%%FF_REGd, %1, 2), (%0, %1, 8)    , (%%FF_REGc))
 DEINT_CUBIC((%%FF_REGd, %1), (%0, %1, 8)    , (%%FF_REGd, %1, 4), (%%FF_REGc)    , (%%FF_REGc, %1, 2))
 
-        : : "r" (src), "r" ((x86_reg)stride)
+        : : "r" (src), "r" ((intptr_t)stride)
         :
 #if TEMPLATE_PP_SSE2
         XMM_CLOBBERS("%xmm0", "%xmm1", "%xmm2", "%xmm3", "%xmm7",)
@@ -1635,7 +1635,7 @@ DEINT_FF((%0, %1, 4)    , (%%FF_REGd)       , (%%FF_REGd, %1), (%%FF_REGd, %1, 2
 DEINT_FF((%%FF_REGd, %1), (%%FF_REGd, %1, 2), (%0, %1, 8)    , (%%FF_REGd, %1, 4))
 
         "movq %%mm0, (%2)                       \n\t"
-        : : "r" (src), "r" ((x86_reg)stride), "r"(tmp)
+        : : "r" (src), "r" ((intptr_t)stride), "r"(tmp)
         : "%"FF_REG_a, "%"FF_REG_d
     );
 #else //TEMPLATE_PP_MMXEXT || TEMPLATE_PP_3DNOW
@@ -1725,7 +1725,7 @@ DEINT_L5(%%mm1, %%mm0, (%%FF_REGd, %1, 2), (%0, %1, 8)       , (%%FF_REGd, %1, 4
 
         "movq %%mm0, (%2)                       \n\t"
         "movq %%mm1, (%3)                       \n\t"
-        : : "r" (src), "r" ((x86_reg)stride), "r"(tmp), "r"(tmp2)
+        : : "r" (src), "r" ((intptr_t)stride), "r"(tmp), "r"(tmp2)
         : "%"FF_REG_a, "%"FF_REG_d
     );
 #else //(TEMPLATE_PP_MMXEXT || TEMPLATE_PP_3DNOW) && HAVE_6REGS
@@ -1813,7 +1813,7 @@ static inline void RENAME(deInterlaceBlendLinear)(uint8_t src[], int stride, uin
         "movq %%mm2, (%%"FF_REG_d", %1, 2)      \n\t"
         "movq %%mm1, (%2)                       \n\t"
 
-        : : "r" (src), "r" ((x86_reg)stride), "r" (tmp)
+        : : "r" (src), "r" ((intptr_t)stride), "r" (tmp)
         : "%"FF_REG_a, "%"FF_REG_d
     );
 #else //TEMPLATE_PP_MMXEXT || TEMPLATE_PP_3DNOW
@@ -1917,7 +1917,7 @@ static inline void RENAME(deInterlaceMedian)(uint8_t src[], int stride)
         "movq %%mm2, (%%"FF_REG_d", %1, 2)      \n\t"
 
 
-        : : "r" (src), "r" ((x86_reg)stride)
+        : : "r" (src), "r" ((intptr_t)stride)
         : "%"FF_REG_a, "%"FF_REG_d
     );
 
@@ -1959,7 +1959,7 @@ MEDIAN((%%FF_REGa, %1), (%%FF_REGa, %1, 2), (%0, %1, 4))
 MEDIAN((%0, %1, 4)    , (%%FF_REGd)       , (%%FF_REGd, %1))
 MEDIAN((%%FF_REGd, %1), (%%FF_REGd, %1, 2), (%0, %1, 8))
 
-        : : "r" (src), "r" ((x86_reg)stride)
+        : : "r" (src), "r" ((intptr_t)stride)
         : "%"FF_REG_a, "%"FF_REG_d
     );
 #endif //TEMPLATE_PP_MMXEXT
@@ -2066,7 +2066,7 @@ static inline void RENAME(transpose1)(uint8_t *dst1, uint8_t *dst2, const uint8_
         "movd %%mm1, 116(%3)                    \n\t"
 
 
-        :: "r" (src), "r" ((x86_reg)srcStride), "r" (dst1), "r" (dst2)
+        :: "r" (src), "r" ((intptr_t)srcStride), "r" (dst1), "r" (dst2)
         : "%"FF_REG_a
     );
 }
@@ -2146,7 +2146,7 @@ static inline void RENAME(transpose2)(uint8_t *dst, int dstStride, const uint8_t
         "psrlq $32, %%mm1                       \n\t"
         "movd %%mm1, 4(%%"FF_REG_d", %1, 2)     \n\t"
 
-        :: "r" (dst), "r" ((x86_reg)dstStride), "r" (src)
+        :: "r" (dst), "r" ((intptr_t)dstStride), "r" (src)
         : "%"FF_REG_a, "%"FF_REG_d
     );
 }
@@ -2449,7 +2449,7 @@ L2_DIFF_CORE((%0, %%FF_REGc)  , (%1, %%FF_REGc))
 
         "4:                                     \n\t"
 
-        :: "r" (src), "r" (tempBlurred), "r"((x86_reg)stride), "m" (tempBlurredPast)
+        :: "r" (src), "r" (tempBlurred), "r"((intptr_t)stride), "m" (tempBlurredPast)
           NAMED_CONSTRAINTS_ADD(b80)
         : "%"FF_REG_a, "%"FF_REG_d, "%"FF_REG_c, "memory"
     );
@@ -2650,14 +2650,14 @@ static av_always_inline void RENAME(do_a_deblock)(uint8_t *src, int step, int st
         "movq %%mm6, %0                         \n\t"
 
         : "=m" (eq_mask), "=m" (dc_mask)
-        : "r" (src), "r" ((x86_reg)step), "m" (c->pQPb), "m"(c->ppMode.flatnessThreshold)
+        : "r" (src), "r" ((intptr_t)step), "m" (c->pQPb), "m"(c->ppMode.flatnessThreshold)
         : "%"FF_REG_a
     );
 
     both_masks = dc_mask & eq_mask;
 
     if(both_masks){
-        x86_reg offset= -8*step;
+        intptr_t offset= -8*step;
         int64_t *temp_sums= sums;
 
         __asm__ volatile(
@@ -2794,7 +2794,7 @@ static av_always_inline void RENAME(do_a_deblock)(uint8_t *src, int step, int st
             "mov %4, %0                             \n\t" //FIXME
 
             : "+&r"(src)
-            : "r" ((x86_reg)step), "m" (c->pQPb), "r"(sums), "g"(src)
+            : "r" ((intptr_t)step), "m" (c->pQPb), "r"(sums), "g"(src)
               NAMED_CONSTRAINTS_ADD(w04)
         );
 
@@ -2832,7 +2832,7 @@ static av_always_inline void RENAME(do_a_deblock)(uint8_t *src, int step, int st
             " js 1b                                 \n\t"
 
             : "+r"(offset), "+r"(temp_sums)
-            : "r" ((x86_reg)step), "r"(src - offset), "m"(both_masks)
+            : "r" ((intptr_t)step), "r"(src - offset), "m"(both_masks)
         );
     }else
         src+= step; // src points to begin of the 8x8 Block
@@ -3066,7 +3066,7 @@ static av_always_inline void RENAME(do_a_deblock)(uint8_t *src, int step, int st
             "movq %%mm0, (%0, %1)                   \n\t"
 
             : "+r" (temp_src)
-            : "r" ((x86_reg)step), "m" (c->pQPb), "m"(eq_mask), "r"(tmp)
+            : "r" ((intptr_t)step), "m" (c->pQPb), "m"(eq_mask), "r"(tmp)
               NAMED_CONSTRAINTS_ADD(w05,w20)
             : "%"FF_REG_a
         );
@@ -3170,8 +3170,8 @@ SCALED_CPY((%%FF_REGa, %4), (%%FF_REGa, %4, 2), (%%FF_REGd, %5), (%%FF_REGd, %5,
         : "0" (packedOffsetAndScale),
         "r"(src),
         "r"(dst),
-        "r" ((x86_reg)srcStride),
-        "r" ((x86_reg)dstStride)
+        "r" ((intptr_t)srcStride),
+        "r" ((intptr_t)dstStride)
         : "%"FF_REG_d
     );
 #else //TEMPLATE_PP_MMX && HAVE_6REGS
@@ -3203,8 +3203,8 @@ SIMPLE_CPY((%%FF_REGa, %2), (%%FF_REGa, %2, 2), (%%FF_REGd, %3), (%%FF_REGd, %3,
 
         : : "r" (src),
         "r" (dst),
-        "r" ((x86_reg)srcStride),
-        "r" ((x86_reg)dstStride)
+        "r" ((intptr_t)srcStride),
+        "r" ((intptr_t)dstStride)
         : "%"FF_REG_a, "%"FF_REG_d
     );
 #else //TEMPLATE_PP_MMX && HAVE_6REGS
@@ -3230,7 +3230,7 @@ static inline void RENAME(duplicate)(uint8_t src[], int stride)
         "movq %%mm0, (%0, %1, 2)        \n\t"
         "movq %%mm0, (%0, %1, 4)        \n\t"
         : "+r" (src)
-        : "r" ((x86_reg)-stride)
+        : "r" ((intptr_t)-stride)
     );
 #else
     int i;
