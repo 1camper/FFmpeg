@@ -50,7 +50,7 @@ static int decode_significance_x86(CABACContext *c, int max_coeff,
     int minusstart= -(intptr_t)significant_coeff_ctx_base;
     int minusindex= 4-(intptr_t)index;
     int bit;
-    int coeff_count;
+    intptr_t coeff_count;
 
 #ifdef BROKEN_RELOCATIONS
     void *tables;
