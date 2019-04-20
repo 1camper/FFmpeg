@@ -31,7 +31,7 @@ SECTION .text
 ; void vector_fmul(float *dst, const float *src0, const float *src1, int len)
 ;-----------------------------------------------------------------------------
 %macro VECTOR_FMUL 0
-cglobal vector_fmul, 4,4,2, dst, src0, src1, len
+cglobal vector_fmul, 4,4,2, "p", dst, "p", src0, "p", src1, "d", len
     lea       lenq, [lend*4 - 64]
 ALIGN 16
 .loop:
@@ -64,9 +64,9 @@ VECTOR_FMUL
 
 %macro VECTOR_FMAC_SCALAR 0
 %if UNIX64
-cglobal vector_fmac_scalar, 3,3,5, dst, src, len
+cglobal vector_fmac_scalar, 3,3,5, "p", dst, "p", src, "d", len
 %else
-cglobal vector_fmac_scalar, 4,4,5, dst, src, mul, len
+cglobal vector_fmac_scalar, 4,4,5, "p", dst, "p", src, "d*", mul, "p", len
 %endif
 %if ARCH_X86_32
     VBROADCASTSS m0, mulm
@@ -128,9 +128,9 @@ VECTOR_FMAC_SCALAR
 
 %macro VECTOR_FMUL_SCALAR 0
 %if UNIX64
-cglobal vector_fmul_scalar, 3,3,2, dst, src, len
+cglobal vector_fmul_scalar, 3,3,2, "p", dst, "p", src, "d", len
 %else
-cglobal vector_fmul_scalar, 4,4,3, dst, src, mul, len
+cglobal vector_fmul_scalar, 4,4,3, "p", dst, "p", src, "d*", mul, "d", len
 %endif
 %if ARCH_X86_32
     movss    m0, mulm
@@ -158,14 +158,14 @@ VECTOR_FMUL_SCALAR
 
 %macro VECTOR_DMAC_SCALAR 0
 %if ARCH_X86_32
-cglobal vector_dmac_scalar, 2,4,5, dst, src, mul, len, lenaddr
+cglobal vector_dmac_scalar, 2,4,5, "p", dst, "p", src, "q*", mul, "d*", len, lenaddr
     mov          lenq, lenaddrm
     VBROADCASTSD m0, mulm
 %else
 %if UNIX64
-cglobal vector_dmac_scalar, 3,3,5, dst, src, len
+cglobal vector_dmac_scalar, 3,3,5, "p", dst, "p", src, "d", len
 %else
-cglobal vector_dmac_scalar, 4,4,5, dst, src, mul, len
+cglobal vector_dmac_scalar, 4,4,5, "p", dst, "p", src, "q*", mul, "d", len
     SWAP 0, 2
 %endif
     movlhps     xm0, xm0
@@ -221,12 +221,12 @@ VECTOR_DMAC_SCALAR
 
 %macro VECTOR_DMUL_SCALAR 0
 %if ARCH_X86_32
-cglobal vector_dmul_scalar, 3,4,3, dst, src, mul, len, lenaddr
+cglobal vector_dmul_scalar, 2,4,3, "p", dst, "p", src, "q*", mul, "d*", len, lenaddr
     mov          lenq, lenaddrm
 %elif UNIX64
-cglobal vector_dmul_scalar, 3,3,3, dst, src, len
+cglobal vector_dmul_scalar, 3,3,3, "p", dst, "p", src, "d", len
 %else
-cglobal vector_dmul_scalar, 4,4,3, dst, src, mul, len
+cglobal vector_dmul_scalar, 4,4,3, "p", dst, "p", src, "q*", mul, "d", len
 %endif
 %if ARCH_X86_32
     VBROADCASTSD   m0, mulm
@@ -262,7 +262,7 @@ VECTOR_DMUL_SCALAR
 ;                    const float *src1, const float *win, int len);
 ;-----------------------------------------------------------------------------
 %macro VECTOR_FMUL_WINDOW 0
-cglobal vector_fmul_window, 5, 6, 6, dst, src0, src1, win, len, len1
+cglobal vector_fmul_window, 5, 6, 6, "p", dst, "p", src0, "p", src1, "p", win, "d", len, len1
     shl     lend, 2
     lea    len1q, [lenq - mmsize]
     add    src0q, lenq
@@ -320,7 +320,7 @@ VECTOR_FMUL_WINDOW
 ;                 const float *src2, int len)
 ;-----------------------------------------------------------------------------
 %macro VECTOR_FMUL_ADD 0
-cglobal vector_fmul_add, 5,5,4, dst, src0, src1, src2, len
+cglobal vector_fmul_add, 5,5,4, "p", dst, "p", src0, "p", src1, "p", src2, "d", len
     lea       lenq, [lend*4 - 2*mmsize]
 ALIGN 16
 .loop:
@@ -361,7 +361,7 @@ VECTOR_FMUL_ADD
 ;                          int len)
 ;-----------------------------------------------------------------------------
 %macro VECTOR_FMUL_REVERSE 0
-cglobal vector_fmul_reverse, 4,4,2, dst, src0, src1, len
+cglobal vector_fmul_reverse, 4,4,2, "p", dst, "p", src0, "p", src1, "d", len
 %if cpuflag(avx2)
     movaps  m2, [pd_reverse]
 %endif
@@ -407,7 +407,7 @@ VECTOR_FMUL_REVERSE
 
 ; float scalarproduct_float_sse(const float *v1, const float *v2, int len)
 INIT_XMM sse
-cglobal scalarproduct_float, 3,3,2, v1, v2, offset
+cglobal scalarproduct_float, 3,3,2, "p", v1, "p", v2, "d", offset
     shl   offsetd, 2
     add       v1q, offsetq
     add       v2q, offsetq
@@ -434,7 +434,7 @@ cglobal scalarproduct_float, 3,3,2, v1, v2, offset
 ; void ff_butterflies_float(float *src0, float *src1, int len);
 ;-----------------------------------------------------------------------------
 INIT_XMM sse
-cglobal butterflies_float, 3,3,3, src0, src1, len
+cglobal butterflies_float, 3,3,3, "p", src0, "p", src1, "d", len
     shl       lend, 2
     add      src0q, lenq
     add      src1q, lenq

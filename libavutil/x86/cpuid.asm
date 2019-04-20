@@ -28,7 +28,7 @@ SECTION .text
 ;-----------------------------------------------------------------------------
 ; void ff_cpu_cpuid(int index, int *eax, int *ebx, int *ecx, int *edx)
 ;-----------------------------------------------------------------------------
-cglobal cpu_cpuid, 5,7
+cglobal cpu_cpuid, 5,7, "d", index, "p", eax_, "p", ebx_, "p", ecx_, "p", edx_
     push rbx
     push  r4
     push  r3
@@ -51,7 +51,7 @@ cglobal cpu_cpuid, 5,7
 ;-----------------------------------------------------------------------------
 ; void ff_cpu_xgetbv(int op, int *eax, int *edx)
 ;-----------------------------------------------------------------------------
-cglobal cpu_xgetbv, 3,7
+cglobal cpu_xgetbv, 3,7, "d", op, "p", eax_, "p", edx_
     push  r2
     push  r1
     mov  ecx, r0d
