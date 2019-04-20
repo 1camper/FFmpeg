@@ -43,10 +43,10 @@ SECTION .text
 ;------------------------------------------------------------------------------
 
 INIT_XMM sse2
-cglobal conv_s16_to_s32, 3,3,3, dst, src, len
-    lea      lenq, [2*lend]
-    lea      dstq, [dstq+2*lenq]
-    add      srcq, lenq
+cglobal conv_s16_to_s32, 3, 3, 3, "p", dst, "p", src, "d", len
+    add      lend, lend
+    add      srcp, lenp
+    lea      dstp, [dstq+2*lenq]
     neg      lenq
 .loop:
     mova       m2, [srcq+lenq]
@@ -65,10 +65,10 @@ cglobal conv_s16_to_s32, 3,3,3, dst, src, len
 ;------------------------------------------------------------------------------
 
 %macro CONV_S16_TO_FLT 0
-cglobal conv_s16_to_flt, 3,3,3, dst, src, len
-    lea      lenq, [2*lend]
-    add      srcq, lenq
-    lea      dstq, [dstq + 2*lenq]
+cglobal conv_s16_to_flt, 3, 3, 3, "p", dst, "p", src, "d", len
+    add      lend, lend
+    add      srcp, lenp
+    lea      dstp, [dstq + 2*lenq]
     neg      lenq
     mova       m2, [pf_s16_inv_scale]
     ALIGN 16
@@ -96,10 +96,10 @@ CONV_S16_TO_FLT
 ;------------------------------------------------------------------------------
 
 %macro CONV_S32_TO_S16 0
-cglobal conv_s32_to_s16, 3,3,4, dst, src, len
-    lea     lenq, [2*lend]
-    lea     srcq, [srcq+2*lenq]
-    add     dstq, lenq
+cglobal conv_s32_to_s16, 3, 3, 4, "p", dst, "p", src, "d", len
+    add     lend, lend
+    lea     srcp, [srcq+2*lenq]
+    add     dstp, lenp
     neg     lenq
 .loop:
     mova      m0, [srcq+2*lenq         ]
@@ -134,10 +134,10 @@ CONV_S32_TO_S16
 ;------------------------------------------------------------------------------
 
 %macro CONV_S32_TO_FLT 0
-cglobal conv_s32_to_flt, 3,3,3, dst, src, len
-    lea     lenq, [4*lend]
-    add     srcq, lenq
-    add     dstq, lenq
+cglobal conv_s32_to_flt, 3, 3, 3, "p", dst, "p", src, "d", len
+    lea     lend, [4*lend]
+    add     srcp, lenp
+    add     dstp, lenp
     neg     lenq
     mova      m0, [pf_s32_inv_scale]
     ALIGN 16
@@ -165,10 +165,10 @@ CONV_S32_TO_FLT
 ;------------------------------------------------------------------------------
 
 INIT_XMM sse2
-cglobal conv_flt_to_s16, 3,3,5, dst, src, len
-    lea     lenq, [2*lend]
-    lea     srcq, [srcq+2*lenq]
-    add     dstq, lenq
+cglobal conv_flt_to_s16, 3, 3, 5, "p", dst, "p", src, "d", len
+    add     lend, lend
+    lea     srcp, [srcq+2*lenq]
+    add     dstp, lenp
     neg     lenq
     mova      m4, [pf_s16_scale]
 .loop:
@@ -197,10 +197,10 @@ cglobal conv_flt_to_s16, 3,3,5, dst, src, len
 ;------------------------------------------------------------------------------
 
 %macro CONV_FLT_TO_S32 0
-cglobal conv_flt_to_s32, 3,3,6, dst, src, len
-    lea     lenq, [lend*4]
-    add     srcq, lenq
-    add     dstq, lenq
+cglobal conv_flt_to_s32, 3, 3, 6, "p", dst, "p", src, "d", len
+    lea     lend, [lend*4]
+    add     srcp, lenp
+    add     dstp, lenp
     neg     lenq
     mova      m4, [pf_s32_scale]
     mova      m5, [pf_s32_clip]
@@ -239,13 +239,13 @@ CONV_FLT_TO_S32
 ;------------------------------------------------------------------------------
 
 %macro CONV_S16P_TO_S16_2CH 0
-cglobal conv_s16p_to_s16_2ch, 3,4,5, dst, src0, len, src1
-    mov       src1q, [src0q+gprsize]
-    mov       src0q, [src0q        ]
-    lea        lenq, [2*lend]
-    add       src0q, lenq
-    add       src1q, lenq
-    lea        dstq, [dstq+2*lenq]
+cglobal conv_s16p_to_s16_2ch, 3, 4, 5, "p", dst, "p", src0, "d", len, src1
+    mov       src1p, [src0q+ptrsize]
+    mov       src0p, [src0q        ]
+    add        lend, lend
+    add       src0p, lenp
+    add       src1p, lenp
+    lea        dstp, [dstq+2*lenq]
     neg        lenq
 .loop:
     mova         m0, [src0q+lenq       ]
@@ -286,17 +286,17 @@ CONV_S16P_TO_S16_2CH
 
 %macro CONV_S16P_TO_S16_6CH 0
 %if ARCH_X86_64
-cglobal conv_s16p_to_s16_6ch, 3,8,7, dst, src0, len, src1, src2, src3, src4, src5
+cglobal conv_s16p_to_s16_6ch, 3, 8, 7, "p", dst, "p", src0, "d", len, src1, src2, src3, src4, src5
 %else
-cglobal conv_s16p_to_s16_6ch, 2,7,7, dst, src0, src1, src2, src3, src4, src5
-%define lend dword r2m
+cglobal conv_s16p_to_s16_6ch, 2, 7, 7, "p", dst, "p", src0, "d*", src1, src2, src3, src4, src5
+%define lend r2md
 %endif
-    mov      src1q, [src0q+1*gprsize]
-    mov      src2q, [src0q+2*gprsize]
-    mov      src3q, [src0q+3*gprsize]
-    mov      src4q, [src0q+4*gprsize]
-    mov      src5q, [src0q+5*gprsize]
-    mov      src0q, [src0q]
+    mov      src1p, [src0q+1*ptrsize]
+    mov      src2p, [src0q+2*ptrsize]
+    mov      src3p, [src0q+3*ptrsize]
+    mov      src4p, [src0q+4*ptrsize]
+    mov      src5p, [src0q+5*ptrsize]
+    mov      src0p, [src0q]
     sub      src1q, src0q
     sub      src2q, src0q
     sub      src3q, src0q
@@ -399,13 +399,13 @@ CONV_S16P_TO_S16_6CH
 ;------------------------------------------------------------------------------
 
 %macro CONV_S16P_TO_FLT_2CH 0
-cglobal conv_s16p_to_flt_2ch, 3,4,6, dst, src0, len, src1
-    lea       lenq, [2*lend]
-    mov      src1q, [src0q+gprsize]
-    mov      src0q, [src0q        ]
-    lea       dstq, [dstq+4*lenq]
-    add      src0q, lenq
-    add      src1q, lenq
+cglobal conv_s16p_to_flt_2ch, 3, 4, 6, "p", dst, "p", src0, "d", len, src1
+    add       lend, lend
+    mov      src1p, [src0q+ptrsize]
+    mov      src0p, [src0q        ]
+    lea       dstp, [dstq+4*lenq]
+    add      src0p, lenp
+    add      src1p, lenp
     neg       lenq
     mova        m5, [pf_s32_inv_scale]
 .loop:
@@ -449,17 +449,17 @@ CONV_S16P_TO_FLT_2CH
 
 %macro CONV_S16P_TO_FLT_6CH 0
 %if ARCH_X86_64
-cglobal conv_s16p_to_flt_6ch, 3,8,8, dst, src, len, src1, src2, src3, src4, src5
+cglobal conv_s16p_to_flt_6ch, 3, 8, 8, "p", dst, "p", src, "d", len, src1, src2, src3, src4, src5
 %else
-cglobal conv_s16p_to_flt_6ch, 2,7,8, dst, src, src1, src2, src3, src4, src5
-%define lend dword r2m
+cglobal conv_s16p_to_flt_6ch, 2, 7, 8, "p", dst, "p", src, src1, src2, src3, src4, src5
+%define lend r2md
 %endif
-    mov     src1q, [srcq+1*gprsize]
-    mov     src2q, [srcq+2*gprsize]
-    mov     src3q, [srcq+3*gprsize]
-    mov     src4q, [srcq+4*gprsize]
-    mov     src5q, [srcq+5*gprsize]
-    mov      srcq, [srcq]
+    mov     src1p, [srcq+1*ptrsize]
+    mov     src2p, [srcq+2*ptrsize]
+    mov     src3p, [srcq+3*ptrsize]
+    mov     src4p, [srcq+4*ptrsize]
+    mov     src5p, [srcq+5*ptrsize]
+    mov      srcp, [srcq]
     sub     src1q, srcq
     sub     src2q, srcq
     sub     src3q, srcq
@@ -552,13 +552,13 @@ CONV_S16P_TO_FLT_6CH
 ;------------------------------------------------------------------------------
 
 %macro CONV_FLTP_TO_S16_2CH 0
-cglobal conv_fltp_to_s16_2ch, 3,4,3, dst, src0, len, src1
-    lea      lenq, [4*lend]
-    mov     src1q, [src0q+gprsize]
-    mov     src0q, [src0q        ]
-    add      dstq, lenq
-    add     src0q, lenq
-    add     src1q, lenq
+cglobal conv_fltp_to_s16_2ch, 3, 4, 3, "p", dst, "p", src0, "d", len, src1
+    lea      lend, [4*lend]
+    mov     src1p, [src0q+ptrsize]
+    mov     src0p, [src0q        ]
+    add      dstp, lenp
+    add     src0p, lenp
+    add     src1p, lenp
     neg      lenq
     mova       m2, [pf_s16_scale]
 %if cpuflag(ssse3)
@@ -595,17 +595,17 @@ CONV_FLTP_TO_S16_2CH
 
 %macro CONV_FLTP_TO_S16_6CH 0
 %if ARCH_X86_64
-cglobal conv_fltp_to_s16_6ch, 3,8,7, dst, src, len, src1, src2, src3, src4, src5
+cglobal conv_fltp_to_s16_6ch, 3, 8, 7, "p", dst, "p", src, "d", len, src1, src2, src3, src4, src5
 %else
-cglobal conv_fltp_to_s16_6ch, 2,7,7, dst, src, src1, src2, src3, src4, src5
-%define lend dword r2m
+cglobal conv_fltp_to_s16_6ch, 2, 7, 7, "p", dst, "p", src, src1, src2, src3, src4, src5
+%define lend r2md
 %endif
-    mov        src1q, [srcq+1*gprsize]
-    mov        src2q, [srcq+2*gprsize]
-    mov        src3q, [srcq+3*gprsize]
-    mov        src4q, [srcq+4*gprsize]
-    mov        src5q, [srcq+5*gprsize]
-    mov         srcq, [srcq]
+    mov        src1p, [srcq+1*ptrsize]
+    mov        src2p, [srcq+2*ptrsize]
+    mov        src3p, [srcq+3*ptrsize]
+    mov        src4p, [srcq+4*ptrsize]
+    mov        src5p, [srcq+5*ptrsize]
+    mov         srcp, [srcq]
     sub        src1q, srcq
     sub        src2q, srcq
     sub        src3q, srcq
@@ -708,13 +708,13 @@ CONV_FLTP_TO_S16_6CH
 ;------------------------------------------------------------------------------
 
 %macro CONV_FLTP_TO_FLT_2CH 0
-cglobal conv_fltp_to_flt_2ch, 3,4,5, dst, src0, len, src1
-    mov  src1q, [src0q+gprsize]
-    mov  src0q, [src0q]
-    lea   lenq, [4*lend]
-    add  src0q, lenq
-    add  src1q, lenq
-    lea   dstq, [dstq+2*lenq]
+cglobal conv_fltp_to_flt_2ch, 3, 4, 5, "p", dst, "p", src0, "d", len, src1
+    mov  src1p, [src0q+ptrsize]
+    mov  src0p, [src0q]
+    lea   lend, [4*lend]
+    add  src0p, lenp
+    add  src1p, lenp
+    lea   dstp, [dstq+2*lenq]
     neg   lenq
 .loop:
     mova    m0, [src0q+lenq       ]
@@ -745,18 +745,18 @@ CONV_FLTP_TO_FLT_2CH
 ;-----------------------------------------------------------------------------
 
 %macro CONV_FLTP_TO_FLT_6CH 0
-cglobal conv_fltp_to_flt_6ch, 2,8,7, dst, src, src1, src2, src3, src4, src5, len
+cglobal conv_fltp_to_flt_6ch, 2, 8, 7, "p", dst, "p", src, src1, src2, src3, src4, src5, len
 %if ARCH_X86_64
     mov     lend, r2d
 %else
-    %define lend dword r2m
+    %define lend r2md
 %endif
-    mov    src1q, [srcq+1*gprsize]
-    mov    src2q, [srcq+2*gprsize]
-    mov    src3q, [srcq+3*gprsize]
-    mov    src4q, [srcq+4*gprsize]
-    mov    src5q, [srcq+5*gprsize]
-    mov     srcq, [srcq]
+    mov    src1p, [srcq+1*ptrsize]
+    mov    src2p, [srcq+2*ptrsize]
+    mov    src3p, [srcq+3*ptrsize]
+    mov    src4p, [srcq+4*ptrsize]
+    mov    src5p, [srcq+5*ptrsize]
+    mov     srcp, [srcq]
     sub    src1q, srcq
     sub    src2q, srcq
     sub    src3q, srcq
@@ -826,13 +826,13 @@ CONV_FLTP_TO_FLT_6CH
 ;------------------------------------------------------------------------------
 
 %macro CONV_S16_TO_S16P_2CH 0
-cglobal conv_s16_to_s16p_2ch, 3,4,4, dst0, src, len, dst1
-    lea       lenq, [2*lend]
-    mov      dst1q, [dst0q+gprsize]
-    mov      dst0q, [dst0q        ]
-    lea       srcq, [srcq+2*lenq]
-    add      dst0q, lenq
-    add      dst1q, lenq
+cglobal conv_s16_to_s16p_2ch, 3, 4, 4, "p", dst0, "p", src, "d", len, dst1
+    add       lend, lend
+    mov      dst1p, [dst0q+ptrsize]
+    mov      dst0p, [dst0q        ]
+    lea       srcp, [srcq+2*lenq]
+    add      dst0p, lenp
+    add      dst1p, lenp
     neg       lenq
 %if cpuflag(ssse3)
     mova        m3, [pb_deinterleave_words]
@@ -876,17 +876,17 @@ CONV_S16_TO_S16P_2CH
 
 %macro CONV_S16_TO_S16P_6CH 0
 %if ARCH_X86_64
-cglobal conv_s16_to_s16p_6ch, 3,8,5, dst, src, len, dst1, dst2, dst3, dst4, dst5
+cglobal conv_s16_to_s16p_6ch, 3, 8, 5, "p", dst, "p", src, "d", len, dst1, dst2, dst3, dst4, dst5
 %else
-cglobal conv_s16_to_s16p_6ch, 2,7,5, dst, src, dst1, dst2, dst3, dst4, dst5
-%define lend dword r2m
+cglobal conv_s16_to_s16p_6ch, 2, 7, 5, "p", dst, "p", src, dst1, dst2, dst3, dst4, dst5
+%define lend r2md
 %endif
-    mov     dst1q, [dstq+  gprsize]
-    mov     dst2q, [dstq+2*gprsize]
-    mov     dst3q, [dstq+3*gprsize]
-    mov     dst4q, [dstq+4*gprsize]
-    mov     dst5q, [dstq+5*gprsize]
-    mov      dstq, [dstq          ]
+    mov     dst1p, [dstq+  ptrsize]
+    mov     dst2p, [dstq+2*ptrsize]
+    mov     dst3p, [dstq+3*ptrsize]
+    mov     dst4p, [dstq+4*ptrsize]
+    mov     dst5p, [dstq+5*ptrsize]
+    mov      dstp, [dstq          ]
     sub     dst1q, dstq
     sub     dst2q, dstq
     sub     dst3q, dstq
@@ -934,13 +934,13 @@ CONV_S16_TO_S16P_6CH
 ;------------------------------------------------------------------------------
 
 %macro CONV_S16_TO_FLTP_2CH 0
-cglobal conv_s16_to_fltp_2ch, 3,4,5, dst0, src, len, dst1
-    lea       lenq, [4*lend]
-    mov      dst1q, [dst0q+gprsize]
-    mov      dst0q, [dst0q        ]
-    add       srcq, lenq
-    add      dst0q, lenq
-    add      dst1q, lenq
+cglobal conv_s16_to_fltp_2ch, 3, 4, 5, "p", dst0, "p", src, "d", len, dst1
+    lea       lend, [4*lend]
+    mov      dst1p, [dst0q+ptrsize]
+    mov      dst0p, [dst0q        ]
+    add       srcp, lenp
+    add      dst0p, lenp
+    add      dst1p, lenp
     neg       lenq
     mova        m3, [pf_s32_inv_scale]
     mova        m4, [pw_zero_even]
@@ -973,17 +973,17 @@ CONV_S16_TO_FLTP_2CH
 
 %macro CONV_S16_TO_FLTP_6CH 0
 %if ARCH_X86_64
-cglobal conv_s16_to_fltp_6ch, 3,8,7, dst, src, len, dst1, dst2, dst3, dst4, dst5
+cglobal conv_s16_to_fltp_6ch, 3, 8, 7, "p", dst, "p", src, "d", len, dst1, dst2, dst3, dst4, dst5
 %else
-cglobal conv_s16_to_fltp_6ch, 2,7,7, dst, src, dst1, dst2, dst3, dst4, dst5
-%define lend dword r2m
+cglobal conv_s16_to_fltp_6ch, 2, 7, 7, "p", dst, "p", src, dst1, dst2, dst3, dst4, dst5
+%define lend r2md
 %endif
-    mov     dst1q, [dstq+  gprsize]
-    mov     dst2q, [dstq+2*gprsize]
-    mov     dst3q, [dstq+3*gprsize]
-    mov     dst4q, [dstq+4*gprsize]
-    mov     dst5q, [dstq+5*gprsize]
-    mov      dstq, [dstq          ]
+    mov     dst1p, [dstq+  ptrsize]
+    mov     dst2p, [dstq+2*ptrsize]
+    mov     dst3p, [dstq+3*ptrsize]
+    mov     dst4p, [dstq+4*ptrsize]
+    mov     dst5p, [dstq+5*ptrsize]
+    mov      dstp, [dstq          ]
     sub     dst1q, dstq
     sub     dst2q, dstq
     sub     dst3q, dstq
@@ -1053,13 +1053,13 @@ CONV_S16_TO_FLTP_6CH
 ;------------------------------------------------------------------------------
 
 %macro CONV_FLT_TO_S16P_2CH 0
-cglobal conv_flt_to_s16p_2ch, 3,4,6, dst0, src, len, dst1
-    lea       lenq, [2*lend]
-    mov      dst1q, [dst0q+gprsize]
-    mov      dst0q, [dst0q        ]
-    lea       srcq, [srcq+4*lenq]
-    add      dst0q, lenq
-    add      dst1q, lenq
+cglobal conv_flt_to_s16p_2ch, 3, 4, 6, "p", dst0, "p", src, "d", len, dst1
+    add       lend, lend
+    mov      dst1p, [dst0q+ptrsize]
+    mov      dst0p, [dst0q        ]
+    lea       srcp, [srcq+4*lenq]
+    add      dst0p, lenp
+    add      dst1p, lenp
     neg       lenq
     mova        m5, [pf_s16_scale]
 .loop:
@@ -1100,17 +1100,17 @@ CONV_FLT_TO_S16P_2CH
 
 %macro CONV_FLT_TO_S16P_6CH 0
 %if ARCH_X86_64
-cglobal conv_flt_to_s16p_6ch, 3,8,7, dst, src, len, dst1, dst2, dst3, dst4, dst5
+cglobal conv_flt_to_s16p_6ch, 3, 8, 7, "p", dst, "p", src, "d", len, dst1, dst2, dst3, dst4, dst5
 %else
-cglobal conv_flt_to_s16p_6ch, 2,7,7, dst, src, dst1, dst2, dst3, dst4, dst5
-%define lend dword r2m
+cglobal conv_flt_to_s16p_6ch, 2, 7, 7, "p", dst, "p", src, dst1, dst2, dst3, dst4, dst5
+%define lend r2md
 %endif
-    mov     dst1q, [dstq+  gprsize]
-    mov     dst2q, [dstq+2*gprsize]
-    mov     dst3q, [dstq+3*gprsize]
-    mov     dst4q, [dstq+4*gprsize]
-    mov     dst5q, [dstq+5*gprsize]
-    mov      dstq, [dstq          ]
+    mov     dst1p, [dstq+  ptrsize]
+    mov     dst2p, [dstq+2*ptrsize]
+    mov     dst3p, [dstq+3*ptrsize]
+    mov     dst4p, [dstq+4*ptrsize]
+    mov     dst5p, [dstq+5*ptrsize]
+    mov      dstp, [dstq          ]
     sub     dst1q, dstq
     sub     dst2q, dstq
     sub     dst3q, dstq
@@ -1171,13 +1171,13 @@ CONV_FLT_TO_S16P_6CH
 ;------------------------------------------------------------------------------
 
 %macro CONV_FLT_TO_FLTP_2CH 0
-cglobal conv_flt_to_fltp_2ch, 3,4,3, dst0, src, len, dst1
-    lea    lenq, [4*lend]
-    mov   dst1q, [dst0q+gprsize]
-    mov   dst0q, [dst0q        ]
-    lea    srcq, [srcq+2*lenq]
-    add   dst0q, lenq
-    add   dst1q, lenq
+cglobal conv_flt_to_fltp_2ch, 3, 4, 3, "p", dst0, "p", src, "d", len, dst1
+    lea    lend, [4*lend]
+    mov   dst1p, [dst0q+ptrsize]
+    mov   dst0p, [dst0q        ]
+    lea    srcp, [srcq+2*lenq]
+    add   dst0p, lenp
+    add   dst1p, lenp
     neg    lenq
 .loop:
     mova     m0, [srcq+2*lenq       ]
@@ -1204,17 +1204,17 @@ CONV_FLT_TO_FLTP_2CH
 
 %macro CONV_FLT_TO_FLTP_6CH 0
 %if ARCH_X86_64
-cglobal conv_flt_to_fltp_6ch, 3,8,7, dst, src, len, dst1, dst2, dst3, dst4, dst5
+cglobal conv_flt_to_fltp_6ch, 3, 8, 7, "p", dst, "p", src, "d", len, dst1, dst2, dst3, dst4, dst5
 %else
-cglobal conv_flt_to_fltp_6ch, 2,7,7, dst, src, dst1, dst2, dst3, dst4, dst5
-%define lend dword r2m
+cglobal conv_flt_to_fltp_6ch, 2, 7, 7, "p", dst, "p", src, dst1, dst2, dst3, dst4, dst5
+%define lend r2md
 %endif
-    mov     dst1q, [dstq+  gprsize]
-    mov     dst2q, [dstq+2*gprsize]
-    mov     dst3q, [dstq+3*gprsize]
-    mov     dst4q, [dstq+4*gprsize]
-    mov     dst5q, [dstq+5*gprsize]
-    mov      dstq, [dstq          ]
+    mov     dst1p, [dstq+  ptrsize]
+    mov     dst2p, [dstq+2*ptrsize]
+    mov     dst3p, [dstq+3*ptrsize]
+    mov     dst4p, [dstq+4*ptrsize]
+    mov     dst5p, [dstq+5*ptrsize]
+    mov      dstp, [dstq          ]
     sub     dst1q, dstq
     sub     dst2q, dstq
     sub     dst3q, dstq

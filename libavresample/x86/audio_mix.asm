@@ -30,11 +30,11 @@ SECTION .text
 ;-----------------------------------------------------------------------------
 
 %macro MIX_2_TO_1_FLTP_FLT 0
-cglobal mix_2_to_1_fltp_flt, 3,4,6, src, matrix, len, src1
-    mov       src1q, [srcq+gprsize]
-    mov        srcq, [srcq        ]
+cglobal mix_2_to_1_fltp_flt, 3, 4, 6, "p", src, "p", matrix, "d", len, src1
+    mov       src1p, [srcq+ptrsize]
+    mov        srcp, [srcq        ]
     sub       src1q, srcq
-    mov     matrixq, [matrixq  ]
+    mov     matrixp, [matrixq  ]
     VBROADCASTSS m4, [matrixq  ]
     VBROADCASTSS m5, [matrixq+4]
     ALIGN 16
@@ -47,7 +47,7 @@ cglobal mix_2_to_1_fltp_flt, 3,4,6, src, matrix, len, src1
     addps        m2, m2, m3
     mova  [srcq       ], m0
     mova  [srcq+mmsize], m2
-    add        srcq, mmsize*2
+    add        srcp, mmsize*2
     sub        lend, mmsize*2/4
     jg .loop
     REP_RET
@@ -66,11 +66,11 @@ MIX_2_TO_1_FLTP_FLT
 ;-----------------------------------------------------------------------------
 
 %macro MIX_2_TO_1_S16P_FLT 0
-cglobal mix_2_to_1_s16p_flt, 3,4,6, src, matrix, len, src1
-    mov       src1q, [srcq+gprsize]
-    mov        srcq, [srcq]
+cglobal mix_2_to_1_s16p_flt, 3, 4, 6, "p", src, "p", matrix, "d", len, src1
+    mov       src1p, [srcq+ptrsize]
+    mov        srcp, [srcq]
     sub       src1q, srcq
-    mov     matrixq, [matrixq  ]
+    mov     matrixp, [matrixq  ]
     VBROADCASTSS m4, [matrixq  ]
     VBROADCASTSS m5, [matrixq+4]
     ALIGN 16
@@ -93,7 +93,7 @@ cglobal mix_2_to_1_s16p_flt, 3,4,6, src, matrix, len, src1
     cvtps2dq     m1, m1
     packssdw     m0, m1
     mova     [srcq], m0
-    add        srcq, mmsize
+    add        srcp, mmsize
     sub        lend, mmsize/2
     jg .loop
     REP_RET
@@ -110,11 +110,11 @@ MIX_2_TO_1_S16P_FLT
 ;-----------------------------------------------------------------------------
 
 INIT_XMM sse2
-cglobal mix_2_to_1_s16p_q8, 3,4,6, src, matrix, len, src1
-    mov       src1q, [srcq+gprsize]
-    mov        srcq, [srcq]
+cglobal mix_2_to_1_s16p_q8, 3, 4, 6, "p", src, "p", matrix, "d", len, src1
+    mov       src1p, [srcq+ptrsize]
+    mov        srcp, [srcq]
     sub       src1q, srcq
-    mov     matrixq, [matrixq]
+    mov     matrixp, [matrixq]
     movd         m4, [matrixq]
     movd         m5, [matrixq]
     SPLATW       m4, m4, 0
@@ -140,7 +140,7 @@ cglobal mix_2_to_1_s16p_q8, 3,4,6, src, matrix, len, src1
     psrad        m1, 8
     packssdw     m0, m1
     mova     [srcq], m0
-    add        srcq, mmsize
+    add        srcp, mmsize
     sub        lend, mmsize/2
     jg .loop
     REP_RET
@@ -151,12 +151,12 @@ cglobal mix_2_to_1_s16p_q8, 3,4,6, src, matrix, len, src1
 ;-----------------------------------------------------------------------------
 
 %macro MIX_1_TO_2_FLTP_FLT 0
-cglobal mix_1_to_2_fltp_flt, 3,5,4, src0, matrix0, len, src1, matrix1
-    mov       src1q, [src0q+gprsize]
-    mov       src0q, [src0q]
+cglobal mix_1_to_2_fltp_flt, 3, 5, 4, "p", src0, "p", matrix0, "d", len, src1, matrix1
+    mov       src1p, [src0q+ptrsize]
+    mov       src0p, [src0q]
     sub       src1q, src0q
-    mov    matrix1q, [matrix0q+gprsize]
-    mov    matrix0q, [matrix0q]
+    mov    matrix1p, [matrix0q+ptrsize]
+    mov    matrix0p, [matrix0q]
     VBROADCASTSS m2, [matrix0q]
     VBROADCASTSS m3, [matrix1q]
     ALIGN 16
@@ -166,7 +166,7 @@ cglobal mix_1_to_2_fltp_flt, 3,5,4, src0, matrix0, len, src1, matrix1
     mulps        m0, m0, m2
     mova  [src0q      ], m0
     mova  [src0q+src1q], m1
-    add       src0q, mmsize
+    add       src0p, mmsize
     sub        lend, mmsize/4
     jg .loop
     REP_RET
@@ -185,12 +185,12 @@ MIX_1_TO_2_FLTP_FLT
 ;-----------------------------------------------------------------------------
 
 %macro MIX_1_TO_2_S16P_FLT 0
-cglobal mix_1_to_2_s16p_flt, 3,5,6, src0, matrix0, len, src1, matrix1
-    mov       src1q, [src0q+gprsize]
-    mov       src0q, [src0q]
+cglobal mix_1_to_2_s16p_flt, 3, 5, 6, "p", src0, "p", matrix0, "d", len, src1, matrix1
+    mov       src1p, [src0q+ptrsize]
+    mov       src0p, [src0q]
     sub       src1q, src0q
-    mov    matrix1q, [matrix0q+gprsize]
-    mov    matrix0q, [matrix0q]
+    mov    matrix1p, [matrix0q+ptrsize]
+    mov    matrix0p, [matrix0q]
     VBROADCASTSS m4, [matrix0q]
     VBROADCASTSS m5, [matrix1q]
     ALIGN 16
@@ -211,7 +211,7 @@ cglobal mix_1_to_2_s16p_flt, 3,5,6, src0, matrix0, len, src1, matrix1
     packssdw     m1, m3
     mova  [src0q      ], m0
     mova  [src0q+src1q], m1
-    add       src0q, mmsize
+    add       src0p, mmsize
     sub        lend, mmsize/2
     jg .loop
     REP_RET
@@ -273,7 +273,7 @@ MIX_1_TO_2_S16P_FLT
 %assign needed_stack_size needed_stack_size - 16
 %endif
 
-cglobal mix_%1_to_%2_%3_flt, 3,in_channels+2,needed_mmregs+matrix_elements_mm, needed_stack_size, src0, src1, len, src2, src3, src4, src5, src6, src7
+cglobal mix_%1_to_%2_%3_flt, 3,in_channels+2,needed_mmregs+matrix_elements_mm, needed_stack_size, "p", src0, "p", src1, "d-", len, src2, src3, src4, src5, src6, src7
 
 ; define src pointers on stack if needed
 %if matrix_elements_stack > 0 && ARCH_X86_32 && in_channels >= 7
@@ -283,12 +283,14 @@ cglobal mix_%1_to_%2_%3_flt, 3,in_channels+2,needed_mmregs+matrix_elements_mm, n
 %endif
 
 ; load matrix pointers
+%define matrix0p r1p
+%define matrix1p r3p
 %define matrix0q r1q
 %define matrix1q r3q
 %if stereo
-    mov      matrix1q, [matrix0q+gprsize]
+    mov      matrix1p, [matrix0q+ptrsize]
 %endif
-    mov      matrix0q, [matrix0q]
+    mov      matrix0p, [matrix0q]
 
 ; define matrix coeff names
 %assign %%i 0
@@ -340,24 +342,21 @@ cglobal mix_%1_to_%2_%3_flt, 3,in_channels+2,needed_mmregs+matrix_elements_mm, n
 %endrep
 
 ; load channel pointers to registers as offsets from the first channel pointer
-%if ARCH_X86_64
-    movsxd       lenq, r2d
-%endif
     shl          lenq, 2-is_s16
 %assign %%i 1
 %rep (in_channels - 1)
     %if ARCH_X86_32 && in_channels >= 7 && %%i >= 5
-    mov         src5q, [src0q+%%i*gprsize]
-    add         src5q, lenq
-    mov         src %+ %%i %+ m, src5q
+    mov         src5p, [src0q+%%i*ptrsize]
+    add         src5p, lenp
+    mov         src %+ %%i %+ mp, src5p
     %else
-    mov         src %+ %%i %+ q, [src0q+%%i*gprsize]
-    add         src %+ %%i %+ q, lenq
+    mov         src %+ %%i %+ p, [src0q+%%i*ptrsize]
+    add         src %+ %%i %+ p, lenp
     %endif
     %assign %%i %%i+1
 %endrep
-    mov         src0q, [src0q]
-    add         src0q, lenq
+    mov         src0p, [src0q]
+    add         src0p, lenp
     neg          lenq
 .loop:
 ; for x86-32 with 7-8 channels we do not have enough gp registers for all src
@@ -378,15 +377,17 @@ cglobal mix_%1_to_%2_%3_flt, 3,in_channels+2,needed_mmregs+matrix_elements_mm, n
 %assign %%i 1
 %rep (in_channels - 1)
     %if copy_src_from_stack
-        %define src_ptr src5q
+        %define src_ptrp src5p
+        %define src_ptrq src5q
     %else
-        %define src_ptr src %+ %%i %+ q
+        %define src_ptrp src %+ %%i %+ p
+        %define src_ptrq src %+ %%i %+ q
     %endif
     %if stereo
     %if copy_src_from_stack
-    mov       src_ptr, src %+ %%i %+ m
+    mov       src_ptrp, src %+ %%i %+ mp
     %endif
-    mova           m4, [src_ptr+lenq]
+    mova           m4, [src_ptrq+lenq]
     S16_TO_S32_SX   4, 5
     cvtdq2ps       m4, m4
     cvtdq2ps       m5, m5
@@ -396,9 +397,9 @@ cglobal mix_%1_to_%2_%3_flt, 3,in_channels+2,needed_mmregs+matrix_elements_mm, n
     FMULADD_PS     m1, m5, mx_0_ %+ %%i, m1, m5
     %else
     %if copy_src_from_stack
-    mov       src_ptr, src %+ %%i %+ m
+    mov       src_ptrp, src %+ %%i %+ mp
     %endif
-    mova           m2, [src_ptr+lenq]
+    mova           m2, [src_ptrq+lenq]
     S16_TO_S32_SX   2, 3
     cvtdq2ps       m2, m2
     cvtdq2ps       m3, m3
@@ -433,14 +434,16 @@ cglobal mix_%1_to_%2_%3_flt, 3,in_channels+2,needed_mmregs+matrix_elements_mm, n
 %assign %%i 1
 %rep (in_channels - 1)
     %if copy_src_from_stack
-        %define src_ptr src5q
-        mov   src_ptr, src %+ %%i %+ m
+        %define src_ptrp src5p
+        %define src_ptrq src5q
+        mov   src_ptrp, src %+ %%i %+ mp
     %else
-        %define src_ptr src %+ %%i %+ q
+        %define src_ptrp src %+ %%i %+ p
+        %define src_ptrq src %+ %%i %+ q
     %endif
     ; avoid extra load for mono if matrix is in a mm register
     %if stereo || mx_stack_0_ %+ %%i
-    mova           m2, [src_ptr+lenq]
+    mova           m2, [src_ptrq+lenq]
     %endif
     %if stereo
     FMULADD_PS     m1, m2, mx_1_ %+ %%i, m1, m3
@@ -448,7 +451,7 @@ cglobal mix_%1_to_%2_%3_flt, 3,in_channels+2,needed_mmregs+matrix_elements_mm, n
     %if stereo || mx_stack_0_ %+ %%i
     FMULADD_PS     m0, m2, mx_0_ %+ %%i, m0, m2
     %else
-    FMULADD_PS     m0, mx_0_ %+ %%i, [src_ptr+lenq], m0, m1
+    FMULADD_PS     m0, mx_0_ %+ %%i, [src_ptrq+lenq], m0, m1
     %endif
     %assign %%i %%i+1
 %endrep

@@ -35,11 +35,11 @@ SECTION .text
 ;------------------------------------------------------------------------------
 
 INIT_XMM sse2
-cglobal quantize, 4,4,3, dst, src, dither, len
-    lea         lenq, [2*lend]
-    add         dstq, lenq
-    lea         srcq, [srcq+2*lenq]
-    lea      ditherq, [ditherq+2*lenq]
+cglobal quantize, 4, 4, 3, "p", dst, "p", src, "d", dither, len
+    add         lend, lend
+    add         dstp, lenp
+    lea         srcp, [srcq+2*lenq]
+    lea      ditherp, [ditherq+2*lenq]
     neg         lenq
     mova          m2, [pf_s16_scale]
 .loop:
@@ -60,10 +60,10 @@ cglobal quantize, 4,4,3, dst, src, dither, len
 ;------------------------------------------------------------------------------
 
 %macro DITHER_INT_TO_FLOAT_RECTANGULAR 0
-cglobal dither_int_to_float_rectangular, 3,3,3, dst, src, len
-    lea         lenq, [4*lend]
-    add         srcq, lenq
-    add         dstq, lenq
+cglobal dither_int_to_float_rectangular, 3, 3, 3, "p", dst, "p", src, "d", len
+    lea         lend, [4*lend]
+    add         srcp, lenp
+    add         dstp, lenp
     neg         lenq
     mova          m0, [pf_dither_scale]
 .loop:
@@ -88,11 +88,11 @@ DITHER_INT_TO_FLOAT_RECTANGULAR
 ;------------------------------------------------------------------------------
 
 %macro DITHER_INT_TO_FLOAT_TRIANGULAR 0
-cglobal dither_int_to_float_triangular, 3,4,5, dst, src0, len, src1
-    lea         lenq, [4*lend]
-    lea        src1q, [src0q+2*lenq]
-    add        src0q, lenq
-    add         dstq, lenq
+cglobal dither_int_to_float_triangular, 3, 4, 5, "p", dst, "p", src0, "d", len, src1
+    lea         lend, [4*lend]
+    lea        src1p, [src0q+2*lenq]
+    add        src0p, lenp
+    add         dstp, lenp
     neg         lenq
     mova          m0, [pf_dither_scale]
 .loop:
