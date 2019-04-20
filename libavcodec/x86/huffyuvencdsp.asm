@@ -86,12 +86,11 @@ SECTION .text
 
 %if ARCH_X86_32
 INIT_MMX mmx
-cglobal diff_int16, 5,5,5, dst, src1, src2, mask, w, tmp
+cglobal diff_int16, 5,5,5, "p", dst, "p", src1, "p", src2, "d", mask, "d", w, tmp
     INT16_LOOP a, sub
 %endif
 
 INIT_XMM sse2
-cglobal diff_int16, 5,5,5, dst, src1, src2, mask, w, tmp
 cglobal diff_int16, 5,5,5, "p", dst, "p", src1, "p", src2, "d", mask, "d", w, tmp
     test src1q, mmsize-1
     jnz .unaligned
