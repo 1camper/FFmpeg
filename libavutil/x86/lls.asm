@@ -47,7 +47,7 @@ endstruc
 
 INIT_XMM sse2
 %define movdqa movaps
-cglobal update_lls, 2,5,8, ctx, var, i, j, covar2
+cglobal update_lls, 2,5,8, "p", ctx, "p", var, i, j, covar2
     %define covarq ctxq
     mov     id, [ctxq + LLSModel.indep_count]
     lea   varq, [varq + iq*8]
@@ -126,7 +126,7 @@ cglobal update_lls, 2,5,8, ctx, var, i, j, covar2
     REP_RET
 
 %macro UPDATE_LLS 0
-cglobal update_lls, 3,6,8, ctx, var, count, i, j, count2
+cglobal update_lls, 2,6,8, "p", ctx, "p", var, count, i, j, count2
     %define covarq ctxq
     mov  countd, [ctxq + LLSModel.indep_count]
     lea count2d, [countq-2]
@@ -253,7 +253,7 @@ UPDATE_LLS
 %endif
 
 INIT_XMM sse2
-cglobal evaluate_lls, 3,4,2, ctx, var, order, i
+cglobal evaluate_lls, 3,4,2, "p", ctx, "p", var, "d", order, i
     ; This function is often called on the same buffer as update_lls, but with
     ; an offset. They can't both be aligned.
     ; Load halves rather than movu to avoid store-forwarding stalls, since the

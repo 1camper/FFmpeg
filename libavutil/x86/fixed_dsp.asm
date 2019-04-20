@@ -28,7 +28,7 @@ SECTION .text
 ; void ff_butterflies_fixed(float *src0, float *src1, int len);
 ;-----------------------------------------------------------------------------
 INIT_XMM sse2
-cglobal butterflies_fixed, 3,3,3, src0, src1, len
+cglobal butterflies_fixed, 3,3,3, "p", src0, "p", src1, "d", len
     shl       lend, 2
     add      src0q, lenq
     add      src1q, lenq
