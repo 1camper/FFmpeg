@@ -87,11 +87,11 @@ SECTION .text
 ; void ff_bswap_buf(uint32_t *dst, const uint32_t *src, int w);
 %macro BSWAP32_BUF 0
 %if cpuflag(ssse3)
-cglobal bswap32_buf, 3,4,3
+cglobal bswap32_buf, 3,4,3, "p", dst, "p", src, "d", w
     mov      r3, r1
     mova     m2, [pb_bswap32]
 %else
-cglobal bswap32_buf, 3,4,5
+cglobal bswap32_buf, 3,4,5, "p", dst, "p", src, "d", w
     mov      r3, r1
 %endif
     or       r3, r0

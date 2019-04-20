@@ -63,11 +63,8 @@ SECTION .text
 %macro COMPOSE_VERTICAL 1
 ; void vertical_compose53iL0(IDWTELEM *b0, IDWTELEM *b1, IDWTELEM *b2,
 ;                                  int width)
-cglobal vertical_compose53iL0_%1, 4,4,1, b0, b1, b2, width
+cglobal vertical_compose53iL0_%1, 4,4,1, "p", b0, "p", b1, "p", b2, "d+", width
     mova    m2, [pw_2]
-%if ARCH_X86_64
-    mov     widthd, widthd
-%endif
 .loop:
     sub     widthq, mmsize/2
     mova    m1, [b0q+2*widthq]
@@ -79,11 +76,8 @@ cglobal vertical_compose53iL0_%1, 4,4,1, b0, b1, b2, width
 
 ; void vertical_compose_dirac53iH0(IDWTELEM *b0, IDWTELEM *b1, IDWTELEM *b2,
 ;                                  int width)
-cglobal vertical_compose_dirac53iH0_%1, 4,4,1, b0, b1, b2, width
+cglobal vertical_compose_dirac53iH0_%1, 4,4,1, "p", b0, "p", b1, "p", b2, "d+", width
     mova    m1, [pw_1]
-%if ARCH_X86_64
-    mov     widthd, widthd
-%endif
 .loop:
     sub     widthq, mmsize/2
     mova    m0, [b0q+2*widthq]
@@ -97,12 +91,9 @@ cglobal vertical_compose_dirac53iH0_%1, 4,4,1, b0, b1, b2, width
 
 ; void vertical_compose_dd97iH0(IDWTELEM *b0, IDWTELEM *b1, IDWTELEM *b2,
 ;                               IDWTELEM *b3, IDWTELEM *b4, int width)
-cglobal vertical_compose_dd97iH0_%1, 6,6,5, b0, b1, b2, b3, b4, width
+cglobal vertical_compose_dd97iH0_%1, 6,6,5, "p", b0, "p", b1, "p", b2, "p", b3, "p", b4, "d+", width
     mova    m3, [pw_8]
     mova    m4, [pw_1991]
-%if ARCH_X86_64
-    mov     widthd, widthd
-%endif
 .loop:
     sub     widthq, mmsize/2
     mova    m0, [b0q+2*widthq]
@@ -114,12 +105,9 @@ cglobal vertical_compose_dd97iH0_%1, 6,6,5, b0, b1, b2, b3, b4, width
 
 ; void vertical_compose_dd137iL0(IDWTELEM *b0, IDWTELEM *b1, IDWTELEM *b2,
 ;                                IDWTELEM *b3, IDWTELEM *b4, int width)
-cglobal vertical_compose_dd137iL0_%1, 6,6,6, b0, b1, b2, b3, b4, width
+cglobal vertical_compose_dd137iL0_%1, 6,6,6, "p", b0, "p", b1, "p", b2, "p", b3, "p", b4, "d+", width
     mova    m3, [pw_16]
     mova    m4, [pw_1991]
-%if ARCH_X86_64
-    mov     widthd, widthd
-%endif
 .loop:
     sub     widthq, mmsize/2
     mova    m0, [b0q+2*widthq]
@@ -142,11 +130,8 @@ cglobal vertical_compose_dd137iL0_%1, 6,6,6, b0, b1, b2, b3, b4, width
     REP_RET
 
 ; void vertical_compose_haar(IDWTELEM *b0, IDWTELEM *b1, int width)
-cglobal vertical_compose_haar_%1, 3,4,3, b0, b1, width
+cglobal vertical_compose_haar_%1, 3,4,3, "p", b0, "p", b1, "d+", width
     mova    m3, [pw_1]
-%if ARCH_X86_64
-    mov     widthd, widthd
-%endif
 .loop:
     sub     widthq, mmsize/2
     mova    m1, [b1q+2*widthq]
@@ -181,7 +166,7 @@ cglobal vertical_compose_haar_%1, 3,4,3, b0, b1, width
 
 %macro HAAR_HORIZONTAL 2
 ; void horizontal_compose_haari(IDWTELEM *b, IDWTELEM *tmp, int width)
-cglobal horizontal_compose_haar%2i_%1, 3,6,4, b, tmp, w, x, w2, b_w2
+cglobal horizontal_compose_haar%2i_%1, 3,6,4, "p", b, "p", tmp, "d+", w, x, w2, b_w2
     mov    w2d, wd
     xor     xq, xq
     shr    w2d, 1
@@ -231,7 +216,7 @@ cglobal horizontal_compose_haar%2i_%1, 3,6,4, b, tmp, w, x, w2, b_w2
 
 INIT_XMM
 ; void horizontal_compose_dd97i(IDWTELEM *b, IDWTELEM *tmp, int width)
-cglobal horizontal_compose_dd97i_ssse3, 3,6,8, b, tmp, w, x, w2, b_w2
+cglobal horizontal_compose_dd97i_ssse3, 3,6,8, "p", b, "p", tmp, "d+", w, x, w2, b_w2
     mov    w2d, wd
     xor     xd, xd
     shr    w2d, 1

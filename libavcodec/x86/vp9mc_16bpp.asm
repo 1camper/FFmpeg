@@ -32,7 +32,7 @@ cextern pw_4095
 SECTION .text
 
 %macro filter_h4_fn 1-2 12
-cglobal vp9_%1_8tap_1d_h_4_10, 6, 6, %2, dst, dstride, src, sstride, h, filtery
+cglobal vp9_%1_8tap_1d_h_4_10, 6, 6, %2, "p", dst, "p-", dstride, "p", src, "p-", sstride, "d", h, "p", filtery
     mova        m5, [pw_1023]
 .body:
 %if notcpuflag(sse4) && ARCH_X86_64
@@ -103,7 +103,7 @@ cglobal vp9_%1_8tap_1d_h_4_10, 6, 6, %2, dst, dstride, src, sstride, h, filtery
     jg .loop
     RET
 
-cglobal vp9_%1_8tap_1d_h_4_12, 6, 6, %2, dst, dstride, src, sstride, h, filtery
+cglobal vp9_%1_8tap_1d_h_4_12, 6, 6, %2, "p", dst, "p-", dstride, "p", src, "p-", sstride, "d", h, "p", filtery
     mova        m5, [pw_4095]
     jmp mangle(private_prefix %+ _ %+ vp9_%1_8tap_1d_h_4_10 %+ SUFFIX).body
 %endmacro
@@ -114,7 +114,7 @@ filter_h4_fn avg
 
 %macro filter_h_fn 1-2 12
 %assign %%px mmsize/2
-cglobal vp9_%1_8tap_1d_h_ %+ %%px %+ _10, 6, 6, %2, dst, dstride, src, sstride, h, filtery
+cglobal vp9_%1_8tap_1d_h_ %+ %%px %+ _10, 6, 6, %2, "p", dst, "p-", dstride, "p", src, "p-", sstride, "d", h, "p", filtery
     mova        m5, [pw_1023]
 .body:
 %if notcpuflag(sse4) && ARCH_X86_64
@@ -193,7 +193,7 @@ cglobal vp9_%1_8tap_1d_h_ %+ %%px %+ _10, 6, 6, %2, dst, dstride, src, sstride, 
     jg .loop
     RET
 
-cglobal vp9_%1_8tap_1d_h_ %+ %%px %+ _12, 6, 6, %2, dst, dstride, src, sstride, h, filtery
+cglobal vp9_%1_8tap_1d_h_ %+ %%px %+ _12, 6, 6, %2, "p", dst, "p-", dstride, "p", src, "p-", sstride, "d", h, "p", filtery
     mova        m5, [pw_4095]
     jmp mangle(private_prefix %+ _ %+ vp9_%1_8tap_1d_h_ %+ %%px %+ _10 %+ SUFFIX).body
 %endmacro
@@ -209,9 +209,9 @@ filter_h_fn avg
 
 %macro filter_v4_fn 1-2 12
 %if ARCH_X86_64
-cglobal vp9_%1_8tap_1d_v_4_10, 6, 8, %2, dst, dstride, src, sstride, h, filtery, src4, sstride3
+cglobal vp9_%1_8tap_1d_v_4_10, 6, 8, %2, "p", dst, "p-", dstride, "p", src, "p-", sstride, "d", h, "p", filtery, src4, sstride3
 %else
-cglobal vp9_%1_8tap_1d_v_4_10, 4, 7, %2, dst, dstride, src, sstride, filtery, src4, sstride3
+cglobal vp9_%1_8tap_1d_v_4_10, 4, 7, %2, "p", dst, "p-", dstride, "p", src, "p-", sstride, filtery, src4, sstride3
     mov   filteryq, r5mp
 %define hd r4mp
 %endif
@@ -293,9 +293,9 @@ cglobal vp9_%1_8tap_1d_v_4_10, 4, 7, %2, dst, dstride, src, sstride, filtery, sr
     RET
 
 %if ARCH_X86_64
-cglobal vp9_%1_8tap_1d_v_4_12, 6, 8, %2, dst, dstride, src, sstride, h, filtery, src4, sstride3
+cglobal vp9_%1_8tap_1d_v_4_12, 6, 8, %2, "p", dst, "p-", dstride, "p", src, "p-", sstride, "d", h, "p", filtery, src4, sstride3
 %else
-cglobal vp9_%1_8tap_1d_v_4_12, 4, 7, %2, dst, dstride, src, sstride, filtery, src4, sstride3
+cglobal vp9_%1_8tap_1d_v_4_12, 4, 7, %2, "p", dst, "p-", dstride, "p", src, "p-", sstride, filtery, src4, sstride3
     mov   filteryq, r5mp
 %endif
     mova        m5, [pw_4095]
@@ -309,9 +309,9 @@ filter_v4_fn avg
 %macro filter_v_fn 1-2 13
 %assign %%px mmsize/2
 %if ARCH_X86_64
-cglobal vp9_%1_8tap_1d_v_ %+ %%px %+ _10, 6, 8, %2, dst, dstride, src, sstride, h, filtery, src4, sstride3
+cglobal vp9_%1_8tap_1d_v_ %+ %%px %+ _10, 6, 8, %2, "p", dst, "p-", dstride, "p", src, "p-", sstride, "d", h, "p", filtery, src4, sstride3
 %else
-cglobal vp9_%1_8tap_1d_v_ %+ %%px %+ _10, 4, 7, %2, dst, dstride, src, sstride, filtery, src4, sstride3
+cglobal vp9_%1_8tap_1d_v_ %+ %%px %+ _10, 4, 7, %2, "p", dst, "p-", dstride, "p", src, "p-", sstride, filtery, src4, sstride3
     mov   filteryq, r5mp
 %define hd r4mp
 %endif
@@ -412,9 +412,9 @@ cglobal vp9_%1_8tap_1d_v_ %+ %%px %+ _10, 4, 7, %2, dst, dstride, src, sstride, 
     RET
 
 %if ARCH_X86_64
-cglobal vp9_%1_8tap_1d_v_ %+ %%px %+ _12, 6, 8, %2, dst, dstride, src, sstride, h, filtery, src4, sstride3
+cglobal vp9_%1_8tap_1d_v_ %+ %%px %+ _12, 6, 8, %2, "p", dst, "p-", dstride, "p", src, "p-", sstride, "d", h, "p", filtery, src4, sstride3
 %else
-cglobal vp9_%1_8tap_1d_v_ %+ %%px %+ _12, 4, 7, %2, dst, dstride, src, sstride, filtery, src4, sstride3
+cglobal vp9_%1_8tap_1d_v_ %+ %%px %+ _12, 4, 7, %2, "p", dst, "p-", dstride, "p", src, "p-", sstride, filtery, src4, sstride3
     mov   filteryq, r5mp
 %endif
     mova        m5, [pw_4095]

@@ -27,7 +27,7 @@ SECTION .text
 ; void get_pixels_8x4_sym_sse2(int16_t *block, const uint8_t *pixels,
 ;                              ptrdiff_t line_size)
 INIT_XMM sse2
-cglobal get_pixels_8x4_sym, 3,3,5, block, pixels, linesize
+cglobal get_pixels_8x4_sym, 3,3,5, "p", block, "p", pixels, "p-", linesize
     pxor      m4,       m4
     movq      m0,       [pixelsq]
     add       pixelsq,  linesizeq

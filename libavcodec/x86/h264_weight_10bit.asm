@@ -41,12 +41,7 @@ SECTION .text
 ;-----------------------------------------------------------------------------
 %macro WEIGHT_PROLOGUE 0
 .prologue:
-    PROLOGUE 0,6,8
-    movifnidn  r0, r0mp
-    movifnidn r1d, r1m
-    movifnidn r2d, r2m
-    movifnidn r4d, r4m
-    movifnidn r5d, r5m
+    PROLOGUE 6, 6, 8, "p", dst, "d", stride, "d", height, "d*", log2_denom, "d", weight, "d", offset
 %endmacro
 
 %macro WEIGHT_SETUP 0
@@ -164,13 +159,8 @@ DECLARE_REG_TMP 7
 
 %macro BIWEIGHT_PROLOGUE 0
 .prologue:
-    PROLOGUE 0,8,8
-    movifnidn  r0, r0mp
-    movifnidn  r1, r1mp
-    movifnidn r2d, r2m
-    movifnidn r5d, r5m
-    movifnidn r6d, r6m
-    movifnidn t0d, r7m
+    PROLOGUE 7, 8, 8, "p", dst, "p", src, "d", stride, "d*", height, "d*", log2_denom, "d", weightd, "d", weights, "d", offset
+    movifnidn t0d, r7md
 %endmacro
 
 %macro BIWEIGHT_SETUP 0

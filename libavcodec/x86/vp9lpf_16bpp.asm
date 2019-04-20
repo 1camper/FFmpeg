@@ -218,7 +218,7 @@ SECTION .text
 %define %%maxf 16
 %endif ; %3
 
-cglobal vp9_loop_filter_%1_%2_%3, 5, %%num_gpr_regs, %%num_xmm_regs, %%stack_mem, dst, stride, E, I, H
+cglobal vp9_loop_filter_%1_%2_%3, 5, %%num_gpr_regs, %%num_xmm_regs, %%stack_mem, "p", dst, "p-", stride, "d", E, "d", I, "d", H
     ; prepare E, I and H masks
     shl                 Ed, %3-8
     shl                 Id, %3-8

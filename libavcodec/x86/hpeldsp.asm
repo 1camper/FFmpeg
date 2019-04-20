@@ -40,9 +40,9 @@ SECTION .text
 ; void ff_put_pixels8_x2(uint8_t *block, const uint8_t *pixels, ptrdiff_t line_size, int h)
 %macro PUT_PIXELS8_X2 0
 %if cpuflag(sse2)
-cglobal put_pixels16_x2, 4,5,4
+cglobal put_pixels16_x2, 4,5,4, "p", block, "p", pixels, "p-", line_size, "d", h
 %else
-cglobal put_pixels8_x2, 4,5
+cglobal put_pixels8_x2, 4,5, "p", block, "p", pixels, "p-", line_size, "d", h
 %endif
     lea          r4, [r2*2]
 .loop:
@@ -89,7 +89,7 @@ PUT_PIXELS8_X2
 
 ; void ff_put_pixels16_x2(uint8_t *block, const uint8_t *pixels, ptrdiff_t line_size, int h)
 %macro PUT_PIXELS_16 0
-cglobal put_pixels16_x2, 4,5
+cglobal put_pixels16_x2, 4,5, "p", block, "p", pixels, "p-", line_size, "d", h
     lea          r4, [r2*2]
 .loop:
     mova         m0, [r1]
@@ -136,7 +136,7 @@ PUT_PIXELS8_X2
 
 ; void ff_put_no_rnd_pixels8_x2(uint8_t *block, const uint8_t *pixels, ptrdiff_t line_size, int h)
 %macro PUT_NO_RND_PIXELS8_X2 0
-cglobal put_no_rnd_pixels8_x2, 4,5
+cglobal put_no_rnd_pixels8_x2, 4,5, "p", block, "p", pixels, "p-", line_size, "d", h
     mova         m6, [pb_1]
     lea          r4, [r2*2]
 .loop:
@@ -178,9 +178,9 @@ PUT_NO_RND_PIXELS8_X2
 ; void ff_put_pixels8_y2(uint8_t *block, const uint8_t *pixels, ptrdiff_t line_size, int h)
 %macro PUT_PIXELS8_Y2 0
 %if cpuflag(sse2)
-cglobal put_pixels16_y2, 4,5,3
+cglobal put_pixels16_y2, 4,5,3, "p", block, "p", pixels, "p-", line_size, "d", h
 %else
-cglobal put_pixels8_y2, 4,5
+cglobal put_pixels8_y2, 4,5, "p", block, "p", pixels, "p-", line_size, "d", h
 %endif
     lea          r4, [r2*2]
     movu         m0, [r1]
@@ -218,7 +218,7 @@ PUT_PIXELS8_Y2
 
 ; void ff_put_no_rnd_pixels8_y2(uint8_t *block, const uint8_t *pixels, ptrdiff_t line_size, int h)
 %macro PUT_NO_RND_PIXELS8_Y2 0
-cglobal put_no_rnd_pixels8_y2, 4,5
+cglobal put_no_rnd_pixels8_y2, 4,5, "p", block, "p", pixels, "p-", line_size, "d", h
     mova         m6, [pb_1]
     lea          r4, [r2+r2]
     mova         m0, [r1]
@@ -255,7 +255,7 @@ PUT_NO_RND_PIXELS8_Y2
 
 ; void ff_avg_pixels8(uint8_t *block, const uint8_t *pixels, ptrdiff_t line_size, int h)
 %macro AVG_PIXELS8 0
-cglobal avg_pixels8, 4,5
+cglobal avg_pixels8, 4,5, "p", block, "p", pixels, "p-", line_size, "d", h
     lea          r4, [r2*2]
 .loop:
     mova         m0, [r0]
@@ -286,9 +286,9 @@ AVG_PIXELS8
 ; void ff_avg_pixels8_x2(uint8_t *block, const uint8_t *pixels, ptrdiff_t line_size, int h)
 %macro AVG_PIXELS8_X2 0
 %if cpuflag(sse2)
-cglobal avg_pixels16_x2, 4,5,4
+cglobal avg_pixels16_x2, 4,5,4, "p", block, "p", pixels, "p-", line_size, "d", h
 %else
-cglobal avg_pixels8_x2, 4,5
+cglobal avg_pixels8_x2, 4,5, "p", block, "p", pixels, "p-", line_size, "d", h
 %endif
     lea          r4, [r2*2]
 %if notcpuflag(mmxext)
@@ -349,9 +349,9 @@ AVG_PIXELS8_X2
 ; void ff_avg_pixels8_y2(uint8_t *block, const uint8_t *pixels, ptrdiff_t line_size, int h)
 %macro AVG_PIXELS8_Y2 0
 %if cpuflag(sse2)
-cglobal avg_pixels16_y2, 4,5,3
+cglobal avg_pixels16_y2, 4,5,3, "p", block, "p", pixels, "p-", line_size, "d", h
 %else
-cglobal avg_pixels8_y2, 4,5
+cglobal avg_pixels8_y2, 4,5, "p", block, "p", pixels, "p-", line_size, "d", h
 %endif
     lea          r4, [r2*2]
     movu         m0, [r1]
@@ -395,7 +395,7 @@ AVG_PIXELS8_Y2
 ; Note this is not correctly rounded, and is therefore used for
 ; not-bitexact output
 %macro AVG_APPROX_PIXELS8_XY2 0
-cglobal avg_approx_pixels8_xy2, 4,5
+cglobal avg_approx_pixels8_xy2, 4,5, "p", block, "p", pixels, "p-", line_size, "d", h
     mova         m6, [pb_1]
     lea          r4, [r2*2]
     mova         m0, [r1]
@@ -440,9 +440,9 @@ AVG_APPROX_PIXELS8_XY2
 ; void ff_avg_pixels16_xy2(uint8_t *block, const uint8_t *pixels, ptrdiff_t line_size, int h)
 %macro SET_PIXELS_XY2 1
 %if cpuflag(sse2)
-cglobal %1_pixels16_xy2, 4,5,8
+cglobal %1_pixels16_xy2, 4,5,8, "p", block, "p", pixels, "p-", line_size, "d", h
 %else
-cglobal %1_pixels8_xy2, 4,5
+cglobal %1_pixels8_xy2, 4,5, "p", block, "p", pixels, "p-", line_size, "d", h
 %endif
     pxor        m7, m7
     mova        m6, [pw_2]
@@ -525,10 +525,10 @@ SET_PIXELS_XY2 avg
 
 %macro SSSE3_PIXELS_XY2 1-2
 %if %0 == 2 ; sse2
-cglobal %1_pixels16_xy2, 4,5,%2
+cglobal %1_pixels16_xy2, 4,5,%2, "p", block, "p", pixels, "p-", line_size, "d", h
     mova        m4, [pb_interleave16]
 %else
-cglobal %1_pixels8_xy2, 4,5
+cglobal %1_pixels8_xy2, 4,5, "p", block, "p", pixels, "p-", line_size, "d", h
     mova        m4, [pb_interleave8]
 %endif
     mova        m5, [pb_1]

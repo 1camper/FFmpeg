@@ -51,7 +51,7 @@ SECTION .text
 %macro v210_planar_pack_10 0
 
 ; v210_planar_pack_10(const uint16_t *y, const uint16_t *u, const uint16_t *v, uint8_t *dst, ptrdiff_t width)
-cglobal v210_planar_pack_10, 5, 5, 4+cpuflag(avx2), y, u, v, dst, width
+cglobal v210_planar_pack_10, 5, 5, 4+cpuflag(avx2), "p", y, "p", u, "p", v, "p", dst, "p-", width
     lea     r0, [yq+2*widthq]
     add     uq, widthq
     add     vq, widthq
@@ -106,7 +106,7 @@ v210_planar_pack_10
 %macro v210_planar_pack_8 0
 
 ; v210_planar_pack_8(const uint8_t *y, const uint8_t *u, const uint8_t *v, uint8_t *dst, ptrdiff_t width)
-cglobal v210_planar_pack_8, 5, 5, 7, y, u, v, dst, width
+cglobal v210_planar_pack_8, 5, 5, 7, "p", y, "p", u, "p", v, "p", dst, "p-", width
     add     yq, widthq
     shr     widthq, 1
     add     uq, widthq

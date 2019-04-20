@@ -153,7 +153,7 @@ cextern pw_1023
 ; void ff_deblock_v_luma_10(uint16_t *pix, int stride, int alpha, int beta,
 ;                           int8_t *tc0)
 ;-----------------------------------------------------------------------------
-cglobal deblock_v_luma_10, 5,5,8*(mmsize/16)
+cglobal deblock_v_luma_10, 5,5,8*(mmsize/16), "p", pix_, "d-", stride_, "d", alpha_, "d", beta_, "p", tc0_
     %assign pad 5*mmsize+12-(stack_offset&15)
     %define tcm [rsp]
     %define ms1 [rsp+mmsize]
@@ -208,7 +208,7 @@ cglobal deblock_v_luma_10, 5,5,8*(mmsize/16)
     ADD         rsp, pad
     RET
 
-cglobal deblock_h_luma_10, 5,6,8*(mmsize/16)
+cglobal deblock_h_luma_10, 5,6,8*(mmsize/16), "p", pix_, "d-", stride_, "d", alpha_, "d", beta_, "p", tc0_
     %assign pad 7*mmsize+12-(stack_offset&15)
     %define tcm [rsp]
     %define ms1 [rsp+mmsize]
@@ -337,7 +337,7 @@ cglobal deblock_h_luma_10, 5,6,8*(mmsize/16)
 %endmacro
 
 %macro DEBLOCK_LUMA_64 0
-cglobal deblock_v_luma_10, 5,5,15
+cglobal deblock_v_luma_10, 5,5,15, "p", pix_, "d-", stride_, "d", alpha_, "d", beta_, "p", tc0_
     %define p2 m8
     %define p1 m0
     %define p0 m1
@@ -374,7 +374,7 @@ cglobal deblock_v_luma_10, 5,5,15
     jg .loop
     REP_RET
 
-cglobal deblock_h_luma_10, 5,7,15
+cglobal deblock_h_luma_10, 5,7,15, "p", pix_, "d-", stride_, "d", alpha_, "d", beta_, "p", tc0_
     shl        r2d, 2
     shl        r3d, 2
     LOAD_AB    m12, m13, r2d, r3d
@@ -603,7 +603,7 @@ DEBLOCK_LUMA_64
 ;                                 int beta)
 ;-----------------------------------------------------------------------------
 %macro DEBLOCK_LUMA_INTRA_64 0
-cglobal deblock_v_luma_intra_10, 4,7,16
+cglobal deblock_v_luma_intra_10, 4,7,16, "p", pix_, "d-", stride_, "d", alpha_, "d", beta_
     %define t0 m1
     %define t1 m2
     %define t2 m4
@@ -654,7 +654,7 @@ cglobal deblock_v_luma_intra_10, 4,7,16
 ; void ff_deblock_h_luma_intra_10(uint16_t *pix, int stride, int alpha,
 ;                                 int beta)
 ;-----------------------------------------------------------------------------
-cglobal deblock_h_luma_intra_10, 4,7,16
+cglobal deblock_h_luma_intra_10, 4,7,16, "p", pix_, "d-", stride_, "d", alpha_, "d", beta_
     %define t0 m15
     %define t1 m14
     %define t2 m2
@@ -727,7 +727,7 @@ DEBLOCK_LUMA_INTRA_64
 ; void ff_deblock_v_luma_intra_10(uint16_t *pix, int stride, int alpha,
 ;                                 int beta)
 ;-----------------------------------------------------------------------------
-cglobal deblock_v_luma_intra_10, 4,7,8*(mmsize/16)
+cglobal deblock_v_luma_intra_10, 4,7,8*(mmsize/16), "p", pix_, "d-", stride_, "d", alpha_, "d", beta_
     LUMA_INTRA_INIT 3
     lea     r4, [r1*4]
     lea     r5, [r1*3]
@@ -756,7 +756,7 @@ cglobal deblock_v_luma_intra_10, 4,7,8*(mmsize/16)
 ; void ff_deblock_h_luma_intra_10(uint16_t *pix, int stride, int alpha,
 ;                                 int beta)
 ;-----------------------------------------------------------------------------
-cglobal deblock_h_luma_intra_10, 4,7,8*(mmsize/16)
+cglobal deblock_h_luma_intra_10, 4,7,8*(mmsize/16), "p", pix_, "d-", stride_, "d", alpha_, "d", beta_
     LUMA_INTRA_INIT 8
 %if mmsize == 8
     lea     r4, [r1*3]
@@ -932,7 +932,7 @@ DEBLOCK_LUMA_INTRA
 ; void ff_deblock_v_chroma_10(uint16_t *pix, int stride, int alpha, int beta,
 ;                             int8_t *tc0)
 ;-----------------------------------------------------------------------------
-cglobal deblock_v_chroma_10, 5,7-(mmsize/16),8*(mmsize/16)
+cglobal deblock_v_chroma_10, 5,7-(mmsize/16),8*(mmsize/16), "p", pix_, "d-", stride_, "d", alpha_, "d", beta_, "p", tc0_
     mov         r5, r0
     sub         r0, r1
     sub         r0, r1
@@ -967,7 +967,7 @@ cglobal deblock_v_chroma_10, 5,7-(mmsize/16),8*(mmsize/16)
 ; void ff_deblock_v_chroma_intra_10(uint16_t *pix, int stride, int alpha,
 ;                                   int beta)
 ;-----------------------------------------------------------------------------
-cglobal deblock_v_chroma_intra_10, 4,6-(mmsize/16),8*(mmsize/16)
+cglobal deblock_v_chroma_intra_10, 4,6-(mmsize/16),8*(mmsize/16), "p", pix_, "d-", stride_, "d", alpha_, "d", beta_
     mov         r4, r0
     sub         r0, r1
     sub         r0, r1
@@ -996,7 +996,7 @@ cglobal deblock_v_chroma_intra_10, 4,6-(mmsize/16),8*(mmsize/16)
 ; void ff_deblock_h_chroma_10(uint16_t *pix, int stride, int alpha, int beta,
 ;                             int8_t *tc0)
 ;-----------------------------------------------------------------------------
-cglobal deblock_h_chroma_10, 5, 7, 8, 0-2*mmsize, pix_, stride_, alpha_, beta_, tc0_
+cglobal deblock_h_chroma_10, 5, 7, 8, 0-2*mmsize, "p", pix_, "d-", stride_, "d", alpha_, "d", beta_, "p", tc0_
     shl alpha_d,  2
     shl beta_d,   2
     mov r5,       pix_q
@@ -1031,7 +1031,7 @@ RET
 ; void ff_deblock_h_chroma422_10(uint16_t *pix, int stride, int alpha, int beta,
 ;                                int8_t *tc0)
 ;-----------------------------------------------------------------------------
-cglobal deblock_h_chroma422_10, 5, 7, 8, 0-3*mmsize, pix_, stride_, alpha_, beta_, tc0_
+cglobal deblock_h_chroma422_10, 5, 7, 8, 0-3*mmsize, "p", pix_, "d-", stride_, "d", alpha_, "d", beta_, "p", tc0_
     shl alpha_d,  2
     shl beta_d,   2
 

@@ -34,8 +34,8 @@ INIT_XMM sse2
 ; void restore_rgb_planes(uint8_t *src_r, uint8_t *src_g, uint8_t *src_b,
 ;                         ptrdiff_t linesize_r, ptrdiff_t linesize_g, ptrdiff_t linesize_b,
 ;                         int width, int height)
-cglobal restore_rgb_planes, 7 + ARCH_X86_64, 7 + ARCH_X86_64 * 2, 4, src_r, src_g, src_b, linesize_r, linesize_g, linesize_b, w, h, x
-    movsxdifnidn wq, wd
+cglobal restore_rgb_planes, 7 + ARCH_X86_64, 7 + ARCH_X86_64 * 2, 4, "p", src_r, "p", src_g, "p", src_b, \
+                          "p-", linesize_r, "p-", linesize_g, "p-", linesize_b, "d-", w, "d", h, x
     add      src_rq, wq
     add      src_gq, wq
     add      src_bq, wq
@@ -69,7 +69,8 @@ DEFINE_ARGS src_r, src_g, src_b, linesize_r, linesize_g, linesize_b, x
     jg .nextrow
     REP_RET
 
-cglobal restore_rgb_planes10, 7 + ARCH_X86_64, 7 + ARCH_X86_64 * 2, 5, src_r, src_g, src_b, linesize_r, linesize_g, linesize_b, w, h, x
+cglobal restore_rgb_planes10, 7 + ARCH_X86_64, 7 + ARCH_X86_64 * 2, 5, "p", src_r, "p", src_g, "p", src_b, \
+                          "p-", linesize_r, "p-", linesize_g, "p-", linesize_b, "d", w, "d", h, x
     shl          wd, 1
     shl linesize_rq, 1
     shl linesize_gq, 1

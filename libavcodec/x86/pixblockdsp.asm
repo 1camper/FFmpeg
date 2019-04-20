@@ -27,7 +27,7 @@ SECTION .text
 
 INIT_MMX mmx
 ; void ff_get_pixels_mmx(int16_t *block, const uint8_t *pixels, ptrdiff_t stride)
-cglobal get_pixels, 3,4
+cglobal get_pixels, 3,4, "p", block, "p", pixels, "p-", stride
     add          r0, 128
     mov          r3, -128
     pxor         m7, m7
@@ -50,7 +50,7 @@ cglobal get_pixels, 3,4
     REP_RET
 
 INIT_XMM sse2
-cglobal get_pixels, 3, 4, 5
+cglobal get_pixels, 3, 4, 5, "p", block, "p", pixels, "p-", stride
     lea          r3, [r2*3]
     pxor         m4, m4
     movh         m0, [r1]
@@ -83,7 +83,7 @@ cglobal get_pixels, 3, 4, 5
 ; void ff_diff_pixels_mmx(int16_t *block, const uint8_t *s1, const uint8_t *s2,
 ;                         ptrdiff_t stride);
 %macro DIFF_PIXELS 0
-cglobal diff_pixels, 4,5,5
+cglobal diff_pixels, 4,5,5, "p", block, "p", s1, "p", s2, "p-", stride
     pxor         m4, m4
     add          r0,  128
     mov          r4, -128

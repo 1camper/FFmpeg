@@ -173,7 +173,7 @@ SECTION .text
 ;-------------------------------------------------------------------------------------------
 
 INIT_MMX mmx
-cglobal vp9_iwht_iwht_4x4_add, 3, 3, 0, dst, stride, block, eob
+cglobal vp9_iwht_iwht_4x4_add, 3, 3, 0, "p", dst, "p-", stride, "p", block, "d", eob
     mova                m0, [blockq+0*8]
     mova                m1, [blockq+1*8]
     mova                m2, [blockq+2*8]
@@ -236,7 +236,7 @@ cglobal vp9_iwht_iwht_4x4_add, 3, 3, 0, dst, stride, block, eob
 
 %macro IDCT_4x4_FN 1
 INIT_MMX %1
-cglobal vp9_idct_idct_4x4_add, 4, 4, 0, dst, stride, block, eob
+cglobal vp9_idct_idct_4x4_add, 4, 4, 0, "p", dst, "p-", stride, "p", block, "d", eob
 
 %if cpuflag(ssse3)
     cmp eobd, 4 ; 2x2 or smaller
@@ -328,7 +328,7 @@ IDCT_4x4_FN ssse3
 
 %macro IADST4_FN 5
 INIT_MMX %5
-cglobal vp9_%1_%3_4x4_add, 3, 3, 0, dst, stride, block, eob
+cglobal vp9_%1_%3_4x4_add, 3, 3, 0, "p", dst, "p-", stride, "p", block, "d", eob
 %if WIN64 && notcpuflag(ssse3)
     WIN64_SPILL_XMM 8
 %endif
@@ -549,7 +549,7 @@ IADST4_FN iadst, IADST4, iadst, IADST4, ssse3
 
 %macro VP9_IDCT_IDCT_8x8_ADD_XMM 2
 INIT_XMM %1
-cglobal vp9_idct_idct_8x8_add, 4, 4, %2, dst, stride, block, eob
+cglobal vp9_idct_idct_8x8_add, 4, 4, %2, "p", dst, "p-", stride, "p", block, "d", eob
 
 %if cpuflag(ssse3)
 %if ARCH_X86_64
@@ -817,7 +817,7 @@ VP9_IDCT_IDCT_8x8_ADD_XMM avx, 13
 
 %macro IADST8_FN 6
 INIT_XMM %5
-cglobal vp9_%1_%3_8x8_add, 3, 3, %6, dst, stride, block, eob
+cglobal vp9_%1_%3_8x8_add, 3, 3, %6, "p", dst, "p-", stride, "p", block, "d", eob
 
 %ifidn %1, idct
 %define first_is_idct 1
@@ -1344,7 +1344,7 @@ IADST8_FN iadst, IADST8, iadst, IADST8, avx, 16
 
 %macro VP9_IDCT_IDCT_16x16_ADD_XMM 1
 INIT_XMM %1
-cglobal vp9_idct_idct_16x16_add, 4, 6, 16, 512, dst, stride, block, eob
+cglobal vp9_idct_idct_16x16_add, 4, 6, 16, 512, "p", dst, "p-", stride, "p", block, "d", eob
 %if cpuflag(ssse3)
     ; 2x2=eob=3, 4x4=eob=10
     cmp eobd, 38
@@ -1534,7 +1534,7 @@ VP9_IDCT_IDCT_16x16_ADD_XMM avx
 
 %if ARCH_X86_64 && HAVE_AVX2_EXTERNAL
 INIT_YMM avx2
-cglobal vp9_idct_idct_16x16_add, 4, 4, 16, dst, stride, block, eob
+cglobal vp9_idct_idct_16x16_add, 4, 4, 16, "p", dst, "p-", stride, "p", block, "d", eob
     cmp eobd, 1 ; faster path for when only DC is set
     jg .idctfull
 
@@ -1947,7 +1947,7 @@ cglobal vp9_idct_idct_16x16_add, 4, 4, 16, dst, stride, block, eob
 
 %macro IADST16_FN 5
 INIT_XMM %5
-cglobal vp9_%1_%3_16x16_add, 3, 6, 16, 512, dst, stride, block, cnt, dst_bak, tmp
+cglobal vp9_%1_%3_16x16_add, 3, 6, 16, 512, "p", dst, "p-", stride, "p", block, cnt, dst_bak, tmp
     mov               cntd, 2
     mov               tmpq, rsp
 .loop1_full:
@@ -2095,7 +2095,7 @@ IADST16_FN iadst, IADST16, iadst, IADST16, avx
 %if ARCH_X86_64 && HAVE_AVX2_EXTERNAL
 %macro IADST16_YMM_FN 4
 INIT_YMM avx2
-cglobal vp9_%1_%3_16x16_add, 4, 4, 16, dst, stride, block, eob
+cglobal vp9_%1_%3_16x16_add, 4, 4, 16, "p", dst, "p-", stride, "p", block, "d", eob
     mova                m1, [blockq+ 32]
     mova                m2, [blockq+ 64]
     mova                m3, [blockq+ 96]
@@ -2906,8 +2906,7 @@ IADST16_YMM_FN iadst, IADST16, iadst, IADST16
 
 %macro VP9_IDCT_IDCT_32x32_ADD_XMM 1
 INIT_XMM %1
-cglobal vp9_idct_idct_32x32_add, 0, 6 + ARCH_X86_64 * 3, 16, 2048, dst, stride, block, eob
-    movifnidn         eobd, dword eobm
+cglobal vp9_idct_idct_32x32_add, 4, 6 + ARCH_X86_64 * 3, 16, 2048, "p*", dst, "p-", stride, "p*", block, "d", eob
 %if cpuflag(ssse3)
     cmp eobd, 135
     jg .idctfull
@@ -2921,9 +2920,9 @@ cglobal vp9_idct_idct_32x32_add, 0, 6 + ARCH_X86_64 * 3, 16, 2048, dst, stride, 
 %endif
 
     ; dc-only case
-    movifnidn       blockq, blockmp
-    movifnidn         dstq, dstmp
-    movifnidn      strideq, stridemp
+    movifnidn       blockp, blockmp
+    movifnidn         dstp, dstmp
+    movifnidn      stridep, stridemp
 %if cpuflag(ssse3)
     movd                m0, [blockq]
     mova                m1, [pw_11585x2]
@@ -3115,7 +3114,7 @@ VP9_IDCT_IDCT_32x32_ADD_XMM avx
 
 %if ARCH_X86_64 && HAVE_AVX2_EXTERNAL
 INIT_YMM avx2
-cglobal vp9_idct_idct_32x32_add, 4, 9, 16, 2048, dst, stride, block, eob
+cglobal vp9_idct_idct_32x32_add, 4, 9, 16, 2048, "p", dst, "p-", stride, "p", block, "d", eob
     cmp eobd, 135
     jg .idctfull
     cmp eobd, 1

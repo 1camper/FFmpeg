@@ -26,13 +26,11 @@ SECTION .text
 
 INIT_XMM sse4
 %if ARCH_X86_64
-    cglobal flac_enc_lpc_16, 5, 7, 8, 0, res, smp, len, order, coefs
+    cglobal flac_enc_lpc_16, 5, 7, 8, 0, "p", res, "p", smp, "d", len, "d-", order, "p", coefs
     DECLARE_REG_TMP 5, 6
     %define length r2d
-
-    movsxd orderq, orderd
 %else
-    cglobal flac_enc_lpc_16, 5, 6, 8, 0, res, smp, len, order, coefs
+    cglobal flac_enc_lpc_16, 5, 6, 8, 0, "p", res, "p", smp, "d", len, "d", order, "p", coefs
     DECLARE_REG_TMP 2, 5
     %define length r2mp
 %endif

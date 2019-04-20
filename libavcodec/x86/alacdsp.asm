@@ -26,17 +26,18 @@ SECTION .text
 
 INIT_XMM sse4
 %if ARCH_X86_64
-cglobal alac_decorrelate_stereo, 2, 5, 8, buf0, len, shift, weight, buf1
+cglobal alac_decorrelate_stereo, 2, 5, 8, "p", buf0, "d", len, "d", shift, "d", weight, buf1
 %else
-cglobal alac_decorrelate_stereo, 2, 3, 8, buf0, len, shift, weight
+cglobal alac_decorrelate_stereo, 2, 3, 8, "p", buf0, "d", len, "d", shift, "d", weight
+%define  buf1p  r2p
 %define  buf1q  r2q
 %endif
     movd    m6, shiftm
     movd    m7, weightm
     SPLATD  m7
     shl   lend, 2
-    mov  buf1q, [buf0q + gprsize]
-    mov  buf0q, [buf0q]
+    mov  buf1p, [buf0q + ptrsize]
+    mov  buf0p, [buf0q]
     add  buf1q, lenq
     add  buf0q, lenq
     neg  lenq
@@ -65,14 +66,13 @@ align 16
     RET
 
 INIT_XMM sse2
-cglobal alac_append_extra_bits_stereo, 2, 5, 5, buf0, exbuf0, buf1, exbuf1, len
-    movifnidn lend, lenm
+cglobal alac_append_extra_bits_stereo, 5, 5, 5, "p", buf0, "p", exbuf0, "d*", buf1, "d*", exbuf1, "d", len
     movd      m4, r2m ; exbits
     shl     lend, 2
-    mov    buf1q, [buf0q + gprsize]
-    mov    buf0q, [buf0q]
-    mov  exbuf1q, [exbuf0q + gprsize]
-    mov  exbuf0q, [exbuf0q]
+    mov    buf1p, [buf0q + ptrsize]
+    mov    buf0p, [buf0q]
+    mov  exbuf1p, [exbuf0q + ptrsize]
+    mov  exbuf0p, [exbuf0q]
     add    buf1q, lenq
     add    buf0q, lenq
     add  exbuf1q, lenq
@@ -103,16 +103,16 @@ align 16
     REP_RET
 
 %if ARCH_X86_64
-cglobal alac_append_extra_bits_mono, 2, 5, 3, buf, exbuf, exbits, ch, len
+cglobal alac_append_extra_bits_mono, 5, 5, 3, "p", buf, "p", exbuf, "d*", exbits, "d*", ch, "d", len
 %else
-cglobal alac_append_extra_bits_mono, 2, 3, 3, buf, exbuf, len
+cglobal alac_append_extra_bits_mono, 2, 3, 3, "p", buf, "p", exbuf, len
 %define exbitsm r2m
+    mov    lend, r4m
 %endif
-    movifnidn lend, r4m
     movd     m2, exbitsm
     shl    lend, 2
-    mov    bufq, [bufq]
-    mov  exbufq, [exbufq]
+    mov    bufp, [bufq]
+    mov  exbufp, [exbufq]
     add    bufq, lenq
     add  exbufq, lenq
     neg lenq

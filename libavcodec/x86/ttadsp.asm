@@ -28,10 +28,9 @@ pd_n0113: dd ~0, ~1, ~1, ~3
 pd_1224:  dd 1, 2, 2, 4
 
 SECTION .text
-
 %macro TTA_FILTER 2
 INIT_XMM %1
-cglobal tta_filter_process, 5,5,%2, qm, dx, dl, error, in, shift, round
+cglobal tta_filter_process, 5,5,%2, "p", qm, "p", dx, "p", dl, "p", error, "p", in, "d", shift, "d", round
     mova       m2, [qmq       ]
     mova       m3, [qmq + 0x10]
     mova       m4, [dxq       ]

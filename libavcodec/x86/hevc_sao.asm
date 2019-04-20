@@ -122,7 +122,7 @@ DEFINE_ARGS dst, src, dststride, srcstride, offset, height
 ;void ff_hevc_sao_band_filter_<width>_8_<opt>(uint8_t *_dst, uint8_t *_src, ptrdiff_t _stride_dst, ptrdiff_t _stride_src,
 ;                                             int16_t *sao_offset_val, int sao_left_class, int width, int height);
 %macro HEVC_SAO_BAND_FILTER 2
-cglobal hevc_sao_band_filter_%1_8, 6, 6, 15, 7*mmsize*ARCH_X86_32, dst, src, dststride, srcstride, offset, left
+cglobal hevc_sao_band_filter_%1_8, 6, 6, 15, 7*mmsize*ARCH_X86_32, "p", dst, "p", src, "p-", dststride, "p-", srcstride, "p", offset, "d", left
     HEVC_SAO_BAND_FILTER_INIT
 
 align 16
@@ -253,13 +253,13 @@ HEVC_SAO_BAND_FILTER 64, 2
 ;                                             int eo, int width, int height);
 %macro HEVC_SAO_EDGE_FILTER 2-3
 %if ARCH_X86_64
-cglobal hevc_sao_edge_filter_%1_8, 4, 9, 8, dst, src, dststride, offset, eo, a_stride, b_stride, height, tmp
+cglobal hevc_sao_edge_filter_%1_8, 4, 9, 8, "p", dst, "p", src, "p-", dststride, "p", offset, "d", eo, a_stride, b_stride, height, tmp
 %define tmp2q heightq
     HEVC_SAO_EDGE_FILTER_INIT
     mov          heightd, r6m
 
 %else ; ARCH_X86_32
-cglobal hevc_sao_edge_filter_%1_8, 1, 6, 8, dst, src, dststride, a_stride, b_stride, height
+cglobal hevc_sao_edge_filter_%1_8, 1, 6, 8, "p", dst, "p", src, "p-", dststride, a_stride, b_stride, height
 %define eoq   srcq
 %define tmpq  heightq
 %define tmp2q dststrideq

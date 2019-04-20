@@ -92,12 +92,12 @@ INIT_MMX mmx
 ;                                    x86_reg stride, int rnd, int64_t shift)
 ; Sacrificing m6 makes it possible to pipeline loads from src
 %if ARCH_X86_32
-cglobal vc1_put_ver_16b_shift2, 3,6,0, dst, src, stride
+cglobal vc1_put_ver_16b_shift2, 3,6,0, "p", dst, "p", src, "q", stride
     DECLARE_REG_TMP     3, 4, 5
     %define rnd r3mp
     %define shift qword r4m
 %else ; X86_64
-cglobal vc1_put_ver_16b_shift2, 4,7,0, dst, src, stride
+cglobal vc1_put_ver_16b_shift2, 4,7,0, "p", dst, "p", src, "q", stride
     DECLARE_REG_TMP     4, 5, 6
     %define   rnd r3d
     ; We need shift either in memory or in a mm reg as it's used in psraw
@@ -151,7 +151,7 @@ cglobal vc1_put_ver_16b_shift2, 4,7,0, dst, src, stride
 ; Data is already unpacked, so some operations can directly be made from
 ; memory.
 %macro HOR_16B_SHIFT2 2 ; op, opname
-cglobal vc1_%2_hor_16b_shift2, 4, 5, 0, dst, stride, src, rnd, h
+cglobal vc1_%2_hor_16b_shift2, 4, 5, 0, "p", dst, "q", stride, "p", src, "d", rnd, h
     mov                hq, 8
     sub              srcq, 2
     sub              rndd, (-1+9+9-1) * 1024 ; add -1024 bias
@@ -227,7 +227,7 @@ HOR_16B_SHIFT2 OP_AVG, avg
 
 ; ff_vc1_inv_trans_?x?_dc_mmxext(uint8_t *dest, ptrdiff_t linesize, int16_t *block)
 INIT_MMX mmxext
-cglobal vc1_inv_trans_4x4_dc, 3,4,0, dest, linesize, block
+cglobal vc1_inv_trans_4x4_dc, 3,4,0, "p", dest, "p-", linesize, "p", block
     movsx         r3d, WORD [blockq]
     mov        blockd, r3d             ; dc
     shl        blockd, 4               ; 16 * dc
@@ -244,7 +244,7 @@ cglobal vc1_inv_trans_4x4_dc, 3,4,0, dest, linesize, block
     RET
 
 INIT_MMX mmxext
-cglobal vc1_inv_trans_4x8_dc, 3,4,0, dest, linesize, block
+cglobal vc1_inv_trans_4x8_dc, 3,4,0, "p", dest, "p-", linesize, "p", block
     movsx         r3d, WORD [blockq]
     mov        blockd, r3d             ; dc
     shl        blockd, 4               ; 16 * dc
@@ -262,7 +262,7 @@ cglobal vc1_inv_trans_4x8_dc, 3,4,0, dest, linesize, block
     RET
 
 INIT_MMX mmxext
-cglobal vc1_inv_trans_8x4_dc, 3,4,0, dest, linesize, block
+cglobal vc1_inv_trans_8x4_dc, 3,4,0, "p", dest, "p-", linesize, "p", block
     movsx      blockd, WORD [blockq]   ; dc
     lea        blockd, [blockq*3+1]    ;  3 * dc + 1
     sar        blockd, 1               ; >> 1
@@ -277,7 +277,7 @@ cglobal vc1_inv_trans_8x4_dc, 3,4,0, dest, linesize, block
     RET
 
 INIT_MMX mmxext
-cglobal vc1_inv_trans_8x8_dc, 3,3,0, dest, linesize, block
+cglobal vc1_inv_trans_8x8_dc, 3,3,0, "p", dest, "p-", linesize, "p", block
     movsx      blockd, WORD [blockq]   ; dc
     lea        blockd, [blockq*3+1]    ;  3 * dc + 1
     sar        blockd, 1               ; >> 1

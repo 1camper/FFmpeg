@@ -29,9 +29,9 @@ SECTION .text
 ;------------------------------------------------------------------------------
 %macro INT32_TO_FLOAT_FMUL_SCALAR 1
 %if UNIX64
-cglobal int32_to_float_fmul_scalar, 3, 3, %1, dst, src, len
+cglobal int32_to_float_fmul_scalar, 3, 3, %1, "p", dst, "p", src, "d", len
 %else
-cglobal int32_to_float_fmul_scalar, 4, 4, %1, dst, src, mul, len
+cglobal int32_to_float_fmul_scalar, 4, 4, %1, "p", dst, "p", src, "d*", mul, "d", len
 %endif
 %if WIN64
     SWAP 0, 2
@@ -81,7 +81,7 @@ INT32_TO_FLOAT_FMUL_SCALAR 3
 ;                                    const float *mul, int len);
 ;------------------------------------------------------------------------------
 %macro INT32_TO_FLOAT_FMUL_ARRAY8 0
-cglobal int32_to_float_fmul_array8, 5, 5, 5, c, dst, src, mul, len
+cglobal int32_to_float_fmul_array8, 5, 5, 5, "p", c, "p", dst, "p", src, "p", mul, "d", len
     shl     lend, 2
     add     srcq, lenq
     add     dstq, lenq

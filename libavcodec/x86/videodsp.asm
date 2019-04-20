@@ -28,7 +28,7 @@ SECTION .text
 
 %macro V_COPY_ROW 2 ; type (top/body/bottom), h
 .%1_y_loop:                                     ; do {
-    mov              wq, r7mp                   ;   initialize w (r7mp = wmp)
+    mov              wq, r7mq                   ;   initialize w (r7mp = wmp)
 .%1_x_loop:                                     ;   do {
     movu             m0, [srcq+wq]              ;     m0 = read($mmsize)
     movu      [dstq+wq], m0                     ;     write(m0, $mmsize)
@@ -54,10 +54,10 @@ SECTION .text
 ; |    |    <- bottom is copied from last line in body of source
 ; '----' <- bh
 %if ARCH_X86_64
-cglobal emu_edge_vvar, 7, 8, 1, dst, dst_stride, src, src_stride, \
-                                start_y, end_y, bh, w
+cglobal emu_edge_vvar, 7, 8, 1, "p", dst, "q", dst_stride, "p", src, "q", src_stride, \
+                                "q", start_y, "q", end_y, "q", bh, "q", w
 %else ; x86-32
-cglobal emu_edge_vvar, 1, 6, 1, dst, src, start_y, end_y, bh, w
+cglobal emu_edge_vvar, 1, 6, 1, "p", dst, src, start_y, end_y, bh, w
 %define src_strideq r3mp
 %define dst_strideq r1mp
     mov            srcq, r2mp
@@ -67,9 +67,9 @@ cglobal emu_edge_vvar, 1, 6, 1, dst, src, start_y, end_y, bh, w
 %endif
     sub             bhq, end_yq                 ; bh    -= end_q
     sub          end_yq, start_yq               ; end_q -= start_q
-    add            srcq, r7mp                   ; (r7mp = wmp)
-    add            dstq, r7mp                   ; (r7mp = wmp)
-    neg            r7mp                         ; (r7mp = wmp)
+    add            srcq, r7mq                   ; src   += wm
+    add            dstq, r7mq                   ; dst   += wm
+    neg            r7mq                         ; wm    =  -wm
     test       start_yq, start_yq               ; if (start_q) {
     jz .body
     V_COPY_ROW      top, start_yq               ;   v_copy_row(top, start_yq)
@@ -92,7 +92,7 @@ INIT_XMM sse
 vvar_fn
 
 %macro hvar_fn 0
-cglobal emu_edge_hvar, 5, 6, 1, dst, dst_stride, start_x, n_words, h, w
+cglobal emu_edge_hvar, 5, 6, 1, "p", dst, "q", dst_stride, "q", start_x, "q", n_words, "q", h, w
     lea            dstq, [dstq+n_wordsq*2]
     neg        n_wordsq
     lea        start_xq, [start_xq+n_wordsq*2]
@@ -269,25 +269,25 @@ hvar_fn
 %rep 1+%2-%1
 %if %%n <= 3
 %if ARCH_X86_64
-cglobal emu_edge_vfix %+ %%n, 6, 8, 0, dst, dst_stride, src, src_stride, \
-                                       start_y, end_y, val, bh
-    mov             bhq, r6mp                   ; r6mp = bhmp
+cglobal emu_edge_vfix %+ %%n, 6, 8, 0, "p", dst, "q", dst_stride, "p", src, "q", src_stride, \
+                                       "q", start_y, "q", end_y, val, bh
+    mov             bhq, r6mq                   ; r6mp = bhmp
 %else ; x86-32
 cglobal emu_edge_vfix %+ %%n, 0, 6, 0, val, dst, src, start_y, end_y, bh
-    mov            dstq, r0mp
-    mov            srcq, r2mp
-    mov        start_yq, r4mp
-    mov          end_yq, r5mp
-    mov             bhq, r6mp
-%define dst_strideq r1mp
-%define src_strideq r3mp
+    mov            dstp, r0mp
+    mov            srcp, r2mp
+    mov        start_yq, r4mq
+    mov          end_yq, r5mq
+    mov             bhq, r6mq
+%define dst_strideq r1mq
+%define src_strideq r3mq
 %endif ; x86-64/32
 %else
 %if ARCH_X86_64
-cglobal emu_edge_vfix %+ %%n, 7, 7, 1, dst, dst_stride, src, src_stride, \
-                                       start_y, end_y, bh
+cglobal emu_edge_vfix %+ %%n, 7, 7, 1, "p", dst, "q", dst_stride, "p", src, "q", src_stride, \
+                                       "q", start_y, "q", end_y, "q", bh
 %else ; x86-32
-cglobal emu_edge_vfix %+ %%n, 1, 5, 1, dst, src, start_y, end_y, bh
+cglobal emu_edge_vfix %+ %%n, 1, 5, 1, "p", dst, src, start_y, end_y, bh
     mov            srcq, r2mp
     mov        start_yq, r4mp
     mov          end_yq, r5mp
@@ -421,9 +421,9 @@ VERTICAL_EXTEND 16, 22
 %assign %%n %1
 %rep 1+(%2-%1)/2
 %if cpuflag(avx2)
-cglobal emu_edge_hfix %+ %%n, 4, 4, 1, dst, dst_stride, start_x, bh
+cglobal emu_edge_hfix %+ %%n, 4, 4, 1, "p", dst, "q", dst_stride, "q", start_x, "q", bh
 %else
-cglobal emu_edge_hfix %+ %%n, 4, 5, 1, dst, dst_stride, start_x, bh, val
+cglobal emu_edge_hfix %+ %%n, 4, 5, 1, "p", dst, "q", dst_stride, "q", start_x, "q", bh, val
 %endif
 .loop_y:                                        ; do {
     READ_V_PIXEL    %%n, [dstq+start_xq]        ;   $variable_regs = read($n)
@@ -451,7 +451,7 @@ H_EXTEND 8, 22
 %endif
 
 %macro PREFETCH_FN 1
-cglobal prefetch, 3, 3, 0, buf, stride, h
+cglobal prefetch, 3, 3, 0, "p", buf, "p-", stride, "d", h
 .loop:
     %1      [bufq]
     add      bufq, strideq
