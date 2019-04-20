@@ -27,7 +27,7 @@ SECTION .text
 INIT_MMX mmx
 
 ;void ff_pp7_dctB_mmx(int16_t *dst, int16_t *src)
-cglobal pp7_dctB, 2, 2, 0, dst, src
+cglobal pp7_dctB, 2, 2, 0, "p", dst, "p", src
     movq   m0, [srcq]
     movq   m1, [srcq+mmsize*1]
     paddw  m0, [srcq+mmsize*6]

@@ -28,7 +28,7 @@ SECTION .text
 ; Implementation that does 8-bytes at a time using single-word operations.
 %macro IDET_FILTER_LINE 1
 INIT_MMX %1
-cglobal idet_filter_line, 4, 5, 0, a, b, c, width, index
+cglobal idet_filter_line, 4, 5, 0, "p", a, "p", b, "p", c, "d", width, index
     xor       indexq, indexq
 %define   m_zero m2
 %define   m_sum  m5
@@ -94,7 +94,7 @@ IDET_FILTER_LINE mmx
 %endmacro
 
 %macro IDET_FILTER_LINE_16BIT 1   ; %1=increment (4 or 8 words)
-cglobal idet_filter_line_16bit, 4, 5, 8, a, b, c, width, index
+cglobal idet_filter_line_16bit, 4, 5, 8, "p", a, "p", b, "p", c, "d", width, index
     xor       indexq, indexq
 %define m_zero m1
 %define m_sum  m0
@@ -137,7 +137,7 @@ IDET_FILTER_LINE_16BIT 4
 ; SSE2 8-bit implementation that does 16-bytes at a time:
 
 INIT_XMM sse2
-cglobal idet_filter_line, 4, 6, 7, a, b, c, width, index, total
+cglobal idet_filter_line, 4, 6, 7, "p", a, "p", b, "p", c, "d", width, index, total
     xor       indexq, indexq
     pxor      m0, m0
     pxor      m1, m1

@@ -36,18 +36,26 @@ SECTION .text
 
 INIT_XMM sse4
 %if ARCH_X86_64
-cglobal anaglyph, 6, 10, 14, 2*6*mmsize, dst, lsrc, rsrc, dst_linesize, l_linesize, r_linesize, width, height, o, cnt
+cglobal anaglyph, 6, 10, 14, 2*6*mmsize, "p", dst, "p", lsrc, "p", rsrc, \
+                                         "p-", dst_linesize, "p-", l_linesize, "p-", r_linesize, \
+                                         width, height, o, cnt
+%define ana_matrix_rp r6p
+%define ana_matrix_gp r7p
+%define ana_matrix_bp r8p
 %define ana_matrix_rq r6q
 %define ana_matrix_gq r7q
 %define ana_matrix_bq r8q
 
 %else ; ARCH_X86_32
 %if HAVE_ALIGNED_STACK
-cglobal anaglyph, 3, 7, 8, 2*9*mmsize, dst, lsrc, rsrc, dst_linesize, l_linesize, o, cnt
+cglobal anaglyph, 3, 7, 8, 2*9*mmsize, "p", dst, "p", lsrc, "p", rsrc, "p-", dst_linesize, "p-", l_linesize, o, cnt
 %else
-cglobal anaglyph, 3, 6, 8, 2*9*mmsize, dst, lsrc, rsrc, dst_linesize, o, cnt
+cglobal anaglyph, 3, 6, 8, 2*9*mmsize, "p", dst, "p", lsrc, "p", rsrc, "p-", dst_linesize, o, cnt
 %define l_linesizeq r4mp
 %endif ; HAVE_ALIGNED_STACK
+%define ana_matrix_rp r3p
+%define ana_matrix_gp r4p
+%define ana_matrix_bp r5p
 %define ana_matrix_rq r3q
 %define ana_matrix_gq r4q
 %define ana_matrix_bq r5q
@@ -62,9 +70,9 @@ cglobal anaglyph, 3, 6, 8, 2*9*mmsize, dst, lsrc, rsrc, dst_linesize, o, cnt
 %define m13 [rsp+mmsize*17]
 %endif ; ARCH
 
-    mov        ana_matrix_rq, r8m
-    mov        ana_matrix_gq, r9m
-    mov        ana_matrix_bq, r10m
+    mov        ana_matrix_rp, r8mp
+    mov        ana_matrix_gp, r9mp
+    mov        ana_matrix_bp, r10mp
     movu                  m3, [ana_matrix_rq+ 0]
     movq                  m5, [ana_matrix_rq+16]
     pshufd                m0, m3, q0000

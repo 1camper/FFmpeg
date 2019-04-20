@@ -25,7 +25,7 @@
 SECTION .text
 
 INIT_XMM sse2
-cglobal w3fdif_scale, 3, 3, 2, 0, out_pixel, work_pixel, linesize
+cglobal w3fdif_scale, 3, 3, 2, 0, "p", out_pixel, "p", work_pixel, "d", linesize
 .loop:
     mova                         m0, [work_pixelq]
     mova                         m1, [work_pixelq+mmsize]
@@ -40,15 +40,15 @@ cglobal w3fdif_scale, 3, 3, 2, 0, out_pixel, work_pixel, linesize
     jg .loop
 REP_RET
 
-cglobal w3fdif_simple_low, 4, 5, 6, 0, work_line, in_lines_cur0, coef, linesize, offset
+cglobal w3fdif_simple_low, 4, 5, 6, 0, "p", work_line, "p", in_lines_cur0, "p", coef, "d", linesize, offset
     movd                  m1, [coefq]
     DEFINE_ARGS    work_line, in_lines_cur0, in_lines_cur1, linesize, offset
     SPLATW                m0, m1, 0
     SPLATW                m1, m1, 1
     pxor                  m4, m4
     mov              offsetq, 0
-    mov       in_lines_cur1q, [in_lines_cur0q + gprsize]
-    mov       in_lines_cur0q, [in_lines_cur0q]
+    mov       in_lines_cur1p, [in_lines_cur0q + ptrsize]
+    mov       in_lines_cur0p, [in_lines_cur0q]
 
 .loop:
     movh                                   m2, [in_lines_cur0q+offsetq]
@@ -65,17 +65,17 @@ cglobal w3fdif_simple_low, 4, 5, 6, 0, work_line, in_lines_cur0, coef, linesize,
     jg .loop
 REP_RET
 
-cglobal w3fdif_complex_low, 4, 7, 8, 0, work_line, in_lines_cur0, coef, linesize
+cglobal w3fdif_complex_low, 4, 7, 8, 0, "p", work_line, "p", in_lines_cur0, "p", coef, "d", linesize
     movq                  m0, [coefq]
     DEFINE_ARGS    work_line, in_lines_cur0, in_lines_cur1, linesize, offset, in_lines_cur2, in_lines_cur3
     pshufd                m2, m0, q1111
     SPLATD                m0
     pxor                  m1, m1
     mov              offsetq, 0
-    mov       in_lines_cur3q, [in_lines_cur0q+gprsize*3]
-    mov       in_lines_cur2q, [in_lines_cur0q+gprsize*2]
-    mov       in_lines_cur1q, [in_lines_cur0q+gprsize]
-    mov       in_lines_cur0q, [in_lines_cur0q]
+    mov       in_lines_cur3p, [in_lines_cur0q+ptrsize*3]
+    mov       in_lines_cur2p, [in_lines_cur0q+ptrsize*2]
+    mov       in_lines_cur1p, [in_lines_cur0q+ptrsize]
+    mov       in_lines_cur0p, [in_lines_cur0q]
 
 .loop:
     movh                                   m4, [in_lines_cur0q+offsetq]
@@ -102,9 +102,9 @@ cglobal w3fdif_complex_low, 4, 7, 8, 0, work_line, in_lines_cur0, coef, linesize
 REP_RET
 
 %if ARCH_X86_64
-cglobal w3fdif_simple_high, 5, 9, 8, 0, work_line, in_lines_cur0, in_lines_adj0, coef, linesize
+cglobal w3fdif_simple_high, 5, 9, 8, 0, "p", work_line, "p", in_lines_cur0, "p", in_lines_adj0, "p", coef, "d", linesize
 %else
-cglobal w3fdif_simple_high, 4, 7, 8, 0, work_line, in_lines_cur0, in_lines_adj0, coef, linesize
+cglobal w3fdif_simple_high, 4, 7, 8, 0, "p", work_line, "p", in_lines_cur0, "p", in_lines_adj0, "p", coef, linesize
 %endif
     movq                  m2, [coefq]
 %if ARCH_X86_64
@@ -118,12 +118,12 @@ cglobal w3fdif_simple_high, 4, 7, 8, 0, work_line, in_lines_cur0, in_lines_adj0,
     pshufd                m0, m2, q0000
     SPLATW                m2, m2, 2
     pxor                  m7, m7
-    mov       in_lines_cur2q, [in_lines_cur0q+gprsize*2]
-    mov       in_lines_cur1q, [in_lines_cur0q+gprsize]
-    mov       in_lines_cur0q, [in_lines_cur0q]
-    mov       in_lines_adj2q, [in_lines_adj0q+gprsize*2]
-    mov       in_lines_adj1q, [in_lines_adj0q+gprsize]
-    mov       in_lines_adj0q, [in_lines_adj0q]
+    mov       in_lines_cur2p, [in_lines_cur0q+ptrsize*2]
+    mov       in_lines_cur1p, [in_lines_cur0q+ptrsize]
+    mov       in_lines_cur0p, [in_lines_cur0q]
+    mov       in_lines_adj2p, [in_lines_adj0q+ptrsize*2]
+    mov       in_lines_adj1p, [in_lines_adj0q+ptrsize]
+    mov       in_lines_adj0p, [in_lines_adj0q]
 
 %if ARCH_X86_32
     sub in_lines_cur1q, in_lines_cur0q
@@ -183,7 +183,7 @@ REP_RET
 
 %if ARCH_X86_64
 
-cglobal w3fdif_complex_high, 5, 13, 10, 0, work_line, in_lines_cur0, in_lines_adj0, coef, linesize
+cglobal w3fdif_complex_high, 5, 13, 10, 0, "p", work_line, "p", in_lines_cur0, "p", in_lines_adj0, "p", coef, "d", linesize
     movq                  m0, [coefq+0]
     movd                  m4, [coefq+8]
     DEFINE_ARGS    work_line, in_lines_cur0, in_lines_adj0, in_lines_cur1, linesize, offset, in_lines_cur2, in_lines_cur3, in_lines_cur4, in_lines_adj1, in_lines_adj2, in_lines_adj3, in_lines_adj4
@@ -192,16 +192,16 @@ cglobal w3fdif_complex_high, 5, 13, 10, 0, work_line, in_lines_cur0, in_lines_ad
     SPLATW                m4, m4
     pxor                  m3, m3
     mov              offsetq, 0
-    mov       in_lines_cur4q, [in_lines_cur0q+gprsize*4]
-    mov       in_lines_cur3q, [in_lines_cur0q+gprsize*3]
-    mov       in_lines_cur2q, [in_lines_cur0q+gprsize*2]
-    mov       in_lines_cur1q, [in_lines_cur0q+gprsize]
-    mov       in_lines_cur0q, [in_lines_cur0q]
-    mov       in_lines_adj4q, [in_lines_adj0q+gprsize*4]
-    mov       in_lines_adj3q, [in_lines_adj0q+gprsize*3]
-    mov       in_lines_adj2q, [in_lines_adj0q+gprsize*2]
-    mov       in_lines_adj1q, [in_lines_adj0q+gprsize]
-    mov       in_lines_adj0q, [in_lines_adj0q]
+    mov       in_lines_cur4p, [in_lines_cur0q+ptrsize*4]
+    mov       in_lines_cur3p, [in_lines_cur0q+ptrsize*3]
+    mov       in_lines_cur2p, [in_lines_cur0q+ptrsize*2]
+    mov       in_lines_cur1p, [in_lines_cur0q+ptrsize]
+    mov       in_lines_cur0p, [in_lines_cur0q]
+    mov       in_lines_adj4p, [in_lines_adj0q+ptrsize*4]
+    mov       in_lines_adj3p, [in_lines_adj0q+ptrsize*3]
+    mov       in_lines_adj2p, [in_lines_adj0q+ptrsize*2]
+    mov       in_lines_adj1p, [in_lines_adj0q+ptrsize]
+    mov       in_lines_adj0p, [in_lines_adj0q]
 
 .loop:
     movh                                   m5, [in_lines_cur0q+offsetq]

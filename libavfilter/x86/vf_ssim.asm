@@ -32,9 +32,9 @@ SECTION .text
 
 %macro SSIM_4X4_LINE 1
 %if ARCH_X86_64
-cglobal ssim_4x4_line, 6, 8, %1, buf, buf_stride, ref, ref_stride, sums, w, buf_stride3, ref_stride3
+cglobal ssim_4x4_line, 6, 8, %1, "p", buf, "p-", buf_stride, "p", ref, "p-", ref_stride, "p", sums, "d", w, buf_stride3, ref_stride3
 %else
-cglobal ssim_4x4_line, 5, 7, %1, buf, buf_stride, ref, ref_stride, sums, buf_stride3, ref_stride3
+cglobal ssim_4x4_line, 5, 7, %1, "p", buf, "p-", buf_stride, "p", ref, "p-", ref_stride, "p", sums, buf_stride3, ref_stride3
 %define wd r5mp
 %endif
     lea     ref_stride3q, [ref_strideq*3]
@@ -169,7 +169,7 @@ SSIM_4X4_LINE 8
 %endif
 
 INIT_XMM sse4
-cglobal ssim_end_line, 3, 3, 6, sum0, sum1, w
+cglobal ssim_end_line, 3, 3, 6, "p", sum0, "p", sum1, "d", w
     pxor              m0, m0
 .loop:
     mova              m1, [sum0q+mmsize*0]

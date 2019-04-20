@@ -277,11 +277,11 @@ SECTION .text
 
 %macro YADIF 0
 %if ARCH_X86_32
-cglobal yadif_filter_line_16bit, 4, 6, 8, 80, dst, prev, cur, next, w, \
-                                              prefs, mrefs, parity, mode
+cglobal yadif_filter_line_16bit, 4, 6, 8, 80, "p", dst, "p", prev, "p", cur, "p", next, "d", w, \
+                                              "d", prefs, "d", mrefs, "d", parity, "d", mode
 %else
-cglobal yadif_filter_line_16bit, 4, 7, 8, 80, dst, prev, cur, next, w, \
-                                              prefs, mrefs, parity, mode
+cglobal yadif_filter_line_16bit, 4, 7, 8, 80, "p", dst, "p", prev, "p", cur, "p", next, "d", w, \
+                                              "d", prefs, "d", mrefs, "d", parity, "d", mode
 %endif
 %if ARCH_X86_32
     mov            r4, r5mp
