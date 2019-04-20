@@ -48,12 +48,11 @@ SECTION .text
 ; shuffle_bytes_2103_mmext (const uint8_t *src, uint8_t *dst, int src_size)
 ;------------------------------------------------------------------------------
 INIT_MMX mmxext
-cglobal shuffle_bytes_2103, 3, 5, 8, src, dst, w, tmp, x
+cglobal shuffle_bytes_2103, 3, 5, 8, "p", src, "p", dst, "d-", w, tmp, x
     mova   m6, [pb_mask_shuffle2103_mmx]
     mova   m7, m6
     psllq  m7, 8
 
-    movsxdifnidn wq, wd
     mov xq, wq
 
     add        srcq, wq
@@ -111,9 +110,8 @@ jge .end
 ;------------------------------------------------------------------------------
 ; %1-4 index shuffle
 %macro SHUFFLE_BYTES 4
-cglobal shuffle_bytes_%1%2%3%4, 3, 5, 2, src, dst, w, tmp, x
+cglobal shuffle_bytes_%1%2%3%4, 3, 5, 2, "p", src, "p", dst, "d-", w, tmp, x
     VBROADCASTI128    m0, [pb_shuffle%1%2%3%4]
-    movsxdifnidn wq, wd
     mov xq, wq
 
     add        srcq, wq
@@ -165,15 +163,11 @@ SHUFFLE_BYTES 3, 2, 1, 0
 ;              int lumStride, int chromStride, int srcStride)
 ;-----------------------------------------------------------------------------------------------
 %macro UYVY_TO_YUV422 0
-cglobal uyvytoyuv422, 9, 14, 8, ydst, udst, vdst, src, w, h, lum_stride, chrom_stride, src_stride, wtwo, whalf, tmp, x, back_w
+cglobal uyvytoyuv422, 9, 14, 8, "p", ydst, "p", udst, "p", vdst, "p", src, "d-", w, "d", h, \
+                                "d-", lum_stride, "d-", chrom_stride, "d-", src_stride, wtwo, whalf, tmp, x, back_w
     pxor         m0, m0
     pcmpeqw      m1, m1
     psrlw        m1, 8
-
-    movsxdifnidn            wq, wd
-    movsxdifnidn   lum_strideq, lum_strided
-    movsxdifnidn chrom_strideq, chrom_strided
-    movsxdifnidn   src_strideq, src_strided
 
     mov     back_wq, wq
     mov      whalfq, wq

@@ -84,14 +84,14 @@ SECTION .text
     movsx     cntr_reg,  fltsizem
 .filterloop_%2_ %+ %%i:
     ; input pixels
-    mov             r6, [srcq+gprsize*cntr_reg-2*gprsize]
+    mov             r6p, [srcq+ptrsize*cntr_reg-2*ptrsize]
 %if %1 == 16
     mova            m3, [r6+r5*4]
     mova            m5, [r6+r5*4+mmsize]
 %else ; %1 == 8/9/10
     mova            m3, [r6+r5*2]
 %endif ; %1 == 8/9/10/16
-    mov             r6, [srcq+gprsize*cntr_reg-gprsize]
+    mov             r6p, [srcq+ptrsize*cntr_reg-ptrsize]
 %if %1 == 16
     mova            m4, [r6+r5*4]
     mova            m6, [r6+r5*4+mmsize]
@@ -177,7 +177,7 @@ SECTION .text
 %define movsx movsxd
 %endif
 
-cglobal yuv2planeX_%1, %3, 8, %2, filter, fltsize, src, dst, w, dither, offset
+cglobal yuv2planeX_%1, %3, 8, %2, "p", filter, "d-*", fltsize, "p", src, "p", dst, "d", w, "p", dither, "d", offset
 %if %1 == 8 || %1 == 9 || %1 == 10
     pxor            m6,  m6
 %endif ; %1 == 8/9/10
@@ -330,8 +330,7 @@ yuv2planeX_fn 10,  7, 5
 %endmacro
 
 %macro yuv2plane1_fn 3
-cglobal yuv2plane1_%1, %3, %3, %2, src, dst, w, dither, offset
-    movsxdifnidn    wq, wd
+cglobal yuv2plane1_%1, %3, %3, %2, "p", src, "p", dst, "d-", w, "p", dither, "d", offset
     add             wq, mmsize - 1
     and             wq, ~(mmsize - 1)
 %if %1 == 8

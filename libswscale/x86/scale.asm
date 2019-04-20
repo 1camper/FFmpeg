@@ -50,12 +50,11 @@ SECTION .text
 ; SCALE_FUNC source_width, intermediate_nbits, filtersize, filtersuffix, n_args, n_xmm
 %macro SCALE_FUNC 6
 %ifnidn %3, X
-cglobal hscale%1to%2_%4, %5, 7, %6, pos0, dst, w, src, filter, fltpos, pos1
+cglobal hscale%1to%2_%4, %5, 7, %6, "p", pos0, "p", dst, "d-", w, "p", src, "p", filter, "p", fltpos, pos1
 %else
-cglobal hscale%1to%2_%4, %5, 10, %6, pos0, dst, w, srcmem, filter, fltpos, fltsize
+cglobal hscale%1to%2_%4, %5, 10, %6, "p", pos0, "p", dst, "d-", w, "p", srcmem, "p", filter, "p", fltpos, "d-", fltsize
 %endif
 %if ARCH_X86_64
-    movsxd        wq, wd
 %define mov32 movsxd
 %else ; x86-32
 %define mov32 mov
@@ -245,12 +244,13 @@ cglobal hscale%1to%2_%4, %5, 10, %6, pos0, dst, w, srcmem, filter, fltpos, fltsi
 %endif ; %4 ==/!= X4
 %if ARCH_X86_64
 %define srcq    r8
+%define srcp    r8p
 %define pos1q   r7
 %define srcendq r9
-    movsxd  fltsizeq, fltsized                  ; filterSize
     lea      srcendq, [srcmemq+(fltsizeq-dlt)*srcmul] ; &src[filterSize&~4]
 %else ; x86-32
 %define srcq    srcmemq
+%define srcp    srcmemp
 %define pos1q   dstq
 %define srcendq r6m
     lea        pos0q, [srcmemq+(fltsizeq-dlt)*srcmul] ; &src[filterSize&~4]
@@ -262,7 +262,7 @@ cglobal hscale%1to%2_%4, %5, 10, %6, pos0, dst, w, srcmem, filter, fltpos, fltsi
 %else ; %2 == 19
     lea         dstq, [dstq+wq*4]
 %endif ; %2 == 15/19
-    movifnidn  dstmp, dstq
+    movifnidn  dstmp, dstp
     neg           wq
 
 .loop:
@@ -271,7 +271,7 @@ cglobal hscale%1to%2_%4, %5, 10, %6, pos0, dst, w, srcmem, filter, fltpos, fltsi
     ; FIXME maybe do 4px/iteration on x86-64 (x86-32 wouldn't have enough regs)?
     pxor          m4, m4
     pxor          m5, m5
-    mov         srcq, srcmemmp
+    mov         srcp, srcmemmp
 
 .innerloop:
     ; load 2x4 (mmx) or 2x8 (sse) source pixels into m0/m1 -> m4/m5
@@ -354,7 +354,7 @@ cglobal hscale%1to%2_%4, %5, 10, %6, pos0, dst, w, srcmem, filter, fltpos, fltsi
     ; clip, store
     psrad         m0, 14 + %1 - %2
 %ifidn %3, X
-    movifnidn   dstq, dstmp
+    movifnidn   dstp, dstmp
 %endif ; %3 == X
 %if %2 == 15
     packssdw      m0, m0

@@ -108,7 +108,7 @@ SECTION .text
 ; %1 = nr. of XMM registers
 ; %2 = rgb or bgr
 %macro RGB24_TO_Y_FN 2-3
-cglobal %2 %+ 24ToY, 6, 6, %1, dst, src, u1, u2, w, table
+cglobal %2 %+ 24ToY, 6, 6, %1, "p", dst, "p", src, "p*", u1, "p*", u2, "d-", w, "p", table
 %if mmsize == 8
     mova           m5, [%2_Ycoeff_12x4]
     mova           m6, [%2_Ycoeff_3x56]
@@ -137,9 +137,6 @@ cglobal %2 %+ 24ToY, 6, 6, %1, dst, src, u1, u2, w, table
 %define shuf_rgb2 [shuf_rgb_3x56]
 %endif ; x86-32/64
 %endif ; cpuflag(ssse3)
-%if ARCH_X86_64
-    movsxd         wq, wd
-%endif
     add            wq, wq
     add          dstq, wq
     neg            wq
@@ -197,7 +194,7 @@ cglobal %2 %+ 24ToY, 6, 6, %1, dst, src, u1, u2, w, table
 ; %1 = nr. of XMM registers
 ; %2 = rgb or bgr
 %macro RGB24_TO_UV_FN 2-3
-cglobal %2 %+ 24ToUV, 7, 7, %1, dstU, dstV, u1, src, u2, w, table
+cglobal %2 %+ 24ToUV, 7, 7, %1, "p", dstU, "p", dstV, "p*", u1, "p", src, "p*", u2, "d-", w, "p", table
 %if ARCH_X86_64
     mova           m8, [%2_Ucoeff_12x4]
     mova           m9, [%2_Ucoeff_3x56]
@@ -227,11 +224,6 @@ cglobal %2 %+ 24ToUV, 7, 7, %1, dstU, dstV, u1, src, u2, w, table
 %define shuf_rgb2 [shuf_rgb_3x56]
 %endif ; x86-32/64
 %endif ; cpuflag(ssse3)
-%if ARCH_X86_64
-    movsxd         wq, dword r5m
-%else ; x86-32
-    mov            wq, r5m
-%endif
     add            wq, wq
     add         dstUq, wq
     add         dstVq, wq
@@ -337,16 +329,13 @@ RGB24_FUNCS 11, 13
 ; %1 = nr. of XMM registers
 ; %2-5 = rgba, bgra, argb or abgr (in individual characters)
 %macro RGB32_TO_Y_FN 5-6
-cglobal %2%3%4%5 %+ ToY, 6, 6, %1, dst, src, u1, u2, w, table
+cglobal %2%3%4%5 %+ ToY, 6, 6, %1, "p", dst, "p", src, "p*", u1, "p*", u2, "d-", w, "p", table
     mova           m5, [rgba_Ycoeff_%2%4]
     mova           m6, [rgba_Ycoeff_%3%5]
 %if %0 == 6
     jmp mangle(private_prefix %+ _ %+ %6 %+ ToY %+ SUFFIX).body
 %else ; %0 == 6
 .body:
-%if ARCH_X86_64
-    movsxd         wq, wd
-%endif
     add            wq, wq
     sub            wq, mmsize - 1
     lea          srcq, [srcq+wq*2]
@@ -398,7 +387,7 @@ cglobal %2%3%4%5 %+ ToY, 6, 6, %1, dst, src, u1, u2, w, table
 ; %1 = nr. of XMM registers
 ; %2-5 = rgba, bgra, argb or abgr (in individual characters)
 %macro RGB32_TO_UV_FN 5-6
-cglobal %2%3%4%5 %+ ToUV, 7, 7, %1, dstU, dstV, u1, src, u2, w, table
+cglobal %2%3%4%5 %+ ToUV, 7, 7, %1, "p", dstU, "p", dstV, "p*", u1, "p", src, "p*", u2, "d-", w, "p", table
 %if ARCH_X86_64
     mova           m8, [rgba_Ucoeff_%2%4]
     mova           m9, [rgba_Ucoeff_%3%5]
@@ -418,11 +407,6 @@ cglobal %2%3%4%5 %+ ToUV, 7, 7, %1, dstU, dstV, u1, src, u2, w, table
     jmp mangle(private_prefix %+ _ %+ %6 %+ ToUV %+ SUFFIX).body
 %else ; ARCH_X86_64 && %0 == 6
 .body:
-%if ARCH_X86_64
-    movsxd         wq, dword r5m
-%else ; x86-32
-    mov            wq, r5m
-%endif
     add            wq, wq
     sub            wq, mmsize - 1
     add         dstUq, wq
@@ -559,10 +543,7 @@ RGB32_FUNCS 8, 12
 ;      will be the same (i.e. YUYV+AVX), and thus we don't need to
 ;      split the loop in an aligned and unaligned case
 %macro YUYV_TO_Y_FN 2-3
-cglobal %2ToY, 5, 5, %1, dst, unused0, unused1, src, w
-%if ARCH_X86_64
-    movsxd         wq, wd
-%endif
+cglobal %2ToY, 5, 5, %1, "p", dst, "p*", unused0, "p*", unused1, "p", src, "d-", w
     add          dstq, wq
 %if mmsize == 16
     test         srcq, 15
@@ -629,12 +610,9 @@ cglobal %2ToY, 5, 5, %1, dst, unused0, unused1, src, w
 ;      will be the same (i.e. UYVY+AVX), and thus we don't need to
 ;      split the loop in an aligned and unaligned case
 %macro YUYV_TO_UV_FN 2-3
-cglobal %2ToUV, 4, 5, %1, dstU, dstV, unused, src, w
-%if ARCH_X86_64
-    movsxd         wq, dword r5m
-%else ; x86-32
-    mov            wq, r5m
-%endif
+cglobal %2ToUV, 4, 5, %1, "p", dstU, "p", dstV, "p*", unused, "p", src, "p*", unused2, "d-*", w
+    ASSIGN_ARG w, 4
+    LOAD_ARG w
     add         dstUq, wq
     add         dstVq, wq
 %if mmsize == 16 && %0 == 2
@@ -684,12 +662,9 @@ cglobal %2ToUV, 4, 5, %1, dstU, dstV, unused, src, w
 ; %1 = nr. of XMM registers
 ; %2 = nv12 or nv21
 %macro NVXX_TO_UV_FN 2
-cglobal %2ToUV, 4, 5, %1, dstU, dstV, unused, src, w
-%if ARCH_X86_64
-    movsxd         wq, dword r5m
-%else ; x86-32
-    mov            wq, r5m
-%endif
+cglobal %2ToUV, 4, 5, %1, "p", dstU, "p", dstV, "p*", unused, "p", src, "p*", unused2, "d-*", w
+    ASSIGN_ARG w, 4
+    LOAD_ARG w
     add         dstUq, wq
     add         dstVq, wq
 %if mmsize == 16
