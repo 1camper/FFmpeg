@@ -28,7 +28,7 @@ w1 : times 16 dw 1
 SECTION .text
 
 %macro MIX2_FLT 1
-cglobal mix_2_1_%1_float, 7, 7, 6, out, in1, in2, coeffp, index1, index2, len
+cglobal mix_2_1_%1_float, 7, 7, 6, "p", out, "p", in1, "p", in2, "p", coeffp, "q", index1, "q", index2, "q", len
 %ifidn %1, a
     test in1q, mmsize-1
         jne mix_2_1_float_u_int %+ SUFFIX
@@ -72,7 +72,7 @@ mix_2_1_float_u_int %+ SUFFIX:
 %endmacro
 
 %macro MIX1_FLT 1
-cglobal mix_1_1_%1_float, 5, 5, 3, out, in, coeffp, index, len
+cglobal mix_1_1_%1_float, 5, 5, 3, "p", out, "p", in, "p", coeffp, "q", index, "q", len
 %ifidn %1, a
     test inq, mmsize-1
         jne mix_1_1_float_u_int %+ SUFFIX
@@ -104,7 +104,7 @@ mix_1_1_float_u_int %+ SUFFIX:
 %endmacro
 
 %macro MIX1_INT16 1
-cglobal mix_1_1_%1_int16, 5, 5, 6, out, in, coeffp, index, len
+cglobal mix_1_1_%1_int16, 5, 5, 6, "p", out, "p", in, "p", coeffp, "q", index, "q", len
 %ifidn %1, a
     test inq, mmsize-1
         jne mix_1_1_int16_u_int %+ SUFFIX
@@ -157,7 +157,7 @@ mix_1_1_int16_u_int %+ SUFFIX:
 %endmacro
 
 %macro MIX2_INT16 1
-cglobal mix_2_1_%1_int16, 7, 7, 8, out, in1, in2, coeffp, index1, index2, len
+cglobal mix_2_1_%1_int16, 7, 7, 8, "p", out, "p", in1, "p", in2, "p", coeffp, "q", index1, "q", index2, "q", len
 %ifidn %1, a
     test in1q, mmsize-1
         jne mix_2_1_int16_u_int %+ SUFFIX

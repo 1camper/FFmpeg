@@ -22,15 +22,9 @@
 
 %include "libavutil/x86/x86util.asm"
 
-%if ARCH_X86_64
-%define pointer resq
-%else
-%define pointer resd
-%endif
-
 struc ResampleContext
-    .av_class:              pointer 1
-    .filter_bank:           pointer 1
+    .av_class:              resp 1
+    .filter_bank:           resp 1
     .filter_length:         resd 1
     .filter_alloc:          resd 1
     .ideal_dst_incr:        resd 1
@@ -59,7 +53,7 @@ SECTION .text
 ; int resample_common_$format(ResampleContext *ctx, $format *dst,
 ;                             const $format *src, int size, int update_ctx)
 %if ARCH_X86_64 ; unix64 and win64
-cglobal resample_common_%1, 0, 15, 2, ctx, dst, src, phase_count, index, frac, \
+cglobal resample_common_%1, 0, 15, 2, "p", ctx, "p", dst, "p", src, "d", phase_count, "d", index, frac, \
                                       dst_incr_mod, size, min_filter_count_x4, \
                                       min_filter_len_x4, dst_incr_div, src_incr, \
                                       phase_mask, dst_end, filter_bank
@@ -82,7 +76,7 @@ cglobal resample_common_%1, 0, 15, 2, ctx, dst, src, phase_count, index, frac, \
     mov                       indexd, [ctxq+ResampleContext.index]
     mov                        fracd, [ctxq+ResampleContext.frac]
     mov                dst_incr_modd, [ctxq+ResampleContext.dst_incr_mod]
-    mov                 filter_bankq, [ctxq+ResampleContext.filter_bank]
+    mov                 filter_bankp, [ctxq+ResampleContext.filter_bank]
     mov                    src_incrd, [ctxq+ResampleContext.src_incr]
     mov                   ctx_stackq, ctxq
     mov           min_filter_len_x4d, [ctxq+ResampleContext.filter_length]
@@ -111,8 +105,8 @@ cglobal resample_common_%1, 0, 15, 2, ctx, dst, src, phase_count, index, frac, \
     sub                         srcq, min_filter_len_x4q
     mov                   src_stackq, srcq
 %else ; x86-32
-cglobal resample_common_%1, 1, 7, 2, ctx, phase_count, dst, frac, \
-                                     index, min_filter_length_x4, filter_bank
+cglobal resample_common_%1, 1, 7, 2, "p", ctx, "p", phase_count, "p", dst, "d", frac, \
+                                     "d", index, min_filter_length_x4, filter_bank
 
     ; push temp variables to stack
 %define ctx_stackq            r0mp
@@ -133,7 +127,7 @@ cglobal resample_common_%1, 1, 7, 2, ctx, phase_count, dst, frac, \
     shl        min_filter_length_x4d, %3
     mov                        fracd, [ctxq+ResampleContext.frac]
     neg        min_filter_length_x4q
-    mov                 filter_bankq, [ctxq+ResampleContext.filter_bank]
+    mov                 filter_bankp, [ctxq+ResampleContext.filter_bank]
     sub                         r2mp, min_filter_length_x4q
     sub                 filter_bankq, min_filter_length_x4q
     PUSH                              min_filter_length_x4q
@@ -273,14 +267,14 @@ cglobal resample_common_%1, 1, 7, 2, ctx, phase_count, dst, frac, \
 ;                             const float *src, int size, int update_ctx)
 %if ARCH_X86_64 ; unix64 and win64
 %if UNIX64
-cglobal resample_linear_%1, 0, 15, 5, ctx, dst, phase_mask, phase_count, index, frac, \
+cglobal resample_linear_%1, 0, 15, 5, "p", ctx, "p", dst, "p", phase_mask, "d", phase_count, "d", index, frac, \
                                       size, dst_incr_mod, min_filter_count_x4, \
                                       min_filter_len_x4, dst_incr_div, src_incr, \
                                       src, dst_end, filter_bank
 
-    mov                         srcq, r2mp
+    mov                         srcp, r2mp
 %else ; win64
-cglobal resample_linear_%1, 0, 15, 5, ctx, phase_mask, src, phase_count, index, frac, \
+cglobal resample_linear_%1, 0, 15, 5, "p", ctx, "p", phase_mask, "p", src, "d", phase_count, "d", index, frac, \
                                       size, dst_incr_mod, min_filter_count_x4, \
                                       min_filter_len_x4, dst_incr_div, src_incr, \
                                       dst, dst_end, filter_bank
@@ -307,7 +301,7 @@ cglobal resample_linear_%1, 0, 15, 5, ctx, phase_mask, src, phase_count, index, 
     mov                       indexd, [ctxq+ResampleContext.index]
     mov                        fracd, [ctxq+ResampleContext.frac]
     mov                dst_incr_modd, [ctxq+ResampleContext.dst_incr_mod]
-    mov                 filter_bankq, [ctxq+ResampleContext.filter_bank]
+    mov                 filter_bankp, [ctxq+ResampleContext.filter_bank]
     mov                    src_incrd, [ctxq+ResampleContext.src_incr]
     mov                   ctx_stackq, ctxq
     mov           min_filter_len_x4d, [ctxq+ResampleContext.filter_length]
@@ -343,7 +337,7 @@ cglobal resample_linear_%1, 0, 15, 5, ctx, phase_mask, src, phase_count, index, 
     sub                         srcq, min_filter_len_x4q
     mov                   src_stackq, srcq
 %else ; x86-32
-cglobal resample_linear_%1, 1, 7, 5, ctx, min_filter_length_x4, filter2, \
+cglobal resample_linear_%1, 1, 7, 5, "p", ctx, min_filter_length_x4, filter2, \
                                      frac, index, dst, filter_bank
 
     ; push temp variables to stack
@@ -376,7 +370,7 @@ cglobal resample_linear_%1, 1, 7, 5, ctx, min_filter_length_x4, filter2, \
     shl        min_filter_length_x4d, %3
     mov                        fracd, [ctxq+ResampleContext.frac]
     neg        min_filter_length_x4q
-    mov                 filter_bankq, [ctxq+ResampleContext.filter_bank]
+    mov                 filter_bankp, [ctxq+ResampleContext.filter_bank]
     sub                         r2mp, min_filter_length_x4q
     sub                 filter_bankq, min_filter_length_x4q
     PUSH                              min_filter_length_x4q
