@@ -28,8 +28,8 @@ pw_ff: times 8 dw 0xFF
 SECTION .text
 
 %macro FILTER_LINE 1
-    movh       m0, [r2+r0]
-    movh       m1, [r3+r0]
+    movh       m0, [srcq+xq]
+    movh       m1, [dcq+xq]
     punpcklbw  m0, m7
     punpcklwd  m1, m1
     psllw      m0, 7
@@ -45,47 +45,47 @@ SECTION .text
     paddw      m0, m1
     psraw      m0, 7
     packuswb   m0, m0
-    movh  [r1+r0], m0
+    movh  [dstq+xq], m0
 %endmacro
 
 INIT_MMX mmxext
-cglobal gradfun_filter_line, 6, 6
-    movh      m5, r4d
+cglobal gradfun_filter_line, 6, 6, "p-", x, "p", dst, "p", src, "p", dc, "d", thresh, "p", dithers
+    movh      m5, threshd
     pxor      m7, m7
     pshufw    m5, m5,0
     mova      m6, [pw_7f]
-    mova      m3, [r5]
-    mova      m4, [r5+8]
+    mova      m3, [dithersq]
+    mova      m4, [dithersq+8]
 .loop:
     FILTER_LINE m3
-    add       r0, 4
+    add       xq, 4
     jge .end
     FILTER_LINE m4
-    add       r0, 4
+    add       xq, 4
     jl .loop
 .end:
     REP_RET
 
 INIT_XMM ssse3
-cglobal gradfun_filter_line, 6, 6, 8
-    movd       m5, r4d
+cglobal gradfun_filter_line, 6, 6, 8, "p-", x, "p", dst, "p", src, "p", dc, "d", thresh, "p", dithers
+    movd       m5, threshd
     pxor       m7, m7
     pshuflw    m5, m5, 0
     mova       m6, [pw_7f]
     punpcklqdq m5, m5
-    mova       m4, [r5]
+    mova       m4, [dithersq]
 .loop:
     FILTER_LINE m4
-    add        r0, 8
+    add        xq, 8
     jl .loop
     REP_RET
 
 %macro BLUR_LINE 1
-cglobal gradfun_blur_line_%1, 6, 6, 8
+cglobal gradfun_blur_line_%1, 6, 6, 8, "p-", x, "p", buf, "p", buf1, "p", dc, "p", src1, "p", src2
     mova        m7, [pw_ff]
 .loop:
-    %1          m0, [r4+r0]
-    %1          m1, [r5+r0]
+    %1          m0, [src1q+xq]
+    %1          m1, [src2q+xq]
     mova        m2, m0
     mova        m3, m1
     psrlw       m0, 8
@@ -95,12 +95,12 @@ cglobal gradfun_blur_line_%1, 6, 6, 8
     paddw       m0, m1
     paddw       m2, m3
     paddw       m0, m2
-    paddw       m0, [r2+r0]
-    mova        m1, [r1+r0]
-    mova   [r1+r0], m0
+    paddw       m0, [buf1q+xq]
+    mova        m1, [bufq+xq]
+    mova   [bufq+xq], m0
     psubw       m0, m1
-    mova   [r3+r0], m0
-    add         r0, 16
+    mova   [dcq+xq], m0
+    add         xq, 16
     jl .loop
     REP_RET
 %endmacro

@@ -52,9 +52,9 @@ INIT_MMX mmx
 ;                        ptrdiff_t dst_stride, ptrdiff_t src_stride,
 ;                        ptrdiff_t width, ptrdiff_t height, ptrdiff_t log2_scale)
 %if ARCH_X86_64
-cglobal store_slice, 7, 9, 0, dst, src, dst_stride, src_stride, width, dither_height, dither, tmp, tmp2
+cglobal store_slice, 7, 9, 0, "p", dst, "p", src, "p-", dst_stride, "p-", src_stride, "p-", width, "p-", dither_height, "p-", dither, tmp, tmp2
 %else
-cglobal store_slice, 2, 7, 0, dst, src, width, dither_height, dither, tmp, tmp2
+cglobal store_slice, 2, 7, 0, "p", dst, "p", src, width, dither_height, dither, tmp, tmp2
 %define dst_strideq r2m
 %define src_strideq r3m
     mov       widthq, r4m
@@ -117,13 +117,11 @@ cglobal store_slice, 2, 7, 0, dst, src, width, dither_height, dither, tmp, tmp2
 ;                         ptrdiff_t dst_stride, ptrdiff_t src_stride,
 ;                         ptrdiff_t width, ptrdiff_t height, ptrdiff_t log2_scale)
 %if ARCH_X86_64
-cglobal store_slice2, 7, 9, 0, dst, src, dst_stride, src_stride, width, dither_height, dither, tmp, tmp2
+cglobal store_slice2, 7, 9, 0, "p", dst, "p", src, "p-", dst_stride, "p-", src_stride, "p-", width, "p-", dither_height, "p-", dither, tmp, tmp2
 %else
-cglobal store_slice2, 0, 7, 0, dst, src, width, dither_height, dither, tmp, tmp2
+cglobal store_slice2, 2, 7, 0, "p", dst, "p", src, width, dither_height, dither, tmp, tmp2
 %define dst_strideq r2m
 %define src_strideq r3m
-    mov       dstq, dstm
-    mov       srcq, srcm
     mov       widthq, r4m
     mov       dither_heightq, r5m
     mov       ditherq, r6m ; log2_scale
@@ -181,7 +179,7 @@ cglobal store_slice2, 0, 7, 0, dst, src, width, dither_height, dither, tmp, tmp2
     RET
 
 ;void ff_mul_thrmat_mmx(int16_t *thr_adr_noq, int16_t *thr_adr, int q);
-cglobal mul_thrmat, 3, 3, 0, thrn, thr, q
+cglobal mul_thrmat, 3, 3, 0, "p", thrn, "p", thr, "d", q
     movd      m7, qd
     movq      m0, [thrnq]
     punpcklwd m7, m7
@@ -461,7 +459,7 @@ cglobal mul_thrmat, 3, 3, 0, thrn, thr, q
 %endmacro
 
 ;void ff_column_fidct_mmx(int16_t *thr_adr, int16_t *data, int16_t *output, int cnt);
-cglobal column_fidct, 4, 5, 0, 32, thr, src, out, cnt, tmp
+cglobal column_fidct, 4, 5, 0, 32, "p", thr, "p", src, "p", out, "d", cnt, tmp
 .fdct1:
     COLUMN_FDCT .idct1
     jmp .fdct2
@@ -482,7 +480,7 @@ cglobal column_fidct, 4, 5, 0, 32, thr, src, out, cnt, tmp
     RET
 
 ;void ff_row_idct_mmx(int16_t *workspace, int16_t *output_adr, ptrdiff_t output_stride, int cnt);
-cglobal row_idct, 4, 5, 0, 16, src, dst, stride, cnt, stride3
+cglobal row_idct, 4, 5, 0, 16, "p", src, "p", dst, "p-", stride, "d", cnt, stride3
     add       strideq, strideq
     lea       stride3q, [strideq+strideq*2]
 .loop:
@@ -612,7 +610,7 @@ cglobal row_idct, 4, 5, 0, 16, src, dst, stride, cnt, stride3
     RET
 
 ;void ff_row_fdct_mmx(int16_t *data, const uint8_t *pixels, ptrdiff_t line_size, int cnt);
-cglobal row_fdct, 4, 5, 0, 16, src, pix, stride, cnt, stride3
+cglobal row_fdct, 4, 5, 0, 16, "p", src, "p", pix, "p-", stride, "d", cnt, stride3
     lea       stride3q, [strideq+strideq*2]
 .loop:
     movd      m0, [pixq]

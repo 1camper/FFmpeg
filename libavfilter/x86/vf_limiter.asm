@@ -24,8 +24,7 @@ SECTION .text
 
 INIT_XMM sse2
 
-cglobal limiter_8bit, 6, 7, 3, src, dst, slinesize, dlinesize, w, h, x
-    movsxdifnidn wq, wd
+cglobal limiter_8bit, 6, 7, 3, "p", src, "p", dst, "p-", slinesize, "p-", dlinesize, "d-", w, "d", h, x
     add        srcq, wq
     add        dstq, wq
     neg          wq
@@ -53,7 +52,7 @@ cglobal limiter_8bit, 6, 7, 3, src, dst, slinesize, dlinesize, w, h, x
 
 INIT_XMM sse4
 
-cglobal limiter_16bit, 6, 7, 3, src, dst, slinesize, dlinesize, w, h, x
+cglobal limiter_16bit, 6, 7, 3, "p", src, "p", dst, "p-", slinesize, "p-", dlinesize, "d", w, "d", h, x
     shl          wd, 1
     add        srcq, wq
     add        dstq, wq

@@ -61,16 +61,16 @@ REP_RET
 %endmacro
 
 %macro LOWPASS_LINE 0
-cglobal lowpass_line, 5, 5, 7, dst, h, src, mref, pref
+cglobal lowpass_line, 5, 5, 7, "p", dst, "p-", h, "p", src, "p-", mref, "p-", pref
     LOWPASS b
 
-cglobal lowpass_line_16, 5, 5, 7, dst, h, src, mref, pref
+cglobal lowpass_line_16, 5, 5, 7, "p", dst, "p-", h, "p", src, "p-", mref, "p-", pref
     shl hq, 1
     LOWPASS w
 %endmacro
 
 %macro LOWPASS_LINE_COMPLEX 0
-cglobal lowpass_line_complex, 5, 5, 8, dst, h, src, mref, pref
+cglobal lowpass_line_complex, 5, 5, 8, "p", dst, "p-", h, "p", src, "p-", mref, "p-", pref
     pxor m7, m7
 .loop:
     mova m0, [srcq+mrefq]
@@ -131,7 +131,7 @@ cglobal lowpass_line_complex, 5, 5, 8, dst, h, src, mref, pref
     jg .loop
 REP_RET
 
-cglobal lowpass_line_complex_12, 5, 5, 8, 16, dst, h, src, mref, pref, clip_max
+cglobal lowpass_line_complex_12, 5, 5, 8, 16, "p", dst, "p-", h, "p", src, "p-", mref, "p-", pref, "d", clip_max
     movd m7, DWORD clip_maxm
     SPLATW m7, m7, 0
     mova [rsp], m7

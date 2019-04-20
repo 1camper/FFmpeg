@@ -28,15 +28,15 @@ SECTION .text
 INIT_XMM sse2
 %if ARCH_X86_32
 %if %1 == 8
-cglobal sse_line_%1 %+ bit, 0, 6, 8, res, buf, w, px1, px2, ref
+cglobal sse_line_%1 %+ bit, 0, 6, 8, "p", res, "p", buf, "d", w, px1, px2, ref
 %else
-cglobal sse_line_%1 %+ bit, 0, 7, 8, res, buf, reshigh, w, px1, px2, ref
+cglobal sse_line_%1 %+ bit, 0, 7, 8, "p", res, "p", buf, "d", reshigh, w, px1, px2, ref
 %endif
     mov       bufq, r0mp
     mov       refq, r1mp
     mov         wd, r2m
 %else
-cglobal sse_line_%1 %+ bit, 3, 5, 8, buf, ref, w, px1, px2
+cglobal sse_line_%1 %+ bit, 3, 5, 8, "p", buf, "p", ref, "d", w, px1, px2
 %endif
     pxor        m6, m6
     pxor        m7, m7

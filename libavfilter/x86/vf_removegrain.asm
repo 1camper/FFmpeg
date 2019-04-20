@@ -158,7 +158,7 @@ SECTION .text
 ; Functions
 
 INIT_XMM sse2
-cglobal rg_fl_mode_1, 4, 5, 3, 0, dst, src, stride, pixels
+cglobal rg_fl_mode_1, 4, 5, 3, 0, "p", dst, "p", src, "p-", stride, "d", pixels
     mov r4q, strideq
     neg r4q
     %define stride_p strideq
@@ -208,7 +208,7 @@ cglobal rg_fl_mode_1, 4, 5, 3, 0, dst, src, stride, pixels
 RET
 
 %if ARCH_X86_64
-cglobal rg_fl_mode_2, 4, 5, 10, 0, dst, src, stride, pixels
+cglobal rg_fl_mode_2, 4, 5, 10, 0, "p", dst, "p", src, "p-", stride, "d", pixels
     mov r4q, strideq
     neg r4q
     %define stride_p strideq
@@ -227,7 +227,7 @@ cglobal rg_fl_mode_2, 4, 5, 10, 0, dst, src, stride, pixels
     jg .loop
 RET
 
-cglobal rg_fl_mode_3, 4, 5, 10, 0, dst, src, stride, pixels
+cglobal rg_fl_mode_3, 4, 5, 10, 0, "p", dst, "p", src, "p-", stride, "d", pixels
     mov r4q, strideq
     neg r4q
     %define stride_p strideq
@@ -246,7 +246,7 @@ cglobal rg_fl_mode_3, 4, 5, 10, 0, dst, src, stride, pixels
     jg .loop
 RET
 
-cglobal rg_fl_mode_4, 4, 5, 10, 0, dst, src, stride, pixels
+cglobal rg_fl_mode_4, 4, 5, 10, 0, "p", dst, "p", src, "p-", stride, "d", pixels
     mov r4q, strideq
     neg r4q
     %define stride_p strideq
@@ -265,7 +265,7 @@ cglobal rg_fl_mode_4, 4, 5, 10, 0, dst, src, stride, pixels
     jg .loop
 RET
 
-cglobal rg_fl_mode_5, 4, 5, 13, 0, dst, src, stride, pixels
+cglobal rg_fl_mode_5, 4, 5, 13, 0, "p", dst, "p", src, "p-", stride, "d", pixels
     mov r4q, strideq
     neg r4q
     %define stride_p strideq
@@ -315,7 +315,7 @@ cglobal rg_fl_mode_5, 4, 5, 13, 0, dst, src, stride, pixels
     jg .loop
 RET
 
-cglobal rg_fl_mode_6, 4, 5, 16, 0, dst, src, stride, pixels
+cglobal rg_fl_mode_6, 4, 5, 16, 0, "p", dst, "p", src, "p-", stride, "d", pixels
     mov r4q, strideq
     neg r4q
     %define stride_p strideq
@@ -383,7 +383,7 @@ cglobal rg_fl_mode_6, 4, 5, 16, 0, dst, src, stride, pixels
 RET
 
 ; This is just copy-pasted straight from mode 6 with the left shifts removed.
-cglobal rg_fl_mode_7, 4, 5, 16, 0, dst, src, stride, pixels
+cglobal rg_fl_mode_7, 4, 5, 16, 0, "p", dst, "p", src, "p-", stride, "d", pixels
     mov r4q, strideq
     neg r4q
     %define stride_p strideq
@@ -444,7 +444,7 @@ cglobal rg_fl_mode_7, 4, 5, 16, 0, dst, src, stride, pixels
 RET
 
 ; This is just copy-pasted straight from mode 6 with a few changes.
-cglobal rg_fl_mode_8, 4, 5, 16, 0, dst, src, stride, pixels
+cglobal rg_fl_mode_8, 4, 5, 16, 0, "p", dst, "p", src, "p-", stride, "d", pixels
     mov r4q, strideq
     neg r4q
     %define stride_p strideq
@@ -508,7 +508,7 @@ cglobal rg_fl_mode_8, 4, 5, 16, 0, dst, src, stride, pixels
     jg .loop
 RET
 
-cglobal rg_fl_mode_9, 4, 5, 13, 0, dst, src, stride, pixels
+cglobal rg_fl_mode_9, 4, 5, 13, 0, "p", dst, "p", src, "p-", stride, "d", pixels
     mov r4q, strideq
     neg r4q
     %define stride_p strideq
@@ -552,7 +552,7 @@ cglobal rg_fl_mode_9, 4, 5, 13, 0, dst, src, stride, pixels
 RET
 %endif
 
-cglobal rg_fl_mode_10, 4, 5, 8, 0, dst, src, stride, pixels
+cglobal rg_fl_mode_10, 4, 5, 8, 0, "p", dst, "p", src, "p-", stride, "d", pixels
     mov r4q, strideq
     neg r4q
     %define stride_p strideq
@@ -621,7 +621,7 @@ cglobal rg_fl_mode_10, 4, 5, 8, 0, dst, src, stride, pixels
     jg .loop
 RET
 
-cglobal rg_fl_mode_11_12, 4, 5, 7, 0, dst, src, stride, pixels
+cglobal rg_fl_mode_11_12, 4, 5, 7, 0, "p", dst, "p", src, "p-", stride, "d", pixels
     mov r4q, strideq
     neg r4q
     %define stride_p strideq
@@ -663,7 +663,7 @@ cglobal rg_fl_mode_11_12, 4, 5, 7, 0, dst, src, stride, pixels
     jg .loop
 RET
 
-cglobal rg_fl_mode_13_14, 4, 5, 8, 0, dst, src, stride, pixels
+cglobal rg_fl_mode_13_14, 4, 5, 8, 0, "p", dst, "p", src, "p-", stride, "d", pixels
     mov r4q, strideq
     neg r4q
     %define stride_p strideq
@@ -702,7 +702,7 @@ cglobal rg_fl_mode_13_14, 4, 5, 8, 0, dst, src, stride, pixels
 RET
 
 %if ARCH_X86_64
-cglobal rg_fl_mode_15_16, 4, 5, 16, 0, dst, src, stride, pixels
+cglobal rg_fl_mode_15_16, 4, 5, 16, 0, "p", dst, "p", src, "p-", stride, "d", pixels
     mov r4q, strideq
     neg r4q
     %define stride_p strideq
@@ -755,7 +755,7 @@ cglobal rg_fl_mode_15_16, 4, 5, 16, 0, dst, src, stride, pixels
     jg .loop
 RET
 
-cglobal rg_fl_mode_17, 4, 5, 9, 0, dst, src, stride, pixels
+cglobal rg_fl_mode_17, 4, 5, 9, 0, "p", dst, "p", src, "p-", stride, "d", pixels
     mov r4q, strideq
     neg r4q
     %define stride_p strideq
@@ -787,7 +787,7 @@ cglobal rg_fl_mode_17, 4, 5, 9, 0, dst, src, stride, pixels
     jg .loop
 RET
 
-cglobal rg_fl_mode_18, 4, 5, 16, 0, dst, src, stride, pixels
+cglobal rg_fl_mode_18, 4, 5, 16, 0, "p", dst, "p", src, "p-", stride, "d", pixels
     mov r4q, strideq
     neg r4q
     %define stride_p strideq
@@ -874,7 +874,7 @@ cglobal rg_fl_mode_18, 4, 5, 16, 0, dst, src, stride, pixels
 RET
 %endif
 
-cglobal rg_fl_mode_19, 4, 5, 7, 0, dst, src, stride, pixels
+cglobal rg_fl_mode_19, 4, 5, 7, 0, "p", dst, "p", src, "p-", stride, "d", pixels
     mov r4q, strideq
     neg r4q
     %define stride_p strideq
@@ -914,7 +914,7 @@ cglobal rg_fl_mode_19, 4, 5, 7, 0, dst, src, stride, pixels
     jg .loop
 RET
 
-cglobal rg_fl_mode_20, 4, 5, 7, 0, dst, src, stride, pixels
+cglobal rg_fl_mode_20, 4, 5, 7, 0, "p", dst, "p", src, "p-", stride, "d", pixels
     mov r4q, strideq
     neg r4q
     %define stride_p strideq
@@ -957,7 +957,7 @@ cglobal rg_fl_mode_20, 4, 5, 7, 0, dst, src, stride, pixels
     jg .loop
 RET
 
-cglobal rg_fl_mode_21, 4, 5, 8, 0, dst, src, stride, pixels
+cglobal rg_fl_mode_21, 4, 5, 8, 0, "p", dst, "p", src, "p-", stride, "d", pixels
     mov r4q, strideq
     neg r4q
     %define stride_p strideq
@@ -1036,7 +1036,7 @@ cglobal rg_fl_mode_21, 4, 5, 8, 0, dst, src, stride, pixels
     jg .loop
 RET
 
-cglobal rg_fl_mode_22, 4, 5, 8, 0, dst, src, stride, pixels
+cglobal rg_fl_mode_22, 4, 5, 8, 0, "p", dst, "p", src, "p-", stride, "d", pixels
     mov r4q, strideq
     neg r4q
     %define stride_p strideq
@@ -1078,7 +1078,7 @@ cglobal rg_fl_mode_22, 4, 5, 8, 0, dst, src, stride, pixels
 RET
 
 %if ARCH_X86_64
-cglobal rg_fl_mode_23, 4, 5, 16, 0, dst, src, stride, pixels
+cglobal rg_fl_mode_23, 4, 5, 16, 0, "p", dst, "p", src, "p-", stride, "d", pixels
     mov r4q, strideq
     neg r4q
     %define stride_p strideq
@@ -1139,7 +1139,7 @@ cglobal rg_fl_mode_23, 4, 5, 16, 0, dst, src, stride, pixels
     jg .loop
 RET
 
-cglobal rg_fl_mode_24, 4, 5, 16, mmsize, dst, src, stride, pixels
+cglobal rg_fl_mode_24, 4, 5, 16, mmsize, "p", dst, "p", src, "p-", stride, "d", pixels
     mov r4q, strideq
     neg r4q
     %define stride_p strideq

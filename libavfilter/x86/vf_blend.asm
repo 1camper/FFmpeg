@@ -36,24 +36,24 @@ SECTION .text
 
 %macro BLEND_INIT 2
 %if ARCH_X86_64
-cglobal blend_%1, 6, 9, %2, top, top_linesize, bottom, bottom_linesize, dst, dst_linesize, width, end, x
-    mov    widthd, dword widthm
+cglobal blend_%1, 7, 9, %2, "p", top, "p", top_linesize, "p", bottom, "p", bottom_linesize, "p", dst, "p", dst_linesize, "d", width, end, x
 %else
-cglobal blend_%1, 5, 7, %2, top, top_linesize, bottom, bottom_linesize, dst, end, x
-%define dst_linesizeq r5mp
+cglobal blend_%1, 5, 7, %2, "p", top, "p", top_linesize, "p", bottom, "p", bottom_linesize, "p", dst, end, x
+%define dst_linesizep r5mp
+%define widthp r6mp
 %define widthq r6mp
 %endif
-    mov      endd, dword r7m
-    add      topq, widthq
-    add   bottomq, widthq
-    add      dstq, widthq
+    mov      endd, r7md
+    add      topp, widthp
+    add   bottomp, widthp
+    add      dstp, widthp
     neg    widthq
 %endmacro
 
 %macro BLEND_END 0
-    add          topq, top_linesizeq
-    add       bottomq, bottom_linesizeq
-    add          dstq, dst_linesizeq
+    add          topp, top_linesizep
+    add       bottomp, bottom_linesizep
+    add          dstp, dst_linesizep
     sub          endd, 1
     jg .nextrow
 REP_RET

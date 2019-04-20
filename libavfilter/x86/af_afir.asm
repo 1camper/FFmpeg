@@ -28,12 +28,12 @@ SECTION .text
 ;------------------------------------------------------------------------------
 
 INIT_XMM sse3
-cglobal fcmul_add, 4,4,6, sum, t, c, len
+cglobal fcmul_add, 4, 4, 6, "p", sum, "p", t, "p", c, "d", len
     shl       lend, 3
     add       lend, mmsize*2
-    add         tq, lenq
-    add         cq, lenq
-    add       sumq, lenq
+    add         tp, lenp
+    add         cp, lenp
+    add       sump, lenp
     neg       lenq
 ALIGN 16
 .loop:

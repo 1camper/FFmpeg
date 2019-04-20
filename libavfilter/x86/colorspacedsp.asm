@@ -85,7 +85,7 @@ SECTION .text
 %assign %%ypmul (1 << %%ypsh)
 
 cglobal yuv2yuv_ %+ %%ss %+ p%1to%2, 8, 14, 16, 0 - (4 * mmsize), \
-                                     yo, yos, yi, yis, w, h, c, yoff, ui, vi, uo, vo
+                                     "p", yo, "p", yos, "p", yi, "p", yis, "d", w, "d", h, "p", c, "p", yoff, ui, vi, uo, vo
 %if %3 == 1
     inc             wd
     sar             wd, 1
@@ -124,27 +124,27 @@ cglobal yuv2yuv_ %+ %%ss %+ p%1to%2, 8, 14, 16, 0 - (4 * mmsize), \
     mova [rsp+1*mmsize], m2
     mova [rsp+2*mmsize], m4
 
-    DEFINE_ARGS yo, yos, yi, yis, ui, vi, uo, vo, uis, vis, uos, vos, x, tmp
+    DEFINE_ARGS "p", yo, "p", yos, "p", yi, "p", yis, ui, vi, uo, vo, uis, vis, uos, vos, x, tmp
 
-    mov            uiq, [yiq+gprsize*1]
-    mov            viq, [yiq+gprsize*2]
-    mov            yiq, [yiq+gprsize*0]
-    mov            uoq, [yoq+gprsize*1]
-    mov            voq, [yoq+gprsize*2]
-    mov            yoq, [yoq+gprsize*0]
-    mov           uisq, [yisq+gprsize*1]
-    mov           visq, [yisq+gprsize*2]
-    mov           yisq, [yisq+gprsize*0]
-    mov           uosq, [yosq+gprsize*1]
-    mov           vosq, [yosq+gprsize*2]
-    mov           yosq, [yosq+gprsize*0]
+    mov            uip, [yiq+ptrsize*1]
+    mov            vip, [yiq+ptrsize*2]
+    mov            yip, [yiq+ptrsize*0]
+    mov            uop, [yoq+ptrsize*1]
+    mov            vop, [yoq+ptrsize*2]
+    mov            yop, [yoq+ptrsize*0]
+    mov           uisp, [yisq+ptrsize*1]
+    mov           visp, [yisq+ptrsize*2]
+    mov           yisp, [yisq+ptrsize*0]
+    mov           uosp, [yosq+ptrsize*1]
+    mov           vosp, [yosq+ptrsize*2]
+    mov           yosp, [yosq+ptrsize*0]
 
 .loop_v:
-    xor             xq, xq
+    xor             xd, xd
 
 .loop_h:
 %if %4 == 1
-    lea           tmpq, [yiq+yisq]
+    lea           tmpp, [yiq+yisq]
 %endif ; %4 == 1
 %if %1 == 8
     movu            m0, [yiq+xq*(1<<%3)]        ; y00/01
@@ -301,7 +301,7 @@ cglobal yuv2yuv_ %+ %%ss %+ p%1to%2, 8, 14, 16, 0 - (4 * mmsize), \
     packssdw        m2, m6
     packssdw        m3, m7
 
-    lea           tmpq, [yoq+yosq]
+    lea           tmpp, [yoq+yosq]
 %if %2 == 8
     packuswb        m2, m3
     movu   [tmpq+xq*2], m2
@@ -342,21 +342,21 @@ cglobal yuv2yuv_ %+ %%ss %+ p%1to%2, 8, 14, 16, 0 - (4 * mmsize), \
     movu [yoq+xq*(2<<%3)+mmsize], m1
 %endif ; %2 ==/!= 8
 
-    add             xq, mmsize >> %3
+    add             xp, mmsize >> %3
     cmp             xd, dword [rsp+3*mmsize+0]
     jl .loop_h
 
 %if %4 == 1
-    lea            yiq, [yiq+yisq*2]
-    lea            yoq, [yoq+yosq*2]
+    lea            yip, [yiq+yisq*2]
+    lea            yop, [yoq+yosq*2]
 %else ; %4 != 1
-    add            yiq, yisq
-    add            yoq, yosq
+    add            yip, yisp
+    add            yop, yosp
 %endif ; %4 ==/!= 1
-    add            uiq, uisq
-    add            viq, visq
-    add            uoq, uosq
-    add            voq, vosq
+    add            uip, uisp
+    add            vip, visp
+    add            uop, uosp
+    add            vop, vosp
     dec dword [rsp+3*mmsize+4]
     jg .loop_v
 
@@ -397,7 +397,7 @@ YUV2YUV_FNS 1, 1
 %endif ; %2/%3
 
 cglobal yuv2rgb_ %+ %%ss %+ p%1, 8, 14, 16, 0 - 8 * mmsize, \
-                                rgb, rgbs, yuv, yuvs, ww, h, c, yoff
+                                "p", rgb, "p", rgbs, "p", yuv, "p", yuvs, "d", ww, "d", h, "p", c, "p", yoff
 %if %2 == 1
     inc            wwd
     sar            wwd, 1
@@ -423,24 +423,24 @@ cglobal yuv2rgb_ %+ %%ss %+ p%1, 8, 14, 16, 0 - 8 * mmsize, \
     mova [rsp+3*mmsize], m14
     pxor           m14, m14
 
-    DEFINE_ARGS r, rgbs, y, ys, ww, h, g, b, u, v, us, vs, x, tmp
+    DEFINE_ARGS "p", r, "p", rgbs, "p", y, "p", ys, "d", ww, "d", h, g, b, u, v, us, vs, x, tmp
 
-    mov             gq, [rq+1*gprsize]
-    mov             bq, [rq+2*gprsize]
-    mov             rq, [rq+0*gprsize]
-    mov             uq, [yq+1*gprsize]
-    mov             vq, [yq+2*gprsize]
-    mov             yq, [yq+0*gprsize]
-    mov            usq, [ysq+1*gprsize]
-    mov            vsq, [ysq+2*gprsize]
-    mov            ysq, [ysq+0*gprsize]
+    mov             gp, [rq+1*ptrsize]
+    mov             bp, [rq+2*ptrsize]
+    mov             rp, [rq+0*ptrsize]
+    mov             up, [yq+1*ptrsize]
+    mov             vp, [yq+2*ptrsize]
+    mov             yp, [yq+0*ptrsize]
+    mov            usp, [ysq+1*ptrsize]
+    mov            vsp, [ysq+2*ptrsize]
+    mov            ysp, [ysq+0*ptrsize]
 
 .loop_v:
-    xor             xq, xq
+    xor             xd, xd
 
 .loop_h:
 %if %3 == 1
-    lea           tmpq, [yq+ysq]
+    lea           tmpp, [yq+ysq]
 %endif ; %3 == 1
 %if %1 == 8
     movu            m0, [yq+xq*(1<<%2)]
@@ -553,7 +553,7 @@ cglobal yuv2rgb_ %+ %%ss %+ p%1, 8, 14, 16, 0 - 8 * mmsize, \
     psrad          m12, %%sh
     psrad          m13, %%sh
 %if %3 == 1
-    lea           tmpq, [rq+rgbsq*2]
+    lea           tmpp, [rq+rgbsq*2]
     packssdw        m2, m3
     packssdw        m8, m9
     mova [tmpq+xq*4], m2
@@ -598,7 +598,7 @@ cglobal yuv2rgb_ %+ %%ss %+ p%1, 8, 14, 16, 0 - 8 * mmsize, \
     psrad          m12, %%sh
     psrad          m13, %%sh
 %if %3 == 1
-    lea           tmpq, [gq+rgbsq*2]
+    lea           tmpp, [gq+rgbsq*2]
     packssdw        m2, m3
     packssdw        m8, m9
     mova [tmpq+xq*4], m2
@@ -647,7 +647,7 @@ cglobal yuv2rgb_ %+ %%ss %+ p%1, 8, 14, 16, 0 - 8 * mmsize, \
     movu   [bq+xq*(2 << %2)], m0
     movu   [bq+xq*(2 << %2)+mmsize], m1
 %if %3 == 1
-    lea           tmpq, [bq+rgbsq*2]
+    lea           tmpp, [bq+rgbsq*2]
     packssdw        m4, m2
     packssdw        m5, m3
     movu [tmpq+xq*4], m4
@@ -658,16 +658,16 @@ cglobal yuv2rgb_ %+ %%ss %+ p%1, 8, 14, 16, 0 - 8 * mmsize, \
     cmp             xd, wwd
     jl .loop_h
 
-    lea             rq, [rq+rgbsq*(2 << %3)]
-    lea             gq, [gq+rgbsq*(2 << %3)]
-    lea             bq, [bq+rgbsq*(2 << %3)]
+    lea             rp, [rq+rgbsq*(2 << %3)]
+    lea             gp, [gq+rgbsq*(2 << %3)]
+    lea             bp, [bq+rgbsq*(2 << %3)]
 %if %3 == 1
-    lea             yq, [yq+ysq*2]
+    lea             yp, [yq+ysq*2]
 %else ; %3 != 0
-    add             yq, ysq
+    add             yp, ysp
 %endif ; %3 ==/!= 1
-    add             uq, usq
-    add             vq, vsq
+    add             up, usp
+    add             vp, vsp
     dec             hd
     jg .loop_v
 
@@ -701,7 +701,7 @@ YUV2RGB_FNS 1, 1
 %endif ; %2/%3
 
 cglobal rgb2yuv_ %+ %%ss %+ p%1, 8, 14, 16, 0 - 6 * mmsize, \
-                                 yuv, yuvs, rgb, rgbs, ww, h, c, off
+                                 "p", yuv, "p", yuvs, "p", rgb, "p", rgbs, "d", ww, "d", h, "p", c, "p", off
 %if %2 == 1
     inc            wwd
     sar            wwd, 1
@@ -740,16 +740,16 @@ cglobal rgb2yuv_ %+ %%ss %+ p%1, 8, 14, 16, 0 - 6 * mmsize, \
     mova [rsp+5*mmsize], m7                 ; cbv, uvoff + rnd
 
 
-    DEFINE_ARGS y, ys, r, rgbs, ww, h, u, v, us, vs, g, b, tmp, x
-    mov             gq, [rq+gprsize*1]
-    mov             bq, [rq+gprsize*2]
-    mov             rq, [rq+gprsize*0]
-    mov             uq, [yq+gprsize*1]
-    mov             vq, [yq+gprsize*2]
-    mov             yq, [yq+gprsize*0]
-    mov            usq, [ysq+gprsize*1]
-    mov            vsq, [ysq+gprsize*2]
-    mov            ysq, [ysq+gprsize*0]
+    DEFINE_ARGS "p", y, "p", ys, "p", r, "p", rgbs, "d", ww, "d", h, u, v, us, vs, g, b, tmp, x
+    mov             gp, [rq+ptrsize*1]
+    mov             bp, [rq+ptrsize*2]
+    mov             rp, [rq+ptrsize*0]
+    mov             up, [yq+ptrsize*1]
+    mov             vp, [yq+ptrsize*2]
+    mov             yp, [yq+ptrsize*0]
+    mov            usp, [ysq+ptrsize*1]
+    mov            vsp, [ysq+ptrsize*2]
+    mov            ysp, [ysq+ptrsize*0]
 
     pxor           m15, m15
 .loop_v:
@@ -812,7 +812,7 @@ cglobal rgb2yuv_ %+ %%ss %+ p%1, 8, 14, 16, 0 - 6 * mmsize, \
 
 %if %3 == 1
     ; bottom line y, r/g portion only
-    lea           tmpq, [rgbsq+xq*2]
+    lea           tmpp, [rgbsq+xq*2]
     mova            m6, [rq+tmpq*2]
     mova            m9, [rq+tmpq*2+mmsize]
     mova            m7, [gq+tmpq*2]
@@ -859,7 +859,7 @@ cglobal rgb2yuv_ %+ %%ss %+ p%1, 8, 14, 16, 0 - 6 * mmsize, \
     psrad          m15, %%sh
     packssdw       m12, m13
     packssdw       m14, m15
-    lea           tmpq, [yq+ysq]
+    lea           tmpp, [yq+ysq]
 %if %1 == 8
     packuswb       m12, m14
     movu   [tmpq+xq*2], m12
@@ -983,20 +983,20 @@ cglobal rgb2yuv_ %+ %%ss %+ p%1, 8, 14, 16, 0 - 6 * mmsize, \
 %endif
 %endif ; %2 ==/!= 1
 
-    add             xq, mmsize >> %2
+    add             xd, mmsize >> %2
     cmp             xd, wwd
     jl .loop_h
 
 %if %3 == 0
-    add             yq, ysq
+    add             yp, ysp
 %else ; %3 != 0
-    lea             yq, [yq+ysq*2]
+    lea             yp, [yq+ysq*2]
 %endif ; %3 ==/!= 0
-    add             uq, usq
-    add             vq, vsq
-    lea             rq, [rq+rgbsq*(2<<%3)]
-    lea             gq, [gq+rgbsq*(2<<%3)]
-    lea             bq, [bq+rgbsq*(2<<%3)]
+    add             up, usp
+    add             vp, vsp
+    lea             rp, [rq+rgbsq*(2<<%3)]
+    lea             gp, [gq+rgbsq*(2<<%3)]
+    lea             bp, [bq+rgbsq*(2<<%3)]
     dec             hd
     jg .loop_v
 
@@ -1017,7 +1017,7 @@ RGB2YUV_FNS 1, 1
 ; void ff_multiply3x3_sse2(int16_t *data[3], ptrdiff_t stride,
 ;                          int w, int h, const int16_t coeff[3][3][8])
 INIT_XMM sse2
-cglobal multiply3x3, 5, 7, 16, data, stride, ww, h, c
+cglobal multiply3x3, 5, 7, 16, "p", data, "p", stride, "d", ww, "d", h, "p", c
     movh            m0, [cq+  0]
     movh            m1, [cq+ 32]
     movh            m2, [cq+ 48]
@@ -1031,11 +1031,11 @@ cglobal multiply3x3, 5, 7, 16, data, stride, ww, h, c
     punpcklwd       m4, [cq+112]
     punpcklwd       m5, [pw_8192]
 
-    DEFINE_ARGS data0, stride, ww, h, data1, data2, x
-    shl        strideq, 1
-    mov         data1q, [data0q+gprsize*1]
-    mov         data2q, [data0q+gprsize*2]
-    mov         data0q, [data0q+gprsize*0]
+    DEFINE_ARGS "p", data0, "p", stride, "d", ww, "d", h, data1, data2, x
+    shl        stridep, 1
+    mov         data1p, [data0q+ptrsize*1]
+    mov         data2p, [data0q+ptrsize*2]
+    mov         data0p, [data0q+ptrsize*0]
 
 .loop_v:
     xor             xd, xd
@@ -1087,9 +1087,9 @@ cglobal multiply3x3, 5, 7, 16, data, stride, ww, h, c
     cmp             xd, wwd
     jl .loop_h
 
-    add         data0q, strideq
-    add         data1q, strideq
-    add         data2q, strideq
+    add         data0p, stridep
+    add         data1p, stridep
+    add         data2p, stridep
     dec             hd
     jg .loop_v
 

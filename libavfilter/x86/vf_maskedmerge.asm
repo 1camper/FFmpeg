@@ -31,11 +31,11 @@ SECTION .text
 
 INIT_XMM sse2
 %if ARCH_X86_64
-cglobal maskedmerge8, 8, 11, 7, bsrc, osrc, msrc, dst, blinesize, olinesize, mlinesize, dlinesize, w, h, x
+cglobal maskedmerge8, 8, 11, 7, "p", bsrc, "p", osrc, "p", msrc, "p", dst, "p-", blinesize, "p-", olinesize, "p-", mlinesize, "p-", dlinesize, "d", w, "d", h, "d", x
     mov         wd, dword wm
     mov         hd, dword hm
 %else
-cglobal maskedmerge8, 5, 7, 7, bsrc, osrc, msrc, dst, blinesize, w, x
+cglobal maskedmerge8, 5, 7, 7, "p", bsrc, "p", osrc, "p", msrc, "p", dst, "p-", blinesize, w, x
     mov         wd, r8m
 %define olinesizeq r5mp
 %define mlinesizeq r6mp
