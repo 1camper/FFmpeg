@@ -104,13 +104,13 @@ cglobal checked_call%1, 2,15,16,max_args*8+8
 
     ; All arguments have been pushed on the stack instead of registers in order to
     ; test for incorrect assumptions that 32-bit ints are zero-extended to 64-bit.
-    mov  r0, r6mp
-    mov  r1, r7mp
-    mov  r2, r8mp
-    mov  r3, r9mp
+    mov  r0, r6mq
+    mov  r1, r7mq
+    mov  r2, r8mq
+    mov  r3, r9mq
 %if UNIX64
-    mov  r4, r10mp
-    mov  r5, r11mp
+    mov  r4, r10mq
+    mov  r5, r11mq
     %assign i 6
     %rep max_args-6
         mov  r9, [rsp+stack_offset+(i+1)*8]
