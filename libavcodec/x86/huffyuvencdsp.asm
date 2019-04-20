@@ -35,7 +35,7 @@ SECTION .text
 ;------------------------------------------------------------------------------
 
 %macro DIFF_INT16 0
-cglobal diff_int16, 5,5,5, dst, src1, src2, mask, w, tmp
+cglobal diff_int16, 5,5,5, "p", dst, "p", src1, "p", src2, "d", mask, "d", w, tmp
 %if mmsize > 8
     test src1q, mmsize-1
     jnz .unaligned
@@ -65,7 +65,7 @@ DIFF_INT16
 %endif
 
 INIT_MMX mmxext
-cglobal sub_hfyu_median_pred_int16, 7,7,0, dst, src1, src2, mask, w, left, left_top
+cglobal sub_hfyu_median_pred_int16, 7,7,0, "p", dst, "p", src1, "p", src2, "d", mask, "d", w, "p", left, "p", left_top
     add      wd, wd
     movd    mm7, maskd
     SPLATW  mm7, mm7

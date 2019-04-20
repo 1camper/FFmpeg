@@ -35,7 +35,7 @@ SECTION .text
 ; ff_ict_float_<opt>(float *src0, float *src1, float *src2, int csize)
 ;***********************************************************************
 %macro ICT_FLOAT 1
-cglobal ict_float, 4, 4, %1, src0, src1, src2, csize
+cglobal ict_float, 4, 4, %1, "p", src0, "p", src1, "p", src2, "d", csize
     shl  csized, 2
     add   src0q, csizeq
     add   src1q, csizeq
@@ -131,7 +131,7 @@ ICT_FLOAT 9
 ; ff_rct_int_<opt>(int32_t *src0, int32_t *src1, int32_t *src2, int csize)
 ;***************************************************************************
 %macro RCT_INT 0
-cglobal rct_int, 4, 4, 4, src0, src1, src2, csize
+cglobal rct_int, 4, 4, 4, "p", src0, "p", src1, "p", src2, "d", csize
     shl  csized, 2
     add   src0q, csizeq
     add   src1q, csizeq

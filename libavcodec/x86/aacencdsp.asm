@@ -32,7 +32,7 @@ SECTION .text
 ;void ff_abs_pow34(float *out, const float *in, const int size);
 ;*******************************************************************
 INIT_XMM sse
-cglobal abs_pow34, 3, 3, 3, out, in, size
+cglobal abs_pow34, 3, 3, 3, "p", out, "p", in, "d-", size
     mova   m2, [float_abs_mask]
     shl    sizeq, 2
     add    inq, sizeq
@@ -54,7 +54,7 @@ cglobal abs_pow34, 3, 3, 3, out, in, size
 ;                           const float rounding)
 ;*******************************************************************
 INIT_XMM sse2
-cglobal aac_quantize_bands, 5, 5, 6, out, in, scaled, size, is_signed, maxval, Q34, rounding
+cglobal aac_quantize_bands, 5, 5, 6, "p", out, "p", in, "p", scaled, "d", size, "d", is_signed, "d", maxval, Q34, rounding
 %if UNIX64 == 0
     movss     m0, Q34m
     movss     m1, roundingm

@@ -192,7 +192,7 @@ INIT_YMM avx
 SECTION .text
 %if HAVE_AVX_EXTERNAL
 ; void ff_dct32_float_avx(FFTSample *out, const FFTSample *in)
-cglobal dct32_float, 2,3,8, out, in, tmp
+cglobal dct32_float, 2,3,8, "p", out, "p", in, tmp
     ; pass 1
     vmovaps     m4, [inq+0]
     vinsertf128 m5, m5, [inq+96], 1
@@ -389,7 +389,7 @@ INIT_XMM
 
 ; void ff_dct32_float_sse(FFTSample *out, const FFTSample *in)
 %macro DCT32_FUNC 0
-cglobal dct32_float, 2, 3, 16, out, in, tmp
+cglobal dct32_float, 2, 3, 16, "p", out, "p", in, tmp
     ; pass 1
 
     movaps      m0, [inq+0]

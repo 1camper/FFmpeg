@@ -111,7 +111,7 @@ INIT_XMM sse2
 
 %macro MCAxA_OP 7
 %if ARCH_X86_32
-cglobal %1_h264_qpel%4_%2_10, %5,%6,%7
+cglobal %1_h264_qpel%4_%2_10, %5,%6,%7, "p", dst, "p", src, "p-", stride
     call stub_%1_h264_qpel%3_%2_10 %+ SUFFIX
     mov  r0, r0m
     mov  r1, r1m
@@ -130,7 +130,7 @@ cglobal %1_h264_qpel%4_%2_10, %5,%6,%7
     call stub_%1_h264_qpel%3_%2_10 %+ SUFFIX
     RET
 %else ; ARCH_X86_64
-cglobal %1_h264_qpel%4_%2_10, %5,%6 + 2,%7
+cglobal %1_h264_qpel%4_%2_10, %5,%6 + 2,%7, "p", dst, "p", src, "p-", stride
     mov r%6, r0
 %assign p1 %6+1
     mov r %+ p1, r1
@@ -157,7 +157,7 @@ cglobal %1_h264_qpel%4_%2_10, %5,%6 + 2,%7
 MCAxA_OP %1, %2, %3, i, %4,%5,%6
 %endif
 
-cglobal %1_h264_qpel%3_%2_10, %4,%5,%6
+cglobal %1_h264_qpel%3_%2_10, %4,%5,%6, "p", dst, "p", src, "p-", stride
 %if UNIX64 == 0 ; no prologue or epilogue for UNIX64
     call stub_%1_h264_qpel%3_%2_10 %+ SUFFIX
     RET
@@ -188,7 +188,7 @@ cglobal_mc %1, mc00, 4, 3,4,0
     ret
 
 INIT_XMM sse2
-cglobal %1_h264_qpel8_mc00_10, 3,4
+cglobal %1_h264_qpel8_mc00_10, 3,4, "p", dst, "p", src, "p-", stride
     lea  r3, [r2*3]
     COPY4
     lea  r0, [r0+r2*4]
@@ -196,7 +196,7 @@ cglobal %1_h264_qpel8_mc00_10, 3,4
     COPY4
     RET
 
-cglobal %1_h264_qpel16_mc00_10, 3,4
+cglobal %1_h264_qpel16_mc00_10, 3,4, "p", dst, "p", src, "p-", stride
     mov r3d, 8
 .loop:
     movu           m0, [r1      ]

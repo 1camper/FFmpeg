@@ -36,7 +36,7 @@ SECTION .text
 ;------------------------------------------------------------------------------
 
 %macro REORDER_PIXELS 0
-cglobal reorder_pixels, 3,4,3, dst, src1, size, src2
+cglobal reorder_pixels, 3,4,3, "p", dst, "p", src1, "p-", size, src2
     lea                              src2q, [src1q+sizeq] ; src2 = src + 2 * half_size
     add                               dstq, sizeq         ; dst offset by size
     shr                              sizeq, 1             ; half_size
@@ -72,7 +72,7 @@ REORDER_PIXELS
 ;------------------------------------------------------------------------------
 
 %macro PREDICTOR 0
-cglobal predictor, 2,2,5, src, size
+cglobal predictor, 2,2,5, "p", src, "p-", size
     mova             m0, [pb_80]
     mova            xm1, [pb_15]
     mova            xm2, xm0

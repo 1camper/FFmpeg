@@ -48,9 +48,7 @@ SECTION .text
 ;                                   int dstStride, int src1Stride, int h)
 %macro PIXELS4_L2 1
 %define OP op_%1h
-cglobal %1_pixels4_l2, 6,6
-    movsxdifnidn r3, r3d
-    movsxdifnidn r4, r4d
+cglobal %1_pixels4_l2, 6,6, "p", dst, "p", src1, "p", src2, "d-", dstStride, "d-", src1Stride, "d", h
     test        r5d, 1
     je        .loop
     movd         m0, [r1]
@@ -92,9 +90,7 @@ PIXELS4_L2 avg
 ;                                   int dstStride, int src1Stride, int h)
 %macro PIXELS8_L2 1
 %define OP op_%1
-cglobal %1_pixels8_l2, 6,6
-    movsxdifnidn r3, r3d
-    movsxdifnidn r4, r4d
+cglobal %1_pixels8_l2, 6,6, "p", dst, "p", src1, "p", src2, "d-", dstStride, "d-", src1Stride, "d", h
     test        r5d, 1
     je        .loop
     mova         m0, [r1]
@@ -136,9 +132,7 @@ PIXELS8_L2 avg
 ;                                    int dstStride, int src1Stride, int h)
 %macro PIXELS16_L2 1
 %define OP op_%1
-cglobal %1_pixels16_l2, 6,6
-    movsxdifnidn r3, r3d
-    movsxdifnidn r4, r4d
+cglobal %1_pixels16_l2, 6,6, "p", dst, "p", src1, "p", src2, "d-", dstStride, "d-", src1Stride, "d", h
     test        r5d, 1
     je        .loop
     mova         m0, [r1]

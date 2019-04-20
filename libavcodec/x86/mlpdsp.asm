@@ -95,9 +95,9 @@ SECTION .text
 ;                             unsigned int maxchan, int matrix_noise_shift,
 ;                             int access_unit_size_pow2, int32_t mask)
 %macro MLP_REMATRIX_CHANNEL 0
-cglobal mlp_rematrix_channel, 0, 13, 5, samples, coeffs, blsbs_ptr, blsbs, \
-                                        index, dest_ch, blockpos, maxchan, mns, \
-                                        accum, mask, cnt
+cglobal mlp_rematrix_channel, 0, 13, 5, "p", samples, "p", coeffs, "p", blsbs_ptr, "p", blsbs, \
+                                        "d", index, "d", dest_ch, "w", blockpos, "d", maxchan, "d", mns, \
+                                        "d", accum, "d", mask, cnt
     mov         mnsd, mnsm                          ; load matrix_noise_shift
     movzx  blockposq, word blockposm                ; load and zero extend blockpos (16bit)
     mov     maxchand, maxchanm                      ; load maxchan

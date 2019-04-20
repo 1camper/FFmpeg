@@ -37,7 +37,7 @@ cextern         ps_neg
 SECTION .text
 
 INIT_XMM sse
-cglobal sbr_sum_square, 2, 3, 6
+cglobal sbr_sum_square, 2, 3, 6, "p", x, "d", n
     mov        r2d, r1d
     xorps       m0, m0
     xorps       m1, m1
@@ -85,7 +85,7 @@ cglobal sbr_sum_square, 2, 3, 6
     RET
 
 %define STEP  40*4*2
-cglobal sbr_hf_g_filt, 5, 6, 5
+cglobal sbr_hf_g_filt, 5, 6, 5, "p", Y, "p", X_high, "p", g_filt, "d", m_max, "p-", ixh
     lea         r1, [r1 + 8*r4] ; offset by ixh elements into X_high
     mov         r5, r3
     and         r3, 0xFC
@@ -129,7 +129,7 @@ cglobal sbr_hf_g_filt, 5, 6, 5
 ;                        const float alpha0[2], const float alpha1[2],
 ;                        float bw, int start, int end)
 ;
-cglobal sbr_hf_gen, 4,4,8, X_high, X_low, alpha0, alpha1, BW, S, E
+cglobal sbr_hf_gen, 4,4,8, "p", X_high, "p", X_low, "p", alpha0, "p", alpha1, BW, S, E
     ; load alpha factors
 %define bw m0
 %if ARCH_X86_64 == 0 || WIN64
@@ -188,7 +188,7 @@ cglobal sbr_hf_gen, 4,4,8, X_high, X_low, alpha0, alpha1, BW, S, E
     jnz         .loop2
     RET
 
-cglobal sbr_sum64x5, 1,2,4,z
+cglobal sbr_sum64x5, 1,2,4, "p", z
     lea    r1q, [zq+ 256]
 .loop:
     mova    m0, [zq+   0]
@@ -211,7 +211,7 @@ cglobal sbr_sum64x5, 1,2,4,z
     REP_RET
 
 INIT_XMM sse
-cglobal sbr_qmf_post_shuffle, 2,3,4,W,z
+cglobal sbr_qmf_post_shuffle, 2,3,4, "p", W, "p", z
     lea              r2q, [zq + (64-4)*4]
     mova              m3, [ps_neg]
 .loop:
@@ -230,7 +230,7 @@ cglobal sbr_qmf_post_shuffle, 2,3,4,W,z
     REP_RET
 
 INIT_XMM sse
-cglobal sbr_neg_odd_64, 1,2,4,z
+cglobal sbr_neg_odd_64, 1,2,4, "p", z
     lea        r1q, [zq+256]
 .loop:
     mova        m0, [zq+ 0]
@@ -252,7 +252,7 @@ cglobal sbr_neg_odd_64, 1,2,4,z
 
 ; void ff_sbr_qmf_deint_bfly_sse2(float *v, const float *src0, const float *src1)
 %macro SBR_QMF_DEINT_BFLY  0
-cglobal sbr_qmf_deint_bfly, 3,5,8, v,src0,src1,vrev,c
+cglobal sbr_qmf_deint_bfly, 3,5,8, "p", v, "p", src0, "p", src1,vrev,c
     mov               cq, 64*4-2*mmsize
     lea            vrevq, [vq + 64*4]
 .loop:
@@ -293,7 +293,7 @@ INIT_XMM sse2
 SBR_QMF_DEINT_BFLY
 
 INIT_XMM sse2
-cglobal sbr_qmf_pre_shuffle, 1,4,6,z
+cglobal sbr_qmf_pre_shuffle, 1,4,6, "p", z
 %define OFFSET  (32*4-2*mmsize)
     mov       r3q, OFFSET
     lea       r1q, [zq + (32+1)*4]
@@ -347,14 +347,14 @@ INIT_XMM sse2
 ; sbr_hf_apply_noise_0(float (*Y)[2], const float *s_m,
 ;                      const float *q_filt, int noise,
 ;                      int kx, int m_max)
-cglobal sbr_hf_apply_noise_0, 5,5+NREGS+UNIX64,8, Y,s_m,q_filt,noise,kx,m_max
+cglobal sbr_hf_apply_noise_0, 5,5+NREGS+UNIX64,8, "p", Y, "p", s_m, "p", q_filt, "d", noise, "d", kx, "d", m_max
     mova       m0, [ps_noise0]
     jmp apply_noise_main
 
 ; sbr_hf_apply_noise_1(float (*Y)[2], const float *s_m,
 ;                      const float *q_filt, int noise,
 ;                      int kx, int m_max)
-cglobal sbr_hf_apply_noise_1, 5,5+NREGS+UNIX64,8, Y,s_m,q_filt,noise,kx,m_max
+cglobal sbr_hf_apply_noise_1, 5,5+NREGS+UNIX64,8, "p", Y, "p", s_m, "p", q_filt, "d", noise, "d", kx, "d", m_max
     and       kxq, 1
     shl       kxq, 4
     LOAD_NST  ps_noise13
@@ -363,14 +363,14 @@ cglobal sbr_hf_apply_noise_1, 5,5+NREGS+UNIX64,8, Y,s_m,q_filt,noise,kx,m_max
 ; sbr_hf_apply_noise_2(float (*Y)[2], const float *s_m,
 ;                      const float *q_filt, int noise,
 ;                      int kx, int m_max)
-cglobal sbr_hf_apply_noise_2, 5,5+NREGS+UNIX64,8, Y,s_m,q_filt,noise,kx,m_max
+cglobal sbr_hf_apply_noise_2, 5,5+NREGS+UNIX64,8, "p", Y, "p", s_m, "p", q_filt, "d", noise, "d", kx, "d", m_max
     mova       m0, [ps_noise2]
     jmp apply_noise_main
 
 ; sbr_hf_apply_noise_3(float (*Y)[2], const float *s_m,
 ;                      const float *q_filt, int noise,
 ;                      int kx, int m_max)
-cglobal sbr_hf_apply_noise_3, 5,5+NREGS+UNIX64,8, Y,s_m,q_filt,noise,kx,m_max
+cglobal sbr_hf_apply_noise_3, 5,5+NREGS+UNIX64,8, "p", Y, "p", s_m, "p", q_filt, "d", noise, "d", kx, "d", m_max
     and       kxq, 1
     shl       kxq, 4
     LOAD_NST  ps_noise13+16
@@ -427,7 +427,7 @@ apply_noise_main:
     RET
 
 INIT_XMM sse
-cglobal sbr_qmf_deint_neg, 2,4,4,v,src,vrev,c
+cglobal sbr_qmf_deint_neg, 2,4,4, "p", v, "p", src,vrev,c
 %define COUNT  32*4
 %define OFFSET 32*4
     mov        cq, -COUNT
@@ -449,7 +449,7 @@ cglobal sbr_qmf_deint_neg, 2,4,4,v,src,vrev,c
     REP_RET
 
 %macro SBR_AUTOCORRELATE 0
-cglobal sbr_autocorrelate, 2,3,8,32, x, phi, cnt
+cglobal sbr_autocorrelate, 2,3,8,32, "p", x, "p", phi, cnt
     mov   cntq, 37*8
     add     xq, cntq
     neg   cntq

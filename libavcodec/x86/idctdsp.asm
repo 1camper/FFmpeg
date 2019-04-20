@@ -65,7 +65,7 @@ SECTION .text
 %endmacro
 
 %macro PUT_SIGNED_PIXELS_CLAMPED 1
-cglobal put_signed_pixels_clamped, 3, 4, %1, block, pixels, lsize, lsize3
+cglobal put_signed_pixels_clamped, 3, 4, %1, "p", block, "p", pixels, "p-", lsize, lsize3
     mova     m0, [pb_80]
     lea      lsize3q, [lsizeq*3]
     PUT_SIGNED_PIXELS_CLAMPED_HALF 0
@@ -109,7 +109,7 @@ PUT_SIGNED_PIXELS_CLAMPED 3
 %endmacro
 
 %macro PUT_PIXELS_CLAMPED 0
-cglobal put_pixels_clamped, 3, 4, 2, block, pixels, lsize, lsize3
+cglobal put_pixels_clamped, 3, 4, 2, "p", block, "p", pixels, "p-", lsize, lsize3
     lea lsize3q, [lsizeq*3]
     PUT_PIXELS_CLAMPED_HALF 0
     lea pixelsq, [pixelsq+lsizeq*4]
@@ -165,7 +165,7 @@ PUT_PIXELS_CLAMPED
 %endmacro
 
 %macro ADD_PIXELS_CLAMPED 0
-cglobal add_pixels_clamped, 3, 3, 5, block, pixels, lsize
+cglobal add_pixels_clamped, 3, 3, 5, "p", block, "p", pixels, "p-", lsize
     pxor       m4, m4
     ADD_PIXELS_CLAMPED 0
     lea        pixelsq, [pixelsq+lsizeq*2]

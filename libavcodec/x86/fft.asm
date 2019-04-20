@@ -30,25 +30,19 @@
 
 %include "libavutil/x86/x86util.asm"
 
-%if ARCH_X86_64
-%define pointer resq
-%else
-%define pointer resd
-%endif
-
 struc FFTContext
     .nbits:    resd 1
     .reverse:  resd 1
-    .revtab:   pointer 1
-    .tmpbuf:   pointer 1
+    .revtab:   resp 1
+    .tmpbuf:   resp 1
     .mdctsize: resd 1
     .mdctbits: resd 1
-    .tcos:     pointer 1
-    .tsin:     pointer 1
-    .fftperm:  pointer 1
-    .fftcalc:  pointer 1
-    .imdctcalc:pointer 1
-    .imdcthalf:pointer 1
+    .tcos:     resp 1
+    .tsin:     resp 1
+    .fftperm:  resp 1
+    .fftcalc:  resp 1
+    .imdctcalc:resp 1
+    .imdcthalf:resp 1
 endstruc
 
 SECTION_RODATA 32
@@ -77,12 +71,6 @@ cextern ps_neg
 cextern cos_ %+ i
 %assign i i<<1
 %endrep
-
-%if ARCH_X86_64
-    %define pointer dq
-%else
-    %define pointer dd
-%endif
 
 %macro IF0 1+
 %endmacro
@@ -547,7 +535,7 @@ DEFINE_ARGS zc, w, n, o1, o3
 
 %macro FFT_DISPATCH 2; clobbers 5 GPRs, 8 XMMs
     lea r2, [dispatch_tab%1]
-    mov r2, [r2 + (%2q-2)*gprsize]
+    mov r2p, [r2 + (%2q-2)*ptrsize]
 %ifdef PIC
     lea r3, [$$]
     add r2, r3
@@ -561,7 +549,7 @@ INIT_YMM avx
 DECL_PASS pass_avx, PASS_BIG 1
 DECL_PASS pass_interleave_avx, PASS_BIG 0
 
-cglobal fft_calc, 2,5,8
+cglobal fft_calc, 2,5,8, "p", s, "p", z
     mov     r3d, [r0 + FFTContext.nbits]
     mov     r0, r1
     mov     r1, r3
@@ -576,7 +564,7 @@ DECL_PASS pass_sse, PASS_BIG 1
 DECL_PASS pass_interleave_sse, PASS_BIG 0
 
 %macro FFT_CALC_FUNC 0
-cglobal fft_calc, 2,5,8
+cglobal fft_calc, 2,5,8, "p", s, "p", z
     mov     r3d, [r0 + FFTContext.nbits]
     PUSH    r1
     PUSH    r3
@@ -623,9 +611,9 @@ FFT_CALC_FUNC
 INIT_XMM sse
 FFT_CALC_FUNC
 
-cglobal fft_permute, 2,7,1
-    mov     r4,  [r0 + FFTContext.revtab]
-    mov     r5,  [r0 + FFTContext.tmpbuf]
+cglobal fft_permute, 2,7,1, "p", s, "p", z
+    mov     r4p, [r0 + FFTContext.revtab]
+    mov     r5p, [r0 + FFTContext.tmpbuf]
     mov     ecx, [r0 + FFTContext.nbits]
     mov     r2, 1
     shl     r2, cl
@@ -657,9 +645,9 @@ cglobal fft_permute, 2,7,1
     REP_RET
 
 %macro IMDCT_CALC_FUNC 0
-cglobal imdct_calc, 3,5,3
+cglobal imdct_calc, 3,5,3, "p", s, "p", output, "p", input
     mov     r3d, [r0 + FFTContext.mdctsize]
-    mov     r4,  [r0 + FFTContext.imdcthalf]
+    mov     r4p, [r0 + FFTContext.imdcthalf]
     add     r1,  r3
     PUSH    r3
     PUSH    r1
@@ -774,7 +762,7 @@ fft %+ n %+ fullsuffix:
 %undef n
 
 align 8
-dispatch_tab %+ fullsuffix: pointer list_of_fft
+dispatch_tab %+ fullsuffix: dp list_of_fft
 %endmacro ; DECL_FFT
 
 %if HAVE_AVX_EXTERNAL
@@ -953,21 +941,27 @@ INIT_XMM sse
 %endmacro
 
 %macro DECL_IMDCT 0
-cglobal imdct_half, 3,12,8; FFTContext *s, FFTSample *output, const FFTSample *input
+cglobal imdct_half, 3,12,8, "p", s, "p", output, "p", input
 %if ARCH_X86_64
 %define rrevtab r7
 %define rtcos   r8
 %define rtsin   r9
+%define rrevtabp r7p
+%define rtcosp  r8p
+%define rtsinp  r9p
 %else
 %define rrevtab r6
 %define rtsin   r6
 %define rtcos   r5
+%define rrevtabp r6p
+%define rtsinp  r6p
+%define rtcosp  r5p
 %endif
     mov   r3d, [r0+FFTContext.mdctsize]
     add   r2, r3
     shr   r3, 1
-    mov   rtcos, [r0+FFTContext.tcos]
-    mov   rtsin, [r0+FFTContext.tsin]
+    mov   rtcosp, [r0+FFTContext.tcos]
+    mov   rtsinp, [r0+FFTContext.tsin]
     add   rtcos, r3
     add   rtsin, r3
 %if ARCH_X86_64 == 0
@@ -975,7 +969,7 @@ cglobal imdct_half, 3,12,8; FFTContext *s, FFTSample *output, const FFTSample *i
     push  rtsin
 %endif
     shr   r3, 1
-    mov   rrevtab, [r0+FFTContext.revtab]
+    mov   rrevtabp, [r0+FFTContext.revtab]
     add   rrevtab, r3
 %if ARCH_X86_64 == 0
     push  rrevtab

@@ -36,7 +36,7 @@ SECTION .text
 
 %macro LPC_32 1
 INIT_XMM %1
-cglobal flac_lpc_32, 5,6,5, decoded, coeffs, pred_order, qlevel, len, j
+cglobal flac_lpc_32, 5,6,5, "p", decoded, "p", coeffs, "d-", pred_order, "d", qlevel, "d", len, j
     sub    lend, pred_orderd
     jle .ret
     lea    decodedq, [decodedq+pred_orderq*4-8]
@@ -88,15 +88,12 @@ LPC_32 sse4
 ;                                                   int len, int shift);
 ;----------------------------------------------------------------------------------
 %macro FLAC_DECORRELATE_16 3-4
-cglobal flac_decorrelate_%1_16, 2, 4, 4, out, in0, in1, len
-%if ARCH_X86_32
-    mov      lend, lenm
-%endif
+cglobal flac_decorrelate_%1_16, 4, 4, 4, "p", out, "p", in0, "d*", in1, "d", len
     movd       m3, r4m
     shl      lend, 2
-    mov      in1q, [in0q + gprsize]
-    mov      in0q, [in0q]
-    mov      outq, [outq]
+    mov      in1p, [in0q + ptrsize]
+    mov      in0p, [in0q]
+    mov      outp, [outq]
     add      in1q, lenq
     add      in0q, lenq
     add      outq, lenq
@@ -133,14 +130,11 @@ FLAC_DECORRELATE_16 ms, 2, 0, add
 ;                                        int len, int shift);
 ;----------------------------------------------------------------------------------
 %macro FLAC_DECORRELATE_32 5
-cglobal flac_decorrelate_%1_32, 2, 4, 4, out, in0, in1, len
-%if ARCH_X86_32
-    mov      lend, lenm
-%endif
+cglobal flac_decorrelate_%1_32, 4, 4, 4, "p", out, "p", in0, "d*", in1, "d", len
     movd       m3, r4m
-    mov      in1q, [in0q + gprsize]
-    mov      in0q, [in0q]
-    mov      outq, [outq]
+    mov      in1p, [in0q + ptrsize]
+    mov      in0p, [in0q]
+    mov      outp, [outq]
     sub      in1q, in0q
 
 align 16
@@ -182,10 +176,10 @@ FLAC_DECORRELATE_32 ms, 2, 0, 1, add
 ;%4 = word/dword (shift instruction)
 %macro FLAC_DECORRELATE_INDEP 4
 %define REPCOUNT %2/(32/%1) ; 16bits = channels / 2; 32bits = channels
-cglobal flac_decorrelate_indep%2_%1, 2, %2+2, %3+1, out, in0, in1, len, in2, in3, in4, in5, in6, in7
+cglobal flac_decorrelate_indep%2_%1, 2, %2+2, %3+1, "p", out, "p", in0, in1, "d", len, in2, in3, in4, in5, in6, in7
 %if ARCH_X86_32
 %if %2 == 6
-    DEFINE_ARGS out, in0, in1, in2, in3, in4, in5
+    DEFINE_ARGS "p", out, "p", in0, in1, in2, in3, in4, in5
     %define  lend  dword r3m
 %else
     mov      lend, lenm
@@ -195,12 +189,12 @@ cglobal flac_decorrelate_indep%2_%1, 2, %2+2, %3+1, out, in0, in1, len, in2, in3
 
 %assign %%i 1
 %rep %2-1
-    mov      in %+ %%i %+ q, [in0q+%%i*gprsize]
+    mov      in %+ %%i %+ p, [in0q+%%i*ptrsize]
 %assign %%i %%i+1
 %endrep
 
-    mov      in0q, [in0q]
-    mov      outq, [outq]
+    mov      in0p, [in0q]
+    mov      outp, [outq]
 
 %assign %%i 1
 %rep %2-1

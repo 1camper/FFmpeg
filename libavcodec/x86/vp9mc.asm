@@ -117,7 +117,7 @@ SECTION .text
 
 %macro filter_sse2_h_fn 1
 %assign %%px mmsize/2
-cglobal vp9_%1_8tap_1d_h_ %+ %%px %+ _8, 6, 6, 15, dst, dstride, src, sstride, h, filtery
+cglobal vp9_%1_8tap_1d_h_ %+ %%px %+ _8, 6, 6, 15, "p", dst, "p-", dstride, "p", src, "p-", sstride, "d", h, "p", filtery
     pxor        m5, m5
     mova        m6, [pw_64]
     mova        m7, [filteryq+  0]
@@ -202,7 +202,7 @@ filter_sse2_h_fn avg
 
 %macro filter_h_fn 1
 %assign %%px mmsize/2
-cglobal vp9_%1_8tap_1d_h_ %+ %%px %+ _8, 6, 6, 11, dst, dstride, src, sstride, h, filtery
+cglobal vp9_%1_8tap_1d_h_ %+ %%px %+ _8, 6, 6, 11, "p", dst, "p-", dstride, "p", src, "p-", sstride, "d", h, "p", filtery
     mova        m6, [pw_256]
     mova        m7, [filteryq+ 0]
 %if ARCH_X86_64 && mmsize > 8
@@ -263,7 +263,7 @@ filter_h_fn avg
 %if ARCH_X86_64
 %macro filter_hx2_fn 1
 %assign %%px mmsize
-cglobal vp9_%1_8tap_1d_h_ %+ %%px %+ _8, 6, 6, 14, dst, dstride, src, sstride, h, filtery
+cglobal vp9_%1_8tap_1d_h_ %+ %%px %+ _8, 6, 6, 14, "p", dst, "p-", dstride, "p", src, "p-", sstride, "d", h, "p", filtery
     mova       m13, [pw_256]
     mova        m8, [filteryq+ 0]
     mova        m9, [filteryq+32]
@@ -325,9 +325,9 @@ filter_hx2_fn avg
 %macro filter_sse2_v_fn 1
 %assign %%px mmsize/2
 %if ARCH_X86_64
-cglobal vp9_%1_8tap_1d_v_ %+ %%px %+ _8, 6, 8, 15, dst, dstride, src, sstride, h, filtery, src4, sstride3
+cglobal vp9_%1_8tap_1d_v_ %+ %%px %+ _8, 6, 8, 15, "p", dst, "p-", dstride, "p", src, "p-", sstride, "d", h, "p", filtery, src4, sstride3
 %else
-cglobal vp9_%1_8tap_1d_v_ %+ %%px %+ _8, 4, 7, 15, dst, dstride, src, sstride, filtery, src4, sstride3
+cglobal vp9_%1_8tap_1d_v_ %+ %%px %+ _8, 4, 7, 15, "p", dst, "p-", dstride, "p", src, "p-", sstride, filtery, src4, sstride3
     mov   filteryq, r5mp
 %define hd r4mp
 %endif
@@ -423,9 +423,9 @@ filter_sse2_v_fn avg
 %macro filter_v_fn 1
 %assign %%px mmsize/2
 %if ARCH_X86_64
-cglobal vp9_%1_8tap_1d_v_ %+ %%px %+ _8, 6, 8, 11, dst, dstride, src, sstride, h, filtery, src4, sstride3
+cglobal vp9_%1_8tap_1d_v_ %+ %%px %+ _8, 6, 8, 11, "p", dst, "p-", dstride, "p", src, "p-", sstride, "d", h, "p", filtery, src4, sstride3
 %else
-cglobal vp9_%1_8tap_1d_v_ %+ %%px %+ _8, 4, 7, 11, dst, dstride, src, sstride, filtery, src4, sstride3
+cglobal vp9_%1_8tap_1d_v_ %+ %%px %+ _8, 4, 7, 11, "p", dst, "p-", dstride, "p", src, "p-", sstride, filtery, src4, sstride3
     mov   filteryq, r5mp
 %define hd r4mp
 %endif
@@ -496,7 +496,7 @@ filter_v_fn avg
 
 %macro filter_vx2_fn 1
 %assign %%px mmsize
-cglobal vp9_%1_8tap_1d_v_ %+ %%px %+ _8, 6, 8, 14, dst, dstride, src, sstride, h, filtery, src4, sstride3
+cglobal vp9_%1_8tap_1d_v_ %+ %%px %+ _8, 6, 8, 14, "p", dst, "p-", dstride, "p", src, "p-", sstride, "d", h, "p", filtery, src4, sstride3
     mova       m13, [pw_256]
     lea  sstride3q, [sstrideq*3]
     lea      src4q, [srcq+sstrideq]
@@ -582,11 +582,11 @@ filter_vx2_fn avg
 %endif
 
 %if %2 <= mmsize
-cglobal vp9_%1%2 %+ %%szsuf, 5, 7, 4, dst, dstride, src, sstride, h, dstride3, sstride3
+cglobal vp9_%1%2 %+ %%szsuf, 5, 7, 4, "p", dst, "p-", dstride, "p", src, "p-", sstride, "d", h, dstride3, sstride3
     lea  sstride3q, [sstrideq*3]
     lea  dstride3q, [dstrideq*3]
 %else
-cglobal vp9_%1%2 %+ %%szsuf, 5, 5, %8, dst, dstride, src, sstride, h
+cglobal vp9_%1%2 %+ %%szsuf, 5, 5, %8, "p", dst, "p-", dstride, "p", src, "p-", sstride, "d", h
 %endif
 .loop:
     %%srcfn     m0, [srcq]

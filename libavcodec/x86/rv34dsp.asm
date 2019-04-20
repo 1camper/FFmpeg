@@ -45,7 +45,7 @@ SECTION .text
 %endmacro
 
 %macro rv34_idct 1
-cglobal rv34_idct_%1, 1, 2, 0
+cglobal rv34_idct_%1, 1, 2, 0, "p", block
     movsx   r1, word [r0]
     IDCT_DC r1
     movd    m0, r1d
@@ -63,10 +63,10 @@ rv34_idct dc
 %define IDCT_DC IDCT_DC_NOROUND
 rv34_idct dc_noround
 
-; ff_rv34_idct_dc_add_mmx(uint8_t *dst, int stride, int dc);
+; ff_rv34_idct_dc_add_mmx(uint8_t *dst, ptrdiff_t stride, int dc);
 %if ARCH_X86_32
 INIT_MMX mmx
-cglobal rv34_idct_dc_add, 3, 3
+cglobal rv34_idct_dc_add, 3, 3, "p", dst, "p-", stride, "d", dc
     ; calculate DC
     IDCT_DC_ROUND r2
     pxor       m1, m1
@@ -157,7 +157,7 @@ cglobal rv34_idct_dc_add, 3, 3
     movd         %1, %2
 %endmacro
 INIT_MMX mmxext
-cglobal rv34_idct_add, 3,3,0, d, s, b
+cglobal rv34_idct_add, 3,3,0, d, s, b, "p", dst, "p-", stride, "p", block
     ROW_TRANSFORM       bq
     COL_TRANSFORM     [dq], mm0, [pw_col_coeffs+ 0], [pw_col_coeffs+ 8]
     mova               mm0, [pw_col_coeffs+ 0]
@@ -168,9 +168,9 @@ cglobal rv34_idct_add, 3,3,0, d, s, b
     COL_TRANSFORM  [dq+sq], mm7, mm0, mm4
     ret
 
-; ff_rv34_idct_dc_add_sse4(uint8_t *dst, int stride, int dc);
+; ff_rv34_idct_dc_add_sse4(uint8_t *dst, ptrdiff_t stride, int dc);
 %macro RV34_IDCT_DC_ADD 0
-cglobal rv34_idct_dc_add, 3, 3, 6
+cglobal rv34_idct_dc_add, 3, 3, 6, "p", dst, "p-", stride, "d", dc
     ; load data
     IDCT_DC_ROUND r2
     pxor       m1, m1

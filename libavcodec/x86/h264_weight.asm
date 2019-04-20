@@ -28,11 +28,11 @@ SECTION .text
 ;-----------------------------------------------------------------------------
 ; biweight pred:
 ;
-; void ff_h264_biweight_16_sse2(uint8_t *dst, uint8_t *src, int stride,
+; void ff_h264_biweight_16_sse2(uint8_t *dst, uint8_t *src, ptrdiff_t stride,
 ;                               int height, int log2_denom, int weightd,
 ;                               int weights, int offset);
 ; and
-; void ff_h264_weight_16_sse2(uint8_t *dst, int stride, int height,
+; void ff_h264_weight_16_sse2(uint8_t *dst, ptrdiff_t stride, int height,
 ;                             int log2_denom, int weight, int offset);
 ;-----------------------------------------------------------------------------
 
@@ -71,7 +71,7 @@ SECTION .text
 %endmacro
 
 INIT_MMX mmxext
-cglobal h264_weight_16, 6, 6, 0
+cglobal h264_weight_16, 6, 6, 0, "p", dst, "p-", stride, "d", height, "d", log2_denom, "d", weight, "d", offset
     WEIGHT_SETUP
 .nextrow:
     WEIGHT_OP 0,  4
@@ -84,7 +84,7 @@ cglobal h264_weight_16, 6, 6, 0
     REP_RET
 
 %macro WEIGHT_FUNC_MM 2
-cglobal h264_weight_%1, 6, 6, %2
+cglobal h264_weight_%1, 6, 6, %2, "p", dst, "p-", stride, "d", height, "d", log2_denom, "d", weight, "d", offset
     WEIGHT_SETUP
 .nextrow:
     WEIGHT_OP 0, mmsize/2
@@ -101,7 +101,7 @@ INIT_XMM sse2
 WEIGHT_FUNC_MM 16, 8
 
 %macro WEIGHT_FUNC_HALF_MM 2
-cglobal h264_weight_%1, 6, 6, %2
+cglobal h264_weight_%1, 6, 6, %2, "p", dst, "p-", stride, "d", height, "d", log2_denom, "d", weight, "d", offset
     WEIGHT_SETUP
     sar       r2d, 1
     lea        r3, [r1*2]
@@ -199,7 +199,7 @@ WEIGHT_FUNC_HALF_MM 8, 8
 %endmacro
 
 INIT_MMX mmxext
-cglobal h264_biweight_16, 7, 8, 0
+cglobal h264_biweight_16, 7, 8, 0, "p", dst, "p", src, "p-", stride, "d", height_, "d", log2_denom_, "d", weightd_, "d", weights_, "d", offset
     BIWEIGHT_SETUP
     movifnidn r3d, r3m
 .nextrow:
@@ -218,7 +218,7 @@ cglobal h264_biweight_16, 7, 8, 0
     REP_RET
 
 %macro BIWEIGHT_FUNC_MM 2
-cglobal h264_biweight_%1, 7, 8, %2
+cglobal h264_biweight_%1, 7, 8, %2, "p", dst, "p", src, "p-", stride, "d", height_, "d", log2_denom_, "d", weightd_, "d", weights_, "d", offset
     BIWEIGHT_SETUP
     movifnidn r3d, r3m
 .nextrow:
@@ -239,7 +239,7 @@ INIT_XMM sse2
 BIWEIGHT_FUNC_MM 16, 8
 
 %macro BIWEIGHT_FUNC_HALF_MM 2
-cglobal h264_biweight_%1, 7, 8, %2
+cglobal h264_biweight_%1, 7, 8, %2, "p", dst, "p", src, "p-", stride, "d", height_, "d", log2_denom_, "d", weightd_, "d", weights_, "d", offset
     BIWEIGHT_SETUP
     movifnidn r3d, r3m
     sar        r3, 1
@@ -278,7 +278,7 @@ BIWEIGHT_FUNC_HALF_MM 8, 8
 %endmacro
 
 INIT_XMM ssse3
-cglobal h264_biweight_16, 7, 8, 8
+cglobal h264_biweight_16, 7, 8, 8, "p", dst, "p", src, "p-", stride, "d", height_, "d", log2_denom_, "d", weightd_, "d", weights_, "d", offset
     BIWEIGHT_SETUP
     movifnidn r3d, r3m
 
@@ -297,7 +297,7 @@ cglobal h264_biweight_16, 7, 8, 8
     REP_RET
 
 INIT_XMM ssse3
-cglobal h264_biweight_8, 7, 8, 8
+cglobal h264_biweight_8, 7, 8, 8, "p", dst, "p", src, "p-", stride, "d", height_, "d", log2_denom_, "d", weightd_, "d", weights_, "d", offset
     BIWEIGHT_SETUP
     movifnidn r3d, r3m
     sar        r3, 1

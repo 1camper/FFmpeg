@@ -47,7 +47,7 @@ SECTION .text
 
 %macro HPEL_FILTER 1
 ; dirac_hpel_filter_v_sse2(uint8_t *dst, uint8_t *src, int stride, int width);
-cglobal dirac_hpel_filter_v_%1, 4,6,8, dst, src, stride, width, src0, stridex3
+cglobal dirac_hpel_filter_v_%1, 4,6,8, "p", dst, "p", src, "d-", stride, "d", width, src0, stridex3
     mov     src0q, srcq
     lea     stridex3q, [3*strideq]
     sub     src0q, stridex3q
@@ -91,7 +91,7 @@ cglobal dirac_hpel_filter_v_%1, 4,6,8, dst, src, stride, width, src0, stridex3
     RET
 
 ; dirac_hpel_filter_h_sse2(uint8_t *dst, uint8_t *src, int width);
-cglobal dirac_hpel_filter_h_%1, 3,3,8, dst, src, width
+cglobal dirac_hpel_filter_h_%1, 3,3,8, "p", dst, "p", src, "d", width
     dec     widthd
     pxor    m7, m7
     and     widthd, ~(mmsize-1)
@@ -133,14 +133,12 @@ cglobal dirac_hpel_filter_h_%1, 3,3,8, dst, src, width
 
 %macro PUT_RECT 1
 ; void put_rect_clamped(uint8_t *dst, int dst_stride, int16_t *src, int src_stride, int width, int height)
-cglobal put_signed_rect_clamped_%1, 5,9,3, dst, dst_stride, src, src_stride, w, dst2, src2
+cglobal put_signed_rect_clamped_%1, 5,9,3, "p", dst, "d-", dst_stride, "p", src, "d-", src_stride, "d", w, dst2, src2
     mova    m0, [pb_80]
     add     wd, (mmsize-1)
     and     wd, ~(mmsize-1)
 
 %if ARCH_X86_64
-    movsxd   dst_strideq, dst_strided
-    movsxd   src_strideq, src_strided
     mov   r7d, r5m
     mov   r8d, wd
     %define wspill r8d
@@ -176,14 +174,12 @@ cglobal put_signed_rect_clamped_%1, 5,9,3, dst, dst_stride, src, src_stride, w, 
 
 %macro ADD_RECT 1
 ; void add_rect_clamped(uint8_t *dst, uint16_t *src, int stride, int16_t *idwt, int idwt_stride, int width, int height)
-cglobal add_rect_clamped_%1, 7,9,3, dst, src, stride, idwt, idwt_stride, w, h
+cglobal add_rect_clamped_%1, 7,9,3, "p", dst, "p", src, "d-", stride, "p", idwt, "d-", idwt_stride, "d", w, "d", h
     mova    m0, [pw_32]
     add     wd, (mmsize-1)
     and     wd, ~(mmsize-1)
 
 %if ARCH_X86_64
-    movsxd   strideq, strided
-    movsxd   idwt_strideq, idwt_strided
     mov   r8d, wd
     %define wspill r8d
 %else
@@ -216,7 +212,7 @@ cglobal add_rect_clamped_%1, 7,9,3, dst, src, stride, idwt, idwt_stride, w, h
 
 %macro ADD_OBMC 2
 ; void add_obmc(uint16_t *dst, uint8_t *src, int stride, uint8_t *obmc_weight, int yblen)
-cglobal add_dirac_obmc%1_%2, 6,6,5, dst, src, stride, obmc, yblen
+cglobal add_dirac_obmc%1_%2, 6,6,5, "p", dst, "p", src, "d-", stride, "p", obmc, "d", yblen
     pxor        m4, m4
 .loop:
 %assign i 0
@@ -269,7 +265,7 @@ ADD_OBMC 16, sse2
 INIT_XMM sse4
 
 ; void dequant_subband_32(uint8_t *src, uint8_t *dst, ptrdiff_t stride, const int qf, const int qs, int tot_v, int tot_h)
-cglobal dequant_subband_32, 7, 7, 4, src, dst, stride, qf, qs, tot_v, tot_h
+cglobal dequant_subband_32, 7, 7, 4, "p", src, "p", dst, "p-", stride, "d", qf, "d", qs, "d", tot_v, "d", tot_h
     movd   m2, qfd
     movd   m3, qsd
     SPLATD m2
@@ -306,9 +302,9 @@ cglobal dequant_subband_32, 7, 7, 4, src, dst, stride, qf, qs, tot_v, tot_h
 INIT_XMM sse4
 ; void put_signed_rect_clamped_10(uint8_t *dst, int dst_stride, const uint8_t *src, int src_stride, int width, int height)
 %if ARCH_X86_64
-cglobal put_signed_rect_clamped_10, 6, 8, 5, dst, dst_stride, src, src_stride, w, h, t1, t2
+cglobal put_signed_rect_clamped_10, 6, 8, 5, "p", dst, "d-", dst_stride, "p", src, "d-", src_stride, "d", w, "d", h, t1, t2
 %else
-cglobal put_signed_rect_clamped_10, 5, 7, 5, dst, dst_stride, src, src_stride, w, t1, t2
+cglobal put_signed_rect_clamped_10, 5, 7, 5, "p", dst, "d-", dst_stride, "p", src, "d-", src_stride, "d", w, t1, t2
     %define  hd  r5mp
 %endif
     shl      wd, 2

@@ -29,7 +29,7 @@ SECTION .text
 
 %if ARCH_X86_32
 INIT_MMX 3dnow
-cglobal vorbis_inverse_coupling, 3, 3, 6, mag, ang, block_size
+cglobal vorbis_inverse_coupling, 3, 3, 6, "p", mag, "p", ang, "p-", block_size
     pxor                     m7, m7
     lea                    magq, [magq+block_sizeq*4]
     lea                    angq, [angq+block_sizeq*4]
@@ -57,7 +57,7 @@ cglobal vorbis_inverse_coupling, 3, 3, 6, mag, ang, block_size
 %endif
 
 INIT_XMM sse
-cglobal vorbis_inverse_coupling, 3, 3, 6, mag, ang, block_size
+cglobal vorbis_inverse_coupling, 3, 3, 6, "p", mag, "p", ang, "p-", block_size
     mova                     m5, [pdw_80000000]
     shl             block_sized, 2
     add                    magq, block_sizeq

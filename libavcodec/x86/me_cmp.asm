@@ -148,7 +148,7 @@ SECTION .text
 %endmacro
 
 %macro hadamard8_16_wrapper 2
-cglobal hadamard8_diff, 4, 4, %1
+cglobal hadamard8_diff, 4, 4, %1, "p", s, "p", src1, "p", src2, "p-", stride
 %ifndef m8
     %assign pad %2*mmsize-(4+stack_offset&(mmsize-1))
     SUB            rsp, pad
@@ -159,7 +159,7 @@ cglobal hadamard8_diff, 4, 4, %1
 %endif
     RET
 
-cglobal hadamard8_diff16, 5, 6, %1
+cglobal hadamard8_diff16, 5, 6, %1, "p", s, "p", src1, "p", src2, "p-", stride, "d", h
 %ifndef m8
     %assign pad %2*mmsize-(4+stack_offset&(mmsize-1))
     SUB            rsp, pad
@@ -283,7 +283,7 @@ HADAMARD8_DIFF 9
 ;               ptrdiff_t line_size, int h)
 
 %macro SUM_SQUARED_ERRORS 1
-cglobal sse%1, 5,5,8, v, pix1, pix2, lsize, h
+cglobal sse%1, 5,5,8, "p", v, "p", pix1, "p", pix2, "p-", lsize, "d", h
 %if %1 == mmsize
     shr       hd, 1
 %endif
@@ -364,7 +364,7 @@ SUM_SQUARED_ERRORS 16
 ; %2 = number of inline loops
 
 %macro SUM_ABS_DCTELEM 2
-cglobal sum_abs_dctelem, 1, 1, %1, block
+cglobal sum_abs_dctelem, 1, 1, %1, "p", block
     pxor    m0, m0
     pxor    m1, m1
 %assign %%i 0
@@ -436,7 +436,7 @@ SUM_ABS_DCTELEM 6, 2
 
 ; %1 = 8/16
 %macro HF_NOISE 1
-cglobal hf_noise%1, 3,3,0, pix1, lsize, h
+cglobal hf_noise%1, 3,3,0, "p", pix1, "p-", lsize, "d", h
     sub        hd, 2
     pxor       m7, m7
     pxor       m6, m6
@@ -475,7 +475,7 @@ HF_NOISE 16
 ;---------------------------------------------------------------------------------------
 ;%1 = 8/16
 %macro SAD 1
-cglobal sad%1, 5, 5, 3, v, pix1, pix2, stride, h
+cglobal sad%1, 5, 5, 3, "p", v, "p", pix1, "p", pix2, "p-", stride, "d", h
     movu      m2, [pix2q]
     movu      m1, [pix2q+strideq]
     psadbw    m2, [pix1q]
@@ -530,7 +530,7 @@ SAD 16
 ;------------------------------------------------------------------------------------------
 ;%1 = 8/16
 %macro SAD_X2 1
-cglobal sad%1_x2, 5, 5, 5, v, pix1, pix2, stride, h
+cglobal sad%1_x2, 5, 5, 5, "p", v, "p", pix1, "p", pix2, "p-", stride, "d", h
     movu      m0, [pix2q]
     movu      m2, [pix2q+strideq]
 %if mmsize == 16
@@ -607,7 +607,7 @@ SAD_X2 16
 ;------------------------------------------------------------------------------------------
 ;%1 = 8/16
 %macro SAD_Y2 1
-cglobal sad%1_y2, 5, 5, 4, v, pix1, pix2, stride, h
+cglobal sad%1_y2, 5, 5, 4, "p", v, "p", pix1, "p", pix2, "p-", stride, "d", h
     movu      m1, [pix2q]
     movu      m0, [pix2q+strideq]
     movu      m3, [pix2q+2*strideq]
@@ -677,7 +677,7 @@ SAD_Y2 16
 ;-------------------------------------------------------------------------------------------
 ;%1 = 8/16
 %macro SAD_APPROX_XY2 1
-cglobal sad%1_approx_xy2, 5, 5, 7, v, pix1, pix2, stride, h
+cglobal sad%1_approx_xy2, 5, 5, 7, "p", v, "p", pix1, "p", pix2, "p-", stride, "d", h
     mova      m4, [pb_1]
     movu      m1, [pix2q]
     movu      m0, [pix2q+strideq]
@@ -779,7 +779,7 @@ SAD_APPROX_XY2 16
 ;--------------------------------------------------------------------
 ; %1 = 8/16
 %macro VSAD_INTRA 1
-cglobal vsad_intra%1, 5, 5, 3, v, pix1, pix2, lsize, h
+cglobal vsad_intra%1, 5, 5, 3, "p", v, "p", pix1, "p", pix2, "p-", lsize, "d", h
     mova      m0, [pix1q]
 %if %1 == mmsize
     mova      m2, [pix1q+lsizeq]
@@ -840,7 +840,7 @@ VSAD_INTRA 16
 ;---------------------------------------------------------------------
 ; %1 = 8/16
 %macro VSAD_APPROX 1
-cglobal vsad%1_approx, 5, 5, 5, v, pix1, pix2, lsize, h
+cglobal vsad%1_approx, 5, 5, 5, "p", v, "p", pix1, "p", pix2, "p-", lsize, "d", h
     mova   m1, [pb_80]
     mova   m0, [pix1q]
 %if %1 == mmsize ; vsad8_mmxext, vsad16_sse2

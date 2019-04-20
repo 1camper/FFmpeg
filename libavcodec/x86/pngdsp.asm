@@ -31,10 +31,7 @@ SECTION .text
 
 ; %1 = nr. of xmm registers used
 %macro ADD_BYTES_FN 1
-cglobal add_bytes_l2, 4, 6, %1, dst, src1, src2, wa, w, i
-%if ARCH_X86_64
-    movsxd             waq, wad
-%endif
+cglobal add_bytes_l2, 4, 6, %1, "p", dst, "p", src1, "p", src2, "d-", wa, w, i
     xor                 iq, iq
 
     ; vector loop
@@ -90,11 +87,7 @@ INIT_XMM sse2
 ADD_BYTES_FN 2
 
 %macro ADD_PAETH_PRED_FN 1
-cglobal add_png_paeth_prediction, 5, 7, %1, dst, src, top, w, bpp, end, cntr
-%if ARCH_X86_64
-    movsxd            bppq, bppd
-    movsxd              wq, wd
-%endif
+cglobal add_png_paeth_prediction, 5, 7, %1, "p", dst, "p", src, "p", top, "d-", w, "d-", bpp, end, cntr
     lea               endq, [dstq+wq-(mmsize/2-1)]
     sub               topq, dstq
     sub               srcq, dstq

@@ -33,12 +33,12 @@ SECTION .text
 ;                    intptr_t w);
 %macro DIFF_BYTES_PROLOGUE 0
 %if ARCH_X86_32
-cglobal diff_bytes, 3,5,2, dst, src1, src2
+cglobal diff_bytes, 3,5,2, "p", dst, "p", src1, "p", src2
 %define wq r4q
     DECLARE_REG_TMP 3
     mov               wq, r3mp
 %else
-cglobal diff_bytes, 4,5,2, dst, src1, src2, w
+cglobal diff_bytes, 4,5,2, "p", dst, "p", src1, "p", src2, "p-", w
     DECLARE_REG_TMP 4
 %endif ; ARCH_X86_32
 %define i t0q
@@ -158,7 +158,7 @@ DIFF_BYTES_PROLOGUE
 ;--------------------------------------------------------------------------------------------------
 
 INIT_XMM avx
-cglobal sub_left_predict, 5,6,5, dst, src, stride, width, height, x
+cglobal sub_left_predict, 5,6,5, "p", dst, "p", src, "p-", stride, "p-", width, "d", height, x
     mova             m1, [pb_80] ; prev initial
     add            dstq, widthq
     add            srcq, widthq

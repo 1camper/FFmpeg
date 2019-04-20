@@ -75,8 +75,7 @@ cextern pd_32
 %endmacro
 
 %macro IDCT_ADD_10 0
-cglobal h264_idct_add_10, 3,3
-    movsxdifnidn r2, r2d
+cglobal h264_idct_add_10, 3, 3, "p", dst, "p", block, "d-", stride
     IDCT4_ADD_10 r0, r1, r2
     RET
 %endmacro
@@ -137,8 +136,7 @@ ADD4x4IDCT
 %endmacro
 
 %macro IDCT_ADD16_10 0
-cglobal h264_idct_add16_10, 5,6
-    movsxdifnidn r3, r3d
+cglobal h264_idct_add16_10, 5, 6, "p", dst, "p", block_offset, "p", block, "d-", stride, "p", nnzc
     ADD16_OP 0, 4+1*8
     ADD16_OP 1, 5+1*8
     ADD16_OP 2, 4+2*8
@@ -196,8 +194,7 @@ IDCT_ADD16_10
 %endmacro
 
 INIT_MMX mmxext
-cglobal h264_idct_dc_add_10,3,3
-    movsxdifnidn r2, r2d
+cglobal h264_idct_dc_add_10, 3, 3, "p", dst, "p", block, "d-", stride
     movd      m0, [r1]
     mov dword [r1], 0
     paddd     m0, [pd_32]
@@ -212,8 +209,7 @@ cglobal h264_idct_dc_add_10,3,3
 ; void ff_h264_idct8_dc_add_10(pixel *dst, int16_t *block, int stride)
 ;-----------------------------------------------------------------------------
 %macro IDCT8_DC_ADD 0
-cglobal h264_idct8_dc_add_10,3,4,7
-    movsxdifnidn r2, r2d
+cglobal h264_idct8_dc_add_10, 3, 4, 7, "p", dst, "p", block, "d-", stride
     movd      m0, [r1]
     mov dword[r1], 0
     paddd     m0, [pd_32]
@@ -282,8 +278,7 @@ idct_dc_add %+ SUFFIX:
     IDCT_DC_ADD_OP_10 r5, r3, r6
     ret
 
-cglobal h264_idct_add16intra_10,5,7,8
-    movsxdifnidn r3, r3d
+cglobal h264_idct_add16intra_10, 5, 7, 8, "p", dst, "p", block_offset, "p", block, "d-", stride, "p", nnzc
     ADD16_OP_INTRA 0, 4+1*8
     ADD16_OP_INTRA 2, 4+2*8
     ADD16_OP_INTRA 4, 6+1*8
@@ -317,21 +312,20 @@ IDCT_ADD16INTRA_10
 ;                           const uint8_t nnzc[6*8])
 ;-----------------------------------------------------------------------------
 %macro IDCT_ADD8 0
-cglobal h264_idct_add8_10,5,8,7
-    movsxdifnidn r3, r3d
+cglobal h264_idct_add8_10, 5, 8, 7, "p", dst, "p", block_offset, "p", block, "d-", stride, "p", nnzc
 %if ARCH_X86_64
     mov      r7, r0
 %endif
     add      r2, 1024
-    mov      r0, [r0]
+    mov      r0p, [r0]
     ADD16_OP_INTRA 16, 4+ 6*8
     ADD16_OP_INTRA 18, 4+ 7*8
     add      r2, 1024-128*2
 %if ARCH_X86_64
-    mov      r0, [r7+gprsize]
+    mov      r0p, [r7+ptrsize]
 %else
-    mov      r0, r0m
-    mov      r0, [r0+gprsize]
+    mov      r0p, r0mp
+    mov      r0p, [r0+ptrsize]
 %endif
     ADD16_OP_INTRA 32, 4+11*8
     ADD16_OP_INTRA 34, 4+12*8
@@ -359,14 +353,13 @@ IDCT_ADD8
 
 %macro IDCT_ADD8_422 0
 
-cglobal h264_idct_add8_422_10, 5, 8, 7
-    movsxdifnidn r3, r3d
+cglobal h264_idct_add8_422_10, 5, 8, 7, "p", dst, "p", block_offset, "p", block, "d-", stride, "p", nnzc
 %if ARCH_X86_64
     mov      r7, r0
 %endif
 
     add      r2, 1024
-    mov      r0, [r0]
+    mov      r0p, [r0]
     ADD16_OP_INTRA 16, 4+ 6*8
     ADD16_OP_INTRA 18, 4+ 7*8
     ADD16_OP_INTRA 24, 4+ 8*8 ; i+4
@@ -374,10 +367,10 @@ cglobal h264_idct_add8_422_10, 5, 8, 7
     add      r2, 1024-128*4
 
 %if ARCH_X86_64
-    mov      r0, [r7+gprsize]
+    mov      r0p, [r7+ptrsize]
 %else
-    mov      r0, r0m
-    mov      r0, [r0+gprsize]
+    mov      r0p, r0mp
+    mov      r0p, [r0+ptrsize]
 %endif
 
     ADD16_OP_INTRA 32, 4+11*8
@@ -507,8 +500,7 @@ IDCT_ADD8_422
 %endmacro
 
 %macro IDCT8_ADD 0
-cglobal h264_idct8_add_10, 3,4,16
-    movsxdifnidn r2, r2d
+cglobal h264_idct8_add_10, 3, 4, 16, "p", dst, "p", block, "d-", stride
 %if UNIX64 == 0
     %assign pad 16-gprsize-(stack_offset&15)
     sub  rsp, pad
@@ -632,15 +624,14 @@ IDCT8_ADD
 %endmacro
 
 %macro IDCT8_ADD4 0
-cglobal h264_idct8_add4_10, 0,7,16
-    movsxdifnidn r3, r3d
+cglobal h264_idct8_add4_10, 5, 7, 16, "p*", dst, "p*", block_offset, "p*", block, "d-*", stride, "p", nnzc
     %assign pad 16-gprsize-(stack_offset&15)
     SUB      rsp, pad
-    mov       r5, r0mp
-    mov       r6, r1mp
-    mov       r1, r2mp
-    mov      r2d, r3m
-    movifnidn r4, r4mp
+    ASSIGN_ARG dst, 5
+    ASSIGN_ARG block_offset, 6
+    ASSIGN_ARG block, 1
+    ASSIGN_ARG stride, 2
+    LOAD_ARG dst, block_offset, block, stride
     IDCT8_ADD4_OP  0, 4+1*8
     IDCT8_ADD4_OP  4, 6+1*8
     IDCT8_ADD4_OP  8, 4+3*8

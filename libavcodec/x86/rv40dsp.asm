@@ -76,8 +76,8 @@ SECTION .text
 ;-----------------------------------------------------------------------------
 ; subpel MC functions:
 ;
-; void ff_[put|rv40]_rv40_qpel_[h|v]_<opt>(uint8_t *dst, int deststride,
-;                                          uint8_t *src, int srcstride,
+; void ff_[put|rv40]_rv40_qpel_[h|v]_<opt>(uint8_t *dst, ptrdiff_t deststride,
+;                                          uint8_t *src, ptrdiff_t srcstride,
 ;                                          int len, int m);
 ;----------------------------------------------------------------------
 %macro LOAD  2
@@ -103,7 +103,7 @@ SECTION .text
 %endmacro
 
 %macro FILTER_V 1
-cglobal %1_rv40_qpel_v, 6,6+npicregs,12, dst, dststride, src, srcstride, height, my, picreg
+cglobal %1_rv40_qpel_v, 6,6+npicregs,12, "p", dst, "p-", dststride, "p", src, "p-", srcstride, "d", height, "d", my, picreg
 %ifdef PIC
     lea  picregq, [sixtap_filter_v_m]
 %endif
@@ -174,7 +174,7 @@ cglobal %1_rv40_qpel_v, 6,6+npicregs,12, dst, dststride, src, srcstride, height,
 %endmacro
 
 %macro FILTER_H  1
-cglobal %1_rv40_qpel_h, 6, 6+npicregs, 12, dst, dststride, src, srcstride, height, mx, picreg
+cglobal %1_rv40_qpel_h, 6, 6+npicregs, 12, "p", dst, "p-", dststride, "p", src, "p-", srcstride, "d", height, "d", mx, picreg
 %ifdef PIC
     lea  picregq, [sixtap_filter_v_m]
 %endif
@@ -251,7 +251,7 @@ FILTER_V  put
 FILTER_V  avg
 
 %macro FILTER_SSSE3 1
-cglobal %1_rv40_qpel_v, 6,6+npicregs,8, dst, dststride, src, srcstride, height, my, picreg
+cglobal %1_rv40_qpel_v, 6,6+npicregs,8, "p", dst, "p-", dststride, "p", src, "p-", srcstride, "d", height, "d", my, picreg
 %ifdef PIC
     lea  picregq, [sixtap_filter_hb_m]
 %endif
@@ -296,7 +296,7 @@ cglobal %1_rv40_qpel_v, 6,6+npicregs,8, dst, dststride, src, srcstride, height, 
     jg       .nextrow
     REP_RET
 
-cglobal %1_rv40_qpel_h, 6,6+npicregs,8, dst, dststride, src, srcstride, height, mx, picreg
+cglobal %1_rv40_qpel_h, 6,6+npicregs,8, "p", dst, "p-", dststride, "p", src, "p-", srcstride, "d", height, "d", mx, picreg
 %ifdef PIC
     lea  picregq, [sixtap_filter_hb_m]
 %endif
@@ -436,8 +436,7 @@ FILTER_SSSE3  avg
 %endif
 
 %endmacro
-
-; void ff_rv40_weight_func_%1(uint8_t *dst, uint8_t *src1, uint8_t *src2, int w1, int w2, int stride)
+; void ff_rv40_weight_func_%1(uint8_t *dst, uint8_t *src1, uint8_t *src2, int w1, int w2, ptrdiff_t stride)
 ; %1=size  %2=num of xmm regs
 ; The weights are FP0.14 notation of fractions depending on pts.
 ; For timebases without rounding error (i.e. PAL), the fractions
@@ -445,7 +444,7 @@ FILTER_SSSE3  avg
 ; Therefore, we check here whether they are multiples of 2^9 for
 ; those simplifications to occur.
 %macro RV40_WEIGHT  3
-cglobal rv40_weight_func_%1_%2, 6, 7, 8
+cglobal rv40_weight_func_%1_%2, 6, 7, 8, "p", dst, "p", src1, "p", src2, "d", w1, "d", w2, "p-", stride
 %if cpuflag(ssse3)
     mova       m1, [pw_1024]
 %else

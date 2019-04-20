@@ -24,7 +24,7 @@
 SECTION .text
 
 %macro SSD_INT8_VS_INT16 0
-cglobal ssd_int8_vs_int16, 3, 3, 3, pix1, pix2, size
+cglobal ssd_int8_vs_int16, 3, 3, 3, "p", pix1, "p", pix2, "p-", size
     pxor m0, m0
 .loop:
     sub       sizeq, 8

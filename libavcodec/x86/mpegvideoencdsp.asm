@@ -32,8 +32,7 @@ SECTION .text
 ; %1 = number of loops
 ; %2 = number of GPRs used
 %macro PIX_SUM16 3
-cglobal pix_sum16, 2, %2, 6
-    movsxdifnidn r1, r1d
+cglobal pix_sum16, 2, %2, 6, "p", pix, "d-", line_size
     mov          r2, %1
 %if mmsize == 16
     lea          r3, [r1*3]
@@ -111,8 +110,7 @@ PIX_SUM16  4, 4, 4
 ; %1 = number of xmm registers used
 ; %2 = number of loops
 %macro PIX_NORM1 2
-cglobal pix_norm1, 2, 3, %1
-    movsxdifnidn r1, r1d
+cglobal pix_norm1, 2, 3, %1, "p", pix, "d-", line_size
     mov          r2, %2
     pxor         m0, m0
     pxor         m5, m5

@@ -63,7 +63,7 @@ SECTION .text
 ;void ff_sbc_analyze_4(const int16_t *in, int32_t *out, const int16_t *consts);
 ;*******************************************************************
 INIT_MMX mmx
-cglobal sbc_analyze_4, 3, 3, 4, in, out, consts
+cglobal sbc_analyze_4, 3, 3, 4, "p", in, "p", out, "p", consts
     ANALYZE_MAC_IN   m0, m1, m0, m1, [scale_mask], [scale_mask], 0
     ANALYZE_MAC_IN   m0, m1, m2, m3, m2, m3, 16
     ANALYZE_MAC_IN   m0, m1, m2, m3, m2, m3, 32
@@ -83,7 +83,7 @@ cglobal sbc_analyze_4, 3, 3, 4, in, out, consts
 ;void ff_sbc_analyze_8(const int16_t *in, int32_t *out, const int16_t *consts);
 ;*******************************************************************
 INIT_MMX mmx
-cglobal sbc_analyze_8, 3, 3, 4, in, out, consts
+cglobal sbc_analyze_8, 3, 3, 4, "p", in, "p", out, "p", consts
     ANALYZE_MAC_IN   m0, m1, m0, m1, [scale_mask], [scale_mask],  0
     ANALYZE_MAC_IN   m2, m3, m2, m3, [scale_mask], [scale_mask], 16
     ANALYZE_MAC_IN   m0, m1, m4, m5, m4, m5,  32
@@ -120,7 +120,7 @@ cglobal sbc_analyze_8, 3, 3, 4, in, out, consts
 ;                              int blocks, int channels, int subbands)
 ;*******************************************************************
 INIT_MMX mmx
-cglobal sbc_calc_scalefactors, 5, 7, 4, sb_sample_f, scale_factor, blocks, channels, subbands, ptr, blk
+cglobal sbc_calc_scalefactors, 5, 7, 4, "p", sb_sample_f, "p", scale_factor, "d", blocks, "d", channels, "d", subbands, ptr, blk
     ; subbands = 4 * subbands * channels
     movq          m3, [scale_mask]
     shl           subbandsd, 2

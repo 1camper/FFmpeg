@@ -31,7 +31,7 @@ SECTION .text
 ;------------------------------------------------------------------------------
 
 %macro ADD_INT16 0
-cglobal add_int16, 4,4,5, dst, src, mask, w, tmp
+cglobal add_int16, 4,4,5, "p", dst, "p", src, "d", mask, "d", w, tmp
 %if mmsize > 8
     test srcq, mmsize-1
     jnz .unaligned
@@ -61,7 +61,7 @@ ADD_INT16
 ; void add_hfyu_left_pred_bgr32(uint8_t *dst, const uint8_t *src,
 ;                               intptr_t w, uint8_t *left)
 %macro LEFT_BGR32 0
-cglobal add_hfyu_left_pred_bgr32, 4,4,3, dst, src, w, left
+cglobal add_hfyu_left_pred_bgr32, 4,4,3, "p", dst, "p", src, "p-", w, "p", left
     shl           wq, 2
     movd          m0, [leftq]
     lea         dstq, [dstq + wq]
@@ -100,7 +100,7 @@ LEFT_BGR32
 
 ; void add_hfyu_median_prediction_mmxext(uint8_t *dst, const uint8_t *top, const uint8_t *diff, int mask, int w, int *left, int *left_top)
 INIT_MMX mmxext
-cglobal add_hfyu_median_pred_int16, 7,7,0, dst, top, diff, mask, w, left, left_top
+cglobal add_hfyu_median_pred_int16, 7,7,0, "p", dst, "p", top, "p", diff, "d", mask, "d", w, "p", left, "p", left_top
     add      wd, wd
     movd    mm6, maskd
     SPLATW  mm6, mm6

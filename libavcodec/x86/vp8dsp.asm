@@ -162,7 +162,7 @@ SECTION .text
 ;-------------------------------------------------------------------------------
 
 %macro FILTER_SSSE3 1
-cglobal put_vp8_epel%1_h6, 6, 6 + npicregs, 8, dst, dststride, src, srcstride, height, mx, picreg
+cglobal put_vp8_epel%1_h6, 6, 6 + npicregs, 8, "p", dst, "p-", dststride, "p", src, "p-", srcstride, "d", height, "d", mx, picreg
     lea      mxd, [mxq*3]
     mova      m3, [filter_h6_shuf2]
     mova      m4, [filter_h6_shuf3]
@@ -202,7 +202,7 @@ cglobal put_vp8_epel%1_h6, 6, 6 + npicregs, 8, dst, dststride, src, srcstride, h
     jg .nextrow
     REP_RET
 
-cglobal put_vp8_epel%1_h4, 6, 6 + npicregs, 7, dst, dststride, src, srcstride, height, mx, picreg
+cglobal put_vp8_epel%1_h4, 6, 6 + npicregs, 7, "p", dst, "p-", dststride, "p", src, "p-", srcstride, "d", height, "d", mx, picreg
     shl      mxd, 4
     mova      m2, [pw_256]
     mova      m3, [filter_h2_shuf]
@@ -232,7 +232,7 @@ cglobal put_vp8_epel%1_h4, 6, 6 + npicregs, 7, dst, dststride, src, srcstride, h
     jg .nextrow
     REP_RET
 
-cglobal put_vp8_epel%1_v4, 7, 7, 8, dst, dststride, src, srcstride, height, picreg, my
+cglobal put_vp8_epel%1_v4, 7, 7, 8, "p", dst, "p-", dststride, "p", src, "p-", srcstride, "d", height, "d", picreg, "d", my
     shl      myd, 4
 %ifdef PIC
     lea  picregq, [fourtap_filter_hb_m]
@@ -270,7 +270,7 @@ cglobal put_vp8_epel%1_v4, 7, 7, 8, dst, dststride, src, srcstride, height, picr
     jg .nextrow
     REP_RET
 
-cglobal put_vp8_epel%1_v6, 7, 7, 8, dst, dststride, src, srcstride, height, picreg, my
+cglobal put_vp8_epel%1_v6, 7, 7, 8, "p", dst, "p-", dststride, "p", src, "p-", srcstride, "d", height, "d", picreg, "d", my
     lea      myd, [myq*3]
 %ifdef PIC
     lea  picregq, [sixtap_filter_hb_m]
@@ -324,7 +324,7 @@ FILTER_SSSE3 8
 
 ; 4x4 block, H-only 4-tap filter
 INIT_MMX mmxext
-cglobal put_vp8_epel4_h4, 6, 6 + npicregs, 0, dst, dststride, src, srcstride, height, mx, picreg
+cglobal put_vp8_epel4_h4, 6, 6 + npicregs, 0, "p", dst, "p-", dststride, "p", src, "p-", srcstride, "d", height, "d", mx, picreg
     shl       mxd, 4
 %ifdef PIC
     lea   picregq, [fourtap_filter_hw_m]
@@ -372,7 +372,7 @@ cglobal put_vp8_epel4_h4, 6, 6 + npicregs, 0, dst, dststride, src, srcstride, he
 
 ; 4x4 block, H-only 6-tap filter
 INIT_MMX mmxext
-cglobal put_vp8_epel4_h6, 6, 6 + npicregs, 0, dst, dststride, src, srcstride, height, mx, picreg
+cglobal put_vp8_epel4_h6, 6, 6 + npicregs, 0, "p", dst, "p-", dststride, "p", src, "p-", srcstride, "d", height, "d", mx, picreg
     lea       mxd, [mxq*3]
 %ifdef PIC
     lea   picregq, [sixtap_filter_hw_m]
@@ -429,7 +429,7 @@ cglobal put_vp8_epel4_h6, 6, 6 + npicregs, 0, dst, dststride, src, srcstride, he
     REP_RET
 
 INIT_XMM sse2
-cglobal put_vp8_epel8_h4, 6, 6 + npicregs, 10, dst, dststride, src, srcstride, height, mx, picreg
+cglobal put_vp8_epel8_h4, 6, 6 + npicregs, 10, "p", dst, "p-", dststride, "p", src, "p-", srcstride, "d", height, "d", mx, picreg
     shl      mxd, 5
 %ifdef PIC
     lea  picregq, [fourtap_filter_v_m]
@@ -477,7 +477,7 @@ cglobal put_vp8_epel8_h4, 6, 6 + npicregs, 10, dst, dststride, src, srcstride, h
     REP_RET
 
 INIT_XMM sse2
-cglobal put_vp8_epel8_h6, 6, 6 + npicregs, 14, dst, dststride, src, srcstride, height, mx, picreg
+cglobal put_vp8_epel8_h6, 6, 6 + npicregs, 14, "p", dst, "p-", dststride, "p", src, "p-", srcstride, "d", height, "d", mx, picreg
     lea      mxd, [mxq*3]
     shl      mxd, 4
 %ifdef PIC
@@ -541,7 +541,7 @@ cglobal put_vp8_epel8_h6, 6, 6 + npicregs, 14, dst, dststride, src, srcstride, h
 
 %macro FILTER_V 1
 ; 4x4 block, V-only 4-tap filter
-cglobal put_vp8_epel%1_v4, 7, 7, 8, dst, dststride, src, srcstride, height, picreg, my
+cglobal put_vp8_epel%1_v4, 7, 7, 8, "p", dst, "p-", dststride, "p", src, "p-", srcstride, "d", height, "d", picreg, "d", my
     shl      myd, 5
 %ifdef PIC
     lea  picregq, [fourtap_filter_v_m]
@@ -594,7 +594,7 @@ cglobal put_vp8_epel%1_v4, 7, 7, 8, dst, dststride, src, srcstride, height, picr
 
 
 ; 4x4 block, V-only 6-tap filter
-cglobal put_vp8_epel%1_v6, 7, 7, 8, dst, dststride, src, srcstride, height, picreg, my
+cglobal put_vp8_epel%1_v6, 7, 7, 8, "p", dst, "p-", dststride, "p", src, "p-", srcstride, "d", height, "d", picreg, "d", my
     shl      myd, 4
     lea      myq, [myq*3]
 %ifdef PIC
@@ -665,7 +665,7 @@ FILTER_V 8
 
 %macro FILTER_BILINEAR 1
 %if cpuflag(ssse3)
-cglobal put_vp8_bilinear%1_v, 7, 7, 5, dst, dststride, src, srcstride, height, picreg, my
+cglobal put_vp8_bilinear%1_v, 7, 7, 5, "p", dst, "p-", dststride, "p", src, "p-", srcstride, "d", height, "d", picreg, "d", my
     shl      myd, 4
 %ifdef PIC
     lea  picregq, [bilinear_filter_vb_m]
@@ -695,7 +695,7 @@ cglobal put_vp8_bilinear%1_v, 7, 7, 5, dst, dststride, src, srcstride, height, p
     movhps [dstq+dststrideq*1], m0
 %endif
 %else ; cpuflag(ssse3)
-cglobal put_vp8_bilinear%1_v, 7, 7, 7, dst, dststride, src, srcstride, height, picreg, my
+cglobal put_vp8_bilinear%1_v, 7, 7, 7, "p", dst, "p-", dststride, "p", src, "p-", srcstride, "d", height, "d", picreg, "d", my
     shl      myd, 4
 %ifdef PIC
     lea  picregq, [bilinear_filter_vw_m]
@@ -741,7 +741,7 @@ cglobal put_vp8_bilinear%1_v, 7, 7, 7, dst, dststride, src, srcstride, height, p
     REP_RET
 
 %if cpuflag(ssse3)
-cglobal put_vp8_bilinear%1_h, 6, 6 + npicregs, 5, dst, dststride, src, srcstride, height, mx, picreg
+cglobal put_vp8_bilinear%1_h, 6, 6 + npicregs, 5, "p", dst, "p-", dststride, "p", src, "p-", srcstride, "d", height, "d", mx, picreg
     shl      mxd, 4
 %ifdef PIC
     lea  picregq, [bilinear_filter_vb_m]
@@ -771,7 +771,7 @@ cglobal put_vp8_bilinear%1_h, 6, 6 + npicregs, 5, dst, dststride, src, srcstride
     movhps [dstq+dststrideq*1], m0
 %endif
 %else ; cpuflag(ssse3)
-cglobal put_vp8_bilinear%1_h, 6, 6 + npicregs, 7, dst, dststride, src, srcstride, height, mx, picreg
+cglobal put_vp8_bilinear%1_h, 6, 6 + npicregs, 7, "p", dst, "p-", dststride, "p", src, "p-", srcstride, "d", height, "d", mx, picreg
     shl      mxd, 4
 %ifdef PIC
     lea  picregq, [bilinear_filter_vw_m]
@@ -828,7 +828,7 @@ INIT_XMM ssse3
 FILTER_BILINEAR 8
 
 INIT_MMX mmx
-cglobal put_vp8_pixels8, 5, 5, 0, dst, dststride, src, srcstride, height
+cglobal put_vp8_pixels8, 5, 5, 0, "p", dst, "p-", dststride, "p", src, "p-", srcstride, "d", height
 .nextrow:
     movq    mm0, [srcq+srcstrideq*0]
     movq    mm1, [srcq+srcstrideq*1]
@@ -842,7 +842,7 @@ cglobal put_vp8_pixels8, 5, 5, 0, dst, dststride, src, srcstride, height
 
 %if ARCH_X86_32
 INIT_MMX mmx
-cglobal put_vp8_pixels16, 5, 5, 0, dst, dststride, src, srcstride, height
+cglobal put_vp8_pixels16, 5, 5, 0, "p", dst, "p-", dststride, "p", src, "p-", srcstride, "d", height
 .nextrow:
     movq    mm0, [srcq+srcstrideq*0+0]
     movq    mm1, [srcq+srcstrideq*0+8]
@@ -860,7 +860,7 @@ cglobal put_vp8_pixels16, 5, 5, 0, dst, dststride, src, srcstride, height
 %endif
 
 INIT_XMM sse
-cglobal put_vp8_pixels16, 5, 5, 2, dst, dststride, src, srcstride, height
+cglobal put_vp8_pixels16, 5, 5, 2, "p", dst, "p-", dststride, "p", src, "p-", srcstride, "d", height
 .nextrow:
     movups xmm0, [srcq+srcstrideq*0]
     movups xmm1, [srcq+srcstrideq*1]
@@ -897,7 +897,7 @@ cglobal put_vp8_pixels16, 5, 5, 2, dst, dststride, src, srcstride, height
 
 %if ARCH_X86_32
 INIT_MMX mmx
-cglobal vp8_idct_dc_add, 3, 3, 0, dst, block, stride
+cglobal vp8_idct_dc_add, 3, 3, 0, "p", dst, "p", block, "p-", stride
     ; load data
     movd       m0, [blockq]
 
@@ -922,7 +922,7 @@ cglobal vp8_idct_dc_add, 3, 3, 0, dst, block, stride
 %endif
 
 %macro VP8_IDCT_DC_ADD 0
-cglobal vp8_idct_dc_add, 3, 3, 6, dst, block, stride
+cglobal vp8_idct_dc_add, 3, 3, 6, "p", dst, "p", block, "p-", stride
     ; load data
     movd       m0, [blockq]
     pxor       m1, m1
@@ -973,7 +973,7 @@ VP8_IDCT_DC_ADD
 
 %if ARCH_X86_32
 INIT_MMX mmx
-cglobal vp8_idct_dc_add4y, 3, 3, 0, dst, block, stride
+cglobal vp8_idct_dc_add4y, 3, 3, 0, "p", dst, "p", block, "p-", stride
     ; load data
     movd      m0, [blockq+32*0] ; A
     movd      m1, [blockq+32*2] ; C
@@ -1010,7 +1010,7 @@ cglobal vp8_idct_dc_add4y, 3, 3, 0, dst, block, stride
 %endif
 
 INIT_XMM sse2
-cglobal vp8_idct_dc_add4y, 3, 3, 6, dst, block, stride
+cglobal vp8_idct_dc_add4y, 3, 3, 6, "p", dst, "p", block, "p-", stride
     ; load data
     movd      m0, [blockq+32*0] ; A
     movd      m1, [blockq+32*2] ; C
@@ -1045,7 +1045,7 @@ cglobal vp8_idct_dc_add4y, 3, 3, 6, dst, block, stride
 ;-----------------------------------------------------------------------------
 
 INIT_MMX mmx
-cglobal vp8_idct_dc_add4uv, 3, 3, 0, dst, block, stride
+cglobal vp8_idct_dc_add4uv, 3, 3, 0, "p", dst, "p", block, "p-", stride
     ; load data
     movd      m0, [blockq+32*0] ; A
     movd      m1, [blockq+32*2] ; C
@@ -1118,7 +1118,7 @@ cglobal vp8_idct_dc_add4uv, 3, 3, 0, dst, block, stride
 %endmacro
 
 %macro VP8_IDCT_ADD 0
-cglobal vp8_idct_add, 3, 3, 0, dst, block, stride
+cglobal vp8_idct_add, 3, 3, 0, "p", dst, "p", block, "p-", stride
     ; load block data
     movq         m0, [blockq+ 0]
     movq         m1, [blockq+ 8]
@@ -1194,7 +1194,7 @@ VP8_IDCT_ADD
 %endmacro
 
 %macro VP8_DC_WHT 0
-cglobal vp8_luma_dc_wht, 2, 3, 0, block, dc1, dc2
+cglobal vp8_luma_dc_wht, 2, 3, 0, "p", block, "p", dc1, dc2
     movq          m0, [dc1q]
     movq          m1, [dc1q+8]
     movq          m2, [dc1q+16]

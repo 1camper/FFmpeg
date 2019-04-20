@@ -33,7 +33,7 @@ SECTION .text
 ; %1 = number of xmm registers used
 ; %2 = number of inline store loops
 %macro CLEAR_BLOCK 2
-cglobal clear_block, 1, 1, %1, blocks
+cglobal clear_block, 1, 1, %1, "p", blocks
     ZERO  m0, m0, m0
 %assign %%i 0
 %rep %2
@@ -60,7 +60,7 @@ CLEAR_BLOCK 1, 1
 ;-----------------------------------------
 ; %1 = number of xmm registers used
 %macro CLEAR_BLOCKS 1
-cglobal clear_blocks, 1, 2, %1, blocks, len
+cglobal clear_blocks, 1, 2, %1, "p", blocks, len
     add   blocksq, 768
     mov      lenq, -768
     ZERO       m0, m0, m0
