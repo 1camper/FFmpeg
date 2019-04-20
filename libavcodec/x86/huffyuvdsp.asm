@@ -82,12 +82,12 @@ SECTION .text
 
 %if ARCH_X86_32
 INIT_MMX mmx
-cglobal add_int16, 4,4,5, dst, src, mask, w, tmp
+cglobal add_int16, 4,4,5, "p", dst, "p", src, "d", mask, "d", w, tmp
     INT16_LOOP a, add
 %endif
 
 INIT_XMM sse2
-cglobal add_int16, 4,4,5, dst, src, mask, w, tmp
+cglobal add_int16, 4,4,5, "p", dst, "p", src, "d", mask, "d", w, tmp
     test srcq, mmsize-1
     jnz .unaligned
     test dstq, mmsize-1

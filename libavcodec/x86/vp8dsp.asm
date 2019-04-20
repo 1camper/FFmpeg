@@ -760,7 +760,7 @@ INIT_XMM sse2
 FILTER_BILINEAR 8
 
 %macro FILTER_BILINEAR_SSSE3 1
-cglobal put_vp8_bilinear%1_v, 7, 7, 5, dst, dststride, src, srcstride, height, picreg, my
+cglobal put_vp8_bilinear%1_v, 7, 7, 5, "p", dst, "p-", dststride, "p", src, "p-", srcstride, "d", height, "d", picreg, "d", my
     shl      myd, 4
 %ifdef PIC
     lea  picregq, [bilinear_filter_vb_m]
@@ -796,7 +796,7 @@ cglobal put_vp8_bilinear%1_v, 7, 7, 5, dst, dststride, src, srcstride, height, p
     jg .nextrow
     REP_RET
 
-cglobal put_vp8_bilinear%1_h, 6, 6 + npicregs, 5, dst, dststride, src, srcstride, height, mx, picreg
+cglobal put_vp8_bilinear%1_h, 6, 6 + npicregs, 5, "p", dst, "p-", dststride, "p", src, "p-", srcstride, "d", height, "d", mx, picreg
     shl      mxd, 4
 %ifdef PIC
     lea  picregq, [bilinear_filter_vb_m]
