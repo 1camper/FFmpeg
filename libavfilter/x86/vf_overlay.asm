@@ -33,9 +33,8 @@ pw_257:   times  8 dw 257
 SECTION .text
 
 INIT_XMM sse4
-cglobal overlay_row_44, 5, 7, 6, 0, d, da, s, a, w, r, x
+cglobal overlay_row_44, 5, 7, 6, 0, "p", d, "p", da, "p", s, "p", a, "d-", w, r, x
     xor          xq, xq
-    movsxdifnidn wq, wd
     mov          rq, wq
     and          rq, mmsize/2 - 1
     cmp          wq, mmsize/2
@@ -65,9 +64,8 @@ cglobal overlay_row_44, 5, 7, 6, 0, d, da, s, a, w, r, x
     RET
 
 INIT_XMM sse4
-cglobal overlay_row_22, 5, 7, 6, 0, d, da, s, a, w, r, x
+cglobal overlay_row_22, 5, 7, 6, 0, "p", d, "p", da, "p", s, "p", a, "d-", w, r, x
     xor          xq, xq
-    movsxdifnidn wq, wd
     sub          wq, 1
     mov          rq, wq
     and          rq, mmsize/2 - 1
@@ -103,11 +101,10 @@ cglobal overlay_row_22, 5, 7, 6, 0, d, da, s, a, w, r, x
     RET
 
 INIT_XMM sse4
-cglobal overlay_row_20, 6, 7, 7, 0, d, da, s, a, w, r, x
+cglobal overlay_row_20, 6, 7, 7, 0, "p", d, "p", da, "p", s, "p", a, "d-", w, r, x
     mov         daq, aq
-    add         daq, rmp
+    add         daq, rmq
     xor          xq, xq
-    movsxdifnidn wq, wd
     sub          wq, 1
     mov          rq, wq
     and          rq, mmsize/2 - 1

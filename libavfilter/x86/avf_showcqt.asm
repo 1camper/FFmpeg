@@ -22,14 +22,8 @@
 
 %include "libavutil/x86/x86util.asm"
 
-%if ARCH_X86_64
-%define pointer resq
-%else
-%define pointer resd
-%endif
-
 struc Coeffs
-    .val:   pointer 1
+    .val:   resp 1
     .start: resd 1
     .len:   resd 1
     .sizeof:
@@ -77,7 +71,7 @@ endstruc
 %macro DECLARE_CQT_CALC 0
 ; ff_showcqt_cqt_calc_*(dst, src, coeffs, len, fft_len)
 %if ARCH_X86_64
-cglobal showcqt_cqt_calc, 5, 10, 12, dst, src, coeffs, len, fft_len, x, coeffs_val, coeffs_val2, i, coeffs_len
+cglobal showcqt_cqt_calc, 5, 10, 12, "p", dst, "p", src, "p", coeffs, "d", len, "d", fft_len, x, coeffs_val, coeffs_val2, i, coeffs_len
     align   16
     .loop_k:
         mov     xd, [coeffsq + Coeffs.len]
@@ -95,8 +89,8 @@ cglobal showcqt_cqt_calc, 5, 10, 12, dst, src, coeffs, len, fft_len, x, coeffs_v
         xor     xd, xd
         test    coeffs_lend, coeffs_lend
         jz      .check_loop_b
-        mov     coeffs_valq, [coeffsq + Coeffs.val]
-        mov     coeffs_val2q, [coeffsq + Coeffs.val + Coeffs.sizeof]
+        mov     coeffs_valp, [coeffsq + Coeffs.val]
+        mov     coeffs_val2p, [coeffsq + Coeffs.val + Coeffs.sizeof]
         align   16
         .loop_ab:
             movaps  m7, [coeffs_valq + 4 * xq]
@@ -141,7 +135,7 @@ cglobal showcqt_cqt_calc, 5, 10, 12, dst, src, coeffs, len, fft_len, x, coeffs_v
             jb      .loop_a
         jmp     .loop_end
 %else
-cglobal showcqt_cqt_calc, 4, 7, 8, dst, src, coeffs, len, x, coeffs_val, i
+cglobal showcqt_cqt_calc, 4, 7, 8, "p", dst, "p", src, "p", coeffs, "d", len, x, coeffs_val, i
 %define fft_lend r4m
     align   16
     .loop_k:
@@ -152,7 +146,7 @@ cglobal showcqt_cqt_calc, 4, 7, 8, dst, src, coeffs, len, x, coeffs_val, i
         movaps  m3, m0
         test    xd, xd
         jz      .store
-        mov     coeffs_valq, [coeffsq + Coeffs.val]
+        mov     coeffs_valp, [coeffsq + Coeffs.val]
         xor     xd, xd
         align   16
         .loop_x:

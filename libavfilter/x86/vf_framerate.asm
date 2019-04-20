@@ -43,17 +43,17 @@ SECTION .text
 
 %macro BLEND_INIT 0-1
 %if ARCH_X86_64
-cglobal blend_frames%1, 6, 9, 5, src1, src1_linesize, src2, src2_linesize, dst, dst_linesize, width, end, x
-    mov    widthd, dword widthm
+cglobal blend_frames%1, 7, 9, 5, "p", src1, "p", src1_linesize, "p", src2, "p", src2_linesize, "p", dst, "p", dst_linesize, "p", width, end, x
 %else
-cglobal blend_frames%1, 5, 7, 5, src1, src1_linesize, src2, src2_linesize, dst, end, x
-%define dst_linesizeq r5mp
-%define widthq r6mp
+cglobal blend_frames%1, 5, 7, 5, "p", src1, "p", src1_linesize, "p", src2, "p", src2_linesize, "p", dst, end, x
+%define dst_linesizep r5mp
+%define widthp r6mp
+%define widthq r6mq
 %endif
-    mov      endd, dword r7m
-    add     src1q, widthq
-    add     src2q, widthq
-    add      dstq, widthq
+    mov      endd, r7md
+    add     src1p, widthp
+    add     src2p, widthp
+    add      dstp, widthp
     neg    widthq
 %endmacro
 
@@ -79,9 +79,9 @@ cglobal blend_frames%1, 5, 7, 5, src1, src1_linesize, src2, src2_linesize, dst, 
         movu   [dstq + xq], m0
         add             xq, mmsize
     jl .loop
-    add     src1q, src1_linesizeq
-    add     src2q, src2_linesizeq
-    add      dstq, dst_linesizeq
+    add     src1p, src1_linesizep
+    add     src2p, src2_linesizep
+    add      dstp, dst_linesizep
     sub      endd, 1
     jg .nextrow
 REP_RET

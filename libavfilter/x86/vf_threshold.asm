@@ -32,11 +32,11 @@ SECTION .text
 ;%1 depth (8 or 16) ; %2 b or w ; %3 constant
 %macro THRESHOLD 3
 %if ARCH_X86_64
-cglobal threshold%1, 10, 13, 5, in, threshold, min, max, out, ilinesize, tlinesize, flinesize, slinesize, olinesize, w, h, x
-    mov             wd, dword wm
-    mov             hd, dword hm
+cglobal threshold%1, 12, 13, 5, "p", in, "p", threshold, "p", min, "p", max, "p", out, \
+                                "p-", ilinesize, "p-", tlinesize, "p-", flinesize, "p-", slinesize, "p-", olinesize, \
+                                "d", w, "d", h, x
 %else
-cglobal threshold%1, 5, 7, 5, in, threshold, min, max, out, w, x
+cglobal threshold%1, 5, 7, 5, "p", in, "p", threshold, "p", min, "p", max, "p", out, w, x
     mov             wd, r10m
 %define     ilinesizeq  r5mp
 %define     tlinesizeq  r6mp

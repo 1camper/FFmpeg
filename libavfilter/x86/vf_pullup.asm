@@ -23,7 +23,7 @@
 SECTION .text
 
 INIT_MMX mmx
-cglobal pullup_filter_diff, 3, 5, 8, first, second, size
+cglobal pullup_filter_diff, 3, 5, 8, "p", first, "p", second, "p-", size
     mov        r3, 4
     pxor       m4, m4
     pxor       m7, m7
@@ -61,7 +61,7 @@ cglobal pullup_filter_diff, 3, 5, 8, first, second, size
     RET
 
 INIT_MMX mmx
-cglobal pullup_filter_comb, 3, 5, 8, first, second, size
+cglobal pullup_filter_comb, 3, 5, 8, "p", first, "p", second, "p-", size
     mov        r3, 4
     pxor       m6, m6
     pxor       m7, m7
@@ -140,7 +140,7 @@ cglobal pullup_filter_comb, 3, 5, 8, first, second, size
     RET
 
 INIT_MMX mmx
-cglobal pullup_filter_var, 3, 5, 8, first, second, size
+cglobal pullup_filter_var, 3, 5, 8, "p", first, "p", second, "p-", size
     mov        r3, 3
     pxor       m4, m4
     pxor       m7, m7

@@ -45,9 +45,9 @@ SECTION .text
 
 %macro HQDN3D_ROW 1 ; bitdepth
 %if ARCH_X86_64
-cglobal hqdn3d_row_%1_x86, 7,10,0, src, dst, lineant, frameant, width, spatial, temporal, pixelant, t0, t1
+cglobal hqdn3d_row_%1_x86, 7, 10, 0, "p", src, "p", dst, "p", lineant, "p", frameant, "p-", width, "p", spatial, "p", temporal, pixelant, t0, t1
 %else
-cglobal hqdn3d_row_%1_x86, 7,7,0, src, dst, lineant, frameant, width, spatial, temporal
+cglobal hqdn3d_row_%1_x86, 7, 7, 0, "p", src, "p", dst, "p", lineant, "p", frameant, "p-", width, "p", spatial, "p", temporal
 %endif
     %assign bytedepth (%1+7)>>3
     %assign lut_bits 4+4*(%1/16)
@@ -67,25 +67,29 @@ cglobal hqdn3d_row_%1_x86, 7,7,0, src, dst, lineant, frameant, width, spatial, t
     %define frameantq r0
     %define lineantq  r0
     %define pixelantq r1
+    %define dstp r0p
+    %define frameantp r0p
+    %define lineantp  r0p
+    %define pixelantp r1p
     %define pixelantd r1d
     DECLARE_REG_TMP 2,3
 %endif
     LOAD   pixelantd, xq, %1
 ALIGN 16
 .loop:
-    movifnidn srcq, srcmp
+    movifnidn srcp, srcmp
     LOAD      t0d, xq+1, %1 ; skip on the last iteration to avoid overread
 .loop2:
-    movifnidn lineantq, lineantmp
+    movifnidn lineantp, lineantmp
     movzx     t1d, word [lineantq+xq*2]
     LOWPASS   t1, pixelant, spatial
     mov       [lineantq+xq*2], t1w
     LOWPASS   pixelant, t0, spatial
-    movifnidn frameantq, frameantmp
+    movifnidn frameantp, frameantmp
     movzx     t0d, word [frameantq+xq*2]
     LOWPASS   t0, t1, temporal
     mov       [frameantq+xq*2], t0w
-    movifnidn dstq, dstmp
+    movifnidn dstp, dstmp
 %if %1 != 16
     shr    t0d, 16-%1 ; could eliminate this by storing from t0h, but only with some contraints on register allocation
 %endif

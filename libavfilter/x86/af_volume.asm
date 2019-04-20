@@ -37,12 +37,12 @@ SECTION .text
 ;------------------------------------------------------------------------------
 
 INIT_XMM sse2
-cglobal scale_samples_s16, 4,4,4, dst, src, len, volume
-    movd        m0, volumem
+cglobal scale_samples_s16, 4, 4, 4, "p", dst, "p", src, "d", len, "d*", volume
+    movd        m0, volumemd
     pshuflw     m0, m0, 0
     punpcklwd   m0, [pw_1]
     mova        m1, [pw_128]
-    lea       lenq, [lend*2-mmsize]
+    lea       lend, [lend*2-mmsize]
 .loop:
     ; dst[i] = av_clip_int16((src[i] * volume + 128) >> 8);
     mova        m2, [srcq+lenq]
@@ -54,7 +54,7 @@ cglobal scale_samples_s16, 4,4,4, dst, src, len, volume
     psrad       m2, 8
     packssdw    m3, m2
     mova  [dstq+lenq], m3
-    sub       lenq, mmsize
+    sub       lend, mmsize
     jge .loop
     REP_RET
 
@@ -64,17 +64,17 @@ cglobal scale_samples_s16, 4,4,4, dst, src, len, volume
 ;------------------------------------------------------------------------------
 
 %macro SCALE_SAMPLES_S32 0
-cglobal scale_samples_s32, 4,4,4, dst, src, len, volume
+cglobal scale_samples_s32, 4, 4, 4, "p", dst, "p", src, "d", len, "d*", volume
 %if ARCH_X86_32 && cpuflag(avx)
-    vbroadcastss   xmm2, volumem
+    vbroadcastss   xmm2, volumemd
 %else
-    movd           xmm2, volumed
+    movd           xmm2, volumemd
     pshufd         xmm2, xmm2, 0
 %endif
     CVTDQ2PD         m2, xmm2
     mulpd            m2, m2, [pd_1_256]
     mova             m3, [pd_int32_max]
-    lea            lenq, [lend*4-mmsize]
+    lea            lend, [lend*4-mmsize]
 .loop:
     CVTDQ2PD         m0, [srcq+lenq         ]
     CVTDQ2PD         m1, [srcq+lenq+mmsize/2]
@@ -91,7 +91,7 @@ cglobal scale_samples_s32, 4,4,4, dst, src, len, volume
     movq    [dstq+lenq         ], xmm0
     movq    [dstq+lenq+mmsize/2], xmm1
 %endif
-    sub            lenq, mmsize
+    sub            lend, mmsize
     jge .loop
     REP_RET
 %endmacro
@@ -110,12 +110,12 @@ SCALE_SAMPLES_S32
 ;       [-INT_MAX, INT_MAX] instead of [INT_MIN, INT_MAX]
 
 INIT_XMM ssse3, atom
-cglobal scale_samples_s32, 4,4,8, dst, src, len, volume
-    movd        m4, volumem
+cglobal scale_samples_s32, 4, 4, 8, "p", dst, "p", src, "d", len, "d*", volume
+    movd        m4, volumemd
     pshufd      m4, m4, 0
     mova        m5, [pq_128]
     pxor        m6, m6
-    lea       lenq, [lend*4-mmsize]
+    lea       lend, [lend*4-mmsize]
 .loop:
     ; src[i] = av_clipl_int32((src[i] * volume + 128) >> 8);
     mova        m7, [srcq+lenq]
@@ -135,6 +135,6 @@ cglobal scale_samples_s32, 4,4,8, dst, src, len, volume
     psrld       m0, 1
     psignd      m0, m7
     mova  [dstq+lenq], m0
-    sub       lenq, mmsize
+    sub       lend, mmsize
     jge .loop
     REP_RET

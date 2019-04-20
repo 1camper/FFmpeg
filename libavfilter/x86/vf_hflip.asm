@@ -31,7 +31,7 @@ SECTION .text
 
 ;%1 byte or short, %2 b or w, %3 size in byte (1 for byte, 2 for short)
 %macro HFLIP 3
-cglobal hflip_%1, 3, 5, 3, src, dst, w, r, x
+cglobal hflip_%1, 3, 5, 3, "p", src, "p", dst, "d", w, r, x
     VBROADCASTI128    m0, [pb_flip_%1]
     xor               xq, xq
 %if %3 == 1

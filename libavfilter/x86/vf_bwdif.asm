@@ -192,11 +192,11 @@ SECTION .text
     pxor         m7, m7
     DISP%4
 
-    add        dstq, STEP
-    add       prevq, STEP
-    add        curq, STEP
-    add       nextq, STEP
-    sub    DWORD wm, mmsize/2
+    add        dstp, STEP
+    add       prevp, STEP
+    add        curp, STEP
+    add       nextp, STEP
+    sub         wmd, mmsize/2
     jg .loop%1
 %endmacro
 
@@ -228,31 +228,29 @@ SECTION .text
 
 %macro BWDIF 0
 %if ARCH_X86_64
-cglobal bwdif_filter_line, 4, 9, 12, 0, dst, prev, cur, next, w, prefs, \
-                                        mrefs, prefs2, mrefs2, prefs3, mrefs3, \
-                                        prefs4, mrefs4, parity, clip_max
+cglobal bwdif_filter_line, 4, 9, 12, 0, "p", dst, "p", prev, "p", cur, "p", next, "d", w, "d", prefs, \
+                                        "d", mrefs, "d", prefs2, "d", mrefs2, "d", prefs3, "d", mrefs3, \
+                                        "d", prefs4, "d", mrefs4, "d", parity, "d", clip_max
 %else
-cglobal bwdif_filter_line, 4, 6, 8, 64, dst, prev, cur, next, w, prefs, \
-                                        mrefs, prefs2, mrefs2, prefs3, mrefs3, \
-                                        prefs4, mrefs4, parity, clip_max
+cglobal bwdif_filter_line, 4, 6, 8, 64, "p", dst, "p", prev, "p", cur, "p", next, "d", w, "d", prefs, \
+                                        "d", mrefs, "d", prefs2, "d", mrefs2, "d", prefs3, "d", mrefs3, \
+                                        "d", prefs4, "d", mrefs4, "d", parity, "d", clip_max
 %endif
     %define STEP mmsize/2
     PROC 8, 1
 
 %if ARCH_X86_64
-cglobal bwdif_filter_line_12bit, 4, 9, 13, 0, dst, prev, cur, next, w, \
-                                              prefs, mrefs, prefs2, mrefs2, \
-                                              prefs3, mrefs3, prefs4, \
-                                              mrefs4, parity, clip_max
-    movd        m12, DWORD clip_maxm
+cglobal bwdif_filter_line_12bit, 4, 9, 13, 0, "p", dst, "p", prev, "p", cur, "p", next, "d", w, "d", prefs, \
+                                              "d", mrefs, "d", prefs2, "d", mrefs2, "d", prefs3, "d", mrefs3, \
+                                              "d", prefs4, "d", mrefs4, "d", parity, "d", clip_max
+    movd        m12, clip_maxmd
     SPLATW      m12, m12, 0
 %else
-cglobal bwdif_filter_line_12bit, 4, 6, 8, 80, dst, prev, cur, next, w, \
-                                              prefs, mrefs, prefs2, mrefs2, \
-                                              prefs3, mrefs3, prefs4, \
-                                              mrefs4, parity, clip_max
+cglobal bwdif_filter_line_12bit, 4, 6, 8, 80, "p", dst, "p", prev, "p", cur, "p", next, "d", w, "d", prefs, \
+                                              "d", mrefs, "d", prefs2, "d", mrefs2, "d", prefs3, "d", mrefs3, \
+                                              "d", prefs4, "d", mrefs4, "d", parity, "d", clip_max
     %define m12 [rsp+64]
-    movd         m0, DWORD clip_maxm
+    movd         m0, clip_maxmd
     SPLATW       m0, m0, 0
     mova        m12, m0
 %endif
