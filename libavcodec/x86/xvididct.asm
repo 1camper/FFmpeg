@@ -651,13 +651,13 @@ SECTION .text
     %define NUM_GPRS 7
 %endif
 %if %1 == 0
-cglobal xvid_idct, 1, NUM_GPRS, 8+7*ARCH_X86_64, block
+cglobal xvid_idct, 1, NUM_GPRS, 8+7*ARCH_X86_64, "p", block
 %xdefine BLOCK blockq
 %else
     %if %1 == 1
-cglobal xvid_idct_put, 0, NUM_GPRS, 8+7*ARCH_X86_64, dest, stride, block
+cglobal xvid_idct_put, 0, NUM_GPRS, 8+7*ARCH_X86_64, "p", dest, "p-", stride, "p", block
     %else
-cglobal xvid_idct_add, 0, NUM_GPRS, 8+7*ARCH_X86_64, dest, stride, block
+cglobal xvid_idct_add, 0, NUM_GPRS, 8+7*ARCH_X86_64, "p", dest, "p-", stride, "p", block
     %endif
     %if ARCH_X86_64
     %xdefine BLOCK blockq
@@ -952,7 +952,7 @@ IDCT_SSE2 2
 %endmacro
 
 %macro XVID_IDCT_MMX 0
-cglobal xvid_idct, 1, 1, 0, block
+cglobal xvid_idct, 1, 1, 0, "p", block
 %if cpuflag(mmxext)
 %define TAB tab_i_04_xmm
 %else

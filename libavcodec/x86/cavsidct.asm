@@ -108,7 +108,7 @@ SECTION .text
 %endmacro
 
 INIT_MMX mmx
-cglobal cavs_idct8, 2, 4, 8, 8 * 16, out, in, cnt, tmp
+cglobal cavs_idct8, 2, 4, 8, 8 * 16, "p", out, "p", in, cnt, tmp
     mov           cntd, 2
     mov           tmpq, rsp
 
@@ -170,7 +170,7 @@ cglobal cavs_idct8, 2, 4, 8, 8 * 16, out, in, cnt, tmp
     RET
 
 INIT_XMM sse2
-cglobal cavs_idct8, 2, 2, 8 + ARCH_X86_64, 0 - 8 * 16, out, in
+cglobal cavs_idct8, 2, 2, 8 + ARCH_X86_64, 0 - 8 * 16, "p", out, "p", in
     CAVS_IDCT8_1D  inq, [pw_4]
     psraw           m7, 3
     psraw           m6, 3

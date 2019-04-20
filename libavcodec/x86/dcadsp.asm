@@ -27,7 +27,7 @@ SECTION .text
 %define FMA3_OFFSET (8 * cpuflag(fma3))
 
 %macro LFE_FIR0_FLOAT 0
-cglobal lfe_fir0_float, 4, 6, 12 + cpuflag(fma3)*4, samples, lfe, coeff, nblocks, cnt1, cnt2
+cglobal lfe_fir0_float, 4, 6, 12 + cpuflag(fma3)*4, "p", samples, "p", lfe, "p", coeff, "p", nblocks, cnt1, cnt2
     shr nblocksd, 1
     sub     lfeq, 7*sizeof_float
     mov    cnt1d, 32*sizeof_float
@@ -222,7 +222,7 @@ LFE_FIR0_FLOAT
 %endif
 
 %macro LFE_FIR1_FLOAT 0
-cglobal lfe_fir1_float, 4, 6, 10, samples, lfe, coeff, nblocks, cnt1, cnt2
+cglobal lfe_fir1_float, 4, 6, 10, "p", samples, "p", lfe, "p", coeff, "p", nblocks, cnt1, cnt2
     shr nblocksd, 2
     sub     lfeq, 3*sizeof_float
     mov    cnt1d, 64*sizeof_float

@@ -47,7 +47,7 @@ SECTION .text
 %define SAVE mova
 %define LEN  %2
 %endif
-cglobal %1_pixels%2, 4,5,4
+cglobal %1_pixels%2, 4,5,4, "p", block, "p", pixels, "p-", line_size, "d", h
     lea          r4, [r2*3]
 %ifidn %1, avg
 %if notcpuflag(mmxext)

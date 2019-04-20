@@ -116,8 +116,8 @@ SECTION .text
 
 %macro vp6_filter_diag4 0
 ; void ff_vp6_filter_diag4_<opt>(uint8_t *dst, uint8_t *src, ptrdiff_t stride,
-;                                const int16_t h_weight[4], const int16_t v_weights[4])
-cglobal vp6_filter_diag4, 5, 7, 8
+;                                const int16_t h_weights[4], const int16_t v_weights[4])
+cglobal vp6_filter_diag4, 5, 7, 8, "p", dst, "p", src, "p-", stride, "p", h_weights, "p", v_weights
     mov          r5, rsp         ; backup stack pointer
     and         rsp, ~(mmsize-1) ; align stack
 %if mmsize == 16

@@ -92,6 +92,7 @@ cglobal diff_int16, 5,5,5, dst, src1, src2, mask, w, tmp
 
 INIT_XMM sse2
 cglobal diff_int16, 5,5,5, dst, src1, src2, mask, w, tmp
+cglobal diff_int16, 5,5,5, "p", dst, "p", src1, "p", src2, "d", mask, "d", w, tmp
     test src1q, mmsize-1
     jnz .unaligned
     test src2q, mmsize-1
@@ -103,7 +104,7 @@ cglobal diff_int16, 5,5,5, dst, src1, src2, mask, w, tmp
     INT16_LOOP u, sub
 
 INIT_MMX mmxext
-cglobal sub_hfyu_median_pred_int16, 7,7,0, dst, src1, src2, mask, w, left, left_top
+cglobal sub_hfyu_median_pred_int16, 7,7,0, "p", dst, "p", src1, "p", src2, "d", mask, "d", w, "p", left, "p", left_top
     add      wd, wd
     movd    mm7, maskd
     SPLATW  mm7, mm7

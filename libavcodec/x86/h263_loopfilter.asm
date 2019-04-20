@@ -102,10 +102,7 @@ SECTION .text
 
 INIT_MMX mmx
 ; void ff_h263_v_loop_filter_mmx(uint8_t *src, int stride, int qscale)
-cglobal h263_v_loop_filter, 3,5
-    movsxdifnidn r1, r1d
-    movsxdifnidn r2, r2d
-
+cglobal h263_v_loop_filter, 3,5, "p", src, "d-", stride, "d-", qscale
     lea          r4, [h263_loop_filter_strength]
     movzx       r3d, BYTE [r4+r2]
     movsx        r2, r3b
@@ -144,10 +141,7 @@ cglobal h263_v_loop_filter, 3,5
 
 ; void ff_h263_h_loop_filter_mmx(uint8_t *src, int stride, int qscale)
 INIT_MMX mmx
-cglobal h263_h_loop_filter, 3,5,0,32
-    movsxdifnidn r1, r1d
-    movsxdifnidn r2, r2d
-
+cglobal h263_h_loop_filter, 3,5,0,32, "p", src, "d-", stride, "d-", qscale
     lea          r4, [h263_loop_filter_strength]
     movzx       r3d, BYTE [r4+r2]
     movsx        r2, r3b

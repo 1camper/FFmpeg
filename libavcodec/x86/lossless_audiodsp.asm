@@ -25,7 +25,7 @@ SECTION .text
 %macro SCALARPRODUCT 0
 ; int ff_scalarproduct_and_madd_int16(int16_t *v1, int16_t *v2, int16_t *v3,
 ;                                     int order, int mul)
-cglobal scalarproduct_and_madd_int16, 4,4,8, v1, v2, v3, order, mul
+cglobal scalarproduct_and_madd_int16, 4,4,8, "p", v1, "p", v2, "p", v3, "d-", order, "d", mul
     shl orderq, 1
     movd    m7, mulm
 %if mmsize == 16
@@ -71,7 +71,7 @@ SCALARPRODUCT
 INIT_XMM sse4
 ; int ff_scalarproduct_and_madd_int32(int16_t *v1, int32_t *v2, int16_t *v3,
 ;                                     int order, int mul)
-cglobal scalarproduct_and_madd_int32, 4,4,8, v1, v2, v3, order, mul
+cglobal scalarproduct_and_madd_int32, 4,4,8, "p", v1, "p", v2, "p", v3, "d-", order, "d", mul
     shl orderq, 1
     movd    m7, mulm
     SPLATW  m7, m7
@@ -149,7 +149,7 @@ align 16
 ; int ff_scalarproduct_and_madd_int16(int16_t *v1, int16_t *v2, int16_t *v3,
 ;                                     int order, int mul)
 INIT_XMM ssse3
-cglobal scalarproduct_and_madd_int16, 4,5,10, v1, v2, v3, order, mul
+cglobal scalarproduct_and_madd_int16, 4,5,10, "p", v1, "p", v2, "p", v3, "d-", order, "d", mul
     shl orderq, 1
     movd    m7, mulm
     pshuflw m7, m7, 0

@@ -32,7 +32,7 @@ pw_qmf_coeffs4: dw  53,    0,  -11,    0,  -11,    0,   3,    0
 SECTION .text
 
 INIT_XMM sse2
-cglobal g722_apply_qmf, 2, 2, 5, prev, out
+cglobal g722_apply_qmf, 2, 2, 5, "p", prev, "p", out
     movu m0, [prevq+mmsize*0]
     movu m1, [prevq+mmsize*1]
     movu m2, [prevq+mmsize*2]

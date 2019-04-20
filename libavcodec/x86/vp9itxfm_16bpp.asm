@@ -151,7 +151,7 @@ SECTION .text
 ; since the input is only 14+sign bit, which fits in 15+sign words directly.
 
 %macro IWHT4_FN 2 ; bpp, max
-cglobal vp9_iwht_iwht_4x4_add_%1, 3, 3, 8, dst, stride, block, eob
+cglobal vp9_iwht_iwht_4x4_add_%1, 3, 3, 8, "p", dst, "p-", stride, "p", block, "d", eob
     mova                m7, [pw_%2]
     mova                m0, [blockq+0*16+0]
     mova                m1, [blockq+1*16+0]
@@ -244,7 +244,7 @@ IWHT4_FN 12, 4095
 ; in 15+1 words without additional effort, since the coefficients are 15bpp.
 
 %macro IDCT4_10_FN 0
-cglobal vp9_idct_idct_4x4_add_10, 4, 4, 8, dst, stride, block, eob
+cglobal vp9_idct_idct_4x4_add_10, 4, 4, 8, "p", dst, "p-", stride, "p", block, "d", eob
     cmp               eobd, 1
     jg .idctfull
 
@@ -301,7 +301,7 @@ INIT_MMX ssse3
 IDCT4_10_FN
 
 %macro IADST4_FN 4
-cglobal vp9_%1_%3_4x4_add_10, 3, 3, 0, dst, stride, block, eob
+cglobal vp9_%1_%3_4x4_add_10, 3, 3, 0, "p", dst, "p-", stride, "p", block, "d", eob
 %if WIN64 && notcpuflag(ssse3)
     WIN64_SPILL_XMM 8
 %endif
@@ -406,7 +406,7 @@ IADST4_FN iadst, IADST4, iadst, IADST4
 %endmacro
 
 INIT_XMM sse2
-cglobal vp9_idct_idct_4x4_add_12, 4, 4, 8, dst, stride, block, eob
+cglobal vp9_idct_idct_4x4_add_12, 4, 4, 8, "p", dst, "p-", stride, "p", block, "d", eob
     cmp               eobd, 1
     jg .idctfull
 
@@ -565,7 +565,7 @@ cglobal vp9_idct_idct_4x4_add_12, 4, 4, 8, dst, stride, block, eob
 %endmacro
 
 %macro IADST4_12BPP_FN 4
-cglobal vp9_%1_%3_4x4_add_12, 3, 3, 12, 2 * ARCH_X86_32 * mmsize, dst, stride, block, eob
+cglobal vp9_%1_%3_4x4_add_12, 3, 3, 12, 2 * ARCH_X86_32 * mmsize, "p", dst, "p-", stride, "p", block, "d", eob
     mova                m0, [blockq+0*16]
     mova                m1, [blockq+1*16]
     mova                m2, [blockq+2*16]
@@ -642,7 +642,7 @@ IADST4_12BPP_FN iadst, IADST4, iadst, IADST4
 INIT_XMM sse2
 cglobal vp9_idct_idct_8x8_add_10, 4, 6 + ARCH_X86_64, 14, \
                                   16 * mmsize + 3 * ARCH_X86_32 * mmsize, \
-                                  dst, stride, block, eob
+                                  "p", dst, "p-", stride, "p", block, "d", eob
     mova                m0, [pw_1023]
     cmp               eobd, 1
     jg .idctfull
@@ -781,7 +781,7 @@ cglobal vp9_idct_idct_8x8_add_10, 4, 6 + ARCH_X86_64, 14, \
 INIT_XMM sse2
 cglobal vp9_idct_idct_8x8_add_12, 4, 6 + ARCH_X86_64, 14, \
                                   16 * mmsize + 3 * ARCH_X86_32 * mmsize, \
-                                  dst, stride, block, eob
+                                  "p", dst, "p-", stride, "p", block, "d", eob
     mova                m0, [pw_4095]
     cmp               eobd, 1
     jg mangle(private_prefix %+ _ %+ vp9_idct_idct_8x8_add_10 %+ SUFFIX).idctfull
@@ -911,7 +911,7 @@ cglobal vp9_idct_idct_8x8_add_12, 4, 6 + ARCH_X86_64, 14, \
 %macro IADST8_FN 5
 cglobal vp9_%1_%3_8x8_add_10, 4, 6 + ARCH_X86_64, 16, \
                               16 * mmsize + ARCH_X86_32 * 6 * mmsize, \
-                              dst, stride, block, eob
+                              "p", dst, "p-", stride, "p", block, "d", eob
     mova                m0, [pw_1023]
 
 .body:
@@ -998,7 +998,7 @@ cglobal vp9_%1_%3_8x8_add_10, 4, 6 + ARCH_X86_64, 16, \
 
 cglobal vp9_%1_%3_8x8_add_12, 4, 6 + ARCH_X86_64, 16, \
                               16 * mmsize + ARCH_X86_32 * 6 * mmsize, \
-                              dst, stride, block, eob
+                              "p", dst, "p-", stride, "p", block, "d", eob
     mova                m0, [pw_4095]
     jmp mangle(private_prefix %+ _ %+ vp9_%1_%3_8x8_add_10 %+ SUFFIX).body
 %endmacro
@@ -1097,7 +1097,7 @@ IADST8_FN iadst, IADST8, iadst, IADST8, default
 INIT_XMM sse2
 cglobal vp9_idct_idct_16x16_add_10, 4, 6 + ARCH_X86_64, 16, \
                                     67 * mmsize + ARCH_X86_32 * 8 * mmsize, \
-                                    dst, stride, block, eob
+                                    "p", dst, "p-", stride, "p", block, "d", eob
     mova                m0, [pw_1023]
     cmp               eobd, 1
     jg .idctfull
@@ -1250,7 +1250,7 @@ cglobal vp9_idct_idct_16x16_add_10, 4, 6 + ARCH_X86_64, 16, \
 INIT_XMM sse2
 cglobal vp9_idct_idct_16x16_add_12, 4, 6 + ARCH_X86_64, 16, \
                                     67 * mmsize + ARCH_X86_32 * 8 * mmsize, \
-                                    dst, stride, block, eob
+                                    "p", dst, "p-", stride, "p", block, "d", eob
     mova                m0, [pw_4095]
     cmp               eobd, 1
     jg mangle(private_prefix %+ _ %+ vp9_idct_idct_16x16_add_10 %+ SUFFIX).idctfull
@@ -1435,7 +1435,7 @@ cglobal vp9_idct_idct_16x16_add_12, 4, 6 + ARCH_X86_64, 16, \
 %macro IADST16_FN 7
 cglobal vp9_%1_%4_16x16_add_10, 4, 6 + ARCH_X86_64, 16, \
                                 70 * mmsize + ARCH_X86_32 * 8 * mmsize, \
-                                dst, stride, block, eob
+                                "p", dst, "p-", stride, "p", block, "d", eob
     mova                m0, [pw_1023]
 
 .body:
@@ -1566,7 +1566,7 @@ cglobal vp9_%1_%4_16x16_add_10, 4, 6 + ARCH_X86_64, 16, \
 
 cglobal vp9_%1_%4_16x16_add_12, 4, 6 + ARCH_X86_64, 16, \
                                 70 * mmsize + ARCH_X86_32 * 8 * mmsize, \
-                                dst, stride, block, eob
+                                "p", dst, "p-", stride, "p", block, "d", eob
     mova                m0, [pw_4095]
     jmp mangle(private_prefix %+ _ %+ vp9_%1_%4_16x16_add_10 %+ SUFFIX).body
 %endmacro
@@ -1927,7 +1927,7 @@ IADST16_FN iadst, IADST16, 70, iadst, IADST16, 70, default
 INIT_XMM sse2
 cglobal vp9_idct_idct_32x32_add_10, 4, 6 + ARCH_X86_64, 16, \
                                     275 * mmsize + ARCH_X86_32 * 8 * mmsize, \
-                                    dst, stride, block, eob
+                                    "p", dst, "p-", stride, "p", block, "d", eob
     mova                m0, [pw_1023]
     cmp               eobd, 1
     jg .idctfull
@@ -2020,7 +2020,7 @@ cglobal vp9_idct_idct_32x32_add_10, 4, 6 + ARCH_X86_64, 16, \
 INIT_XMM sse2
 cglobal vp9_idct_idct_32x32_add_12, 4, 6 + ARCH_X86_64, 16, \
                                     275 * mmsize + ARCH_X86_32 * 8 * mmsize, \
-                                    dst, stride, block, eob
+                                    "p", dst, "p-", stride, "p", block, "d", eob
     mova                m0, [pw_4095]
     cmp               eobd, 1
     jg mangle(private_prefix %+ _ %+ vp9_idct_idct_32x32_add_10 %+ SUFFIX).idctfull

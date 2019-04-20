@@ -241,7 +241,7 @@ SECTION .text
 ; %2 = number of loops
 ; %3 = bitdepth
 %macro IDCT_DC 3
-cglobal hevc_idct_%1x%1_dc_%3, 1, 2, 1, coeff, tmp
+cglobal hevc_idct_%1x%1_dc_%3, 1, 2, 1, "p", coeff, tmp
     movsx             tmpd, word [coeffq]
     add               tmpd, (1 << (14 - %3)) + 1
     sar               tmpd, (15 - %3)
@@ -267,7 +267,7 @@ cglobal hevc_idct_%1x%1_dc_%3, 1, 2, 1, coeff, tmp
 ; %1 = HxW
 ; %2 = bitdepth
 %macro IDCT_DC_NL 2 ; No loop
-cglobal hevc_idct_%1x%1_dc_%2, 1, 2, 1, coeff, tmp
+cglobal hevc_idct_%1x%1_dc_%2, 1, 2, 1, "p", coeff, tmp
     movsx             tmpd, word [coeffq]
     add               tmpd, (1 << (14 - %2)) + 1
     sar               tmpd, (15 - %2)
@@ -359,7 +359,7 @@ cglobal hevc_idct_%1x%1_dc_%2, 1, 2, 1, coeff, tmp
 ; void ff_hevc_idct_4x4__{8,10}_<opt>(int16_t *coeffs, int col_limit)
 ; %1 = bitdepth
 %macro IDCT_4x4 1
-cglobal hevc_idct_4x4_%1, 1, 1, 5, coeffs
+cglobal hevc_idct_4x4_%1, 1, 1, 5, "p", coeffs
     mova m0, [coeffsq]
     mova m1, [coeffsq + 16]
 
@@ -506,7 +506,7 @@ cglobal hevc_idct_transpose_8x8, 0, 0, 0
 ; void ff_hevc_idct_8x8_{8,10}_<opt>(int16_t *coeffs, int col_limit)
 ; %1 = bitdepth
 %macro IDCT_8x8 1
-cglobal hevc_idct_8x8_%1, 1, 1, 8, coeffs
+cglobal hevc_idct_8x8_%1, 1, 1, 8, "p", coeffs
     TR_8x4 0, 7, 32, 1, 16, 8, 1
     TR_8x4 8, 7, 32, 1, 16, 8, 1
 
@@ -628,7 +628,7 @@ cglobal hevc_idct_transpose_16x16, 0, 0, 0
 ; void ff_hevc_idct_16x16_{8,10}_<opt>(int16_t *coeffs, int col_limit)
 ; %1 = bitdepth
 %macro IDCT_16x16 1
-cglobal hevc_idct_16x16_%1, 1, 2, 16, coeffs
+cglobal hevc_idct_16x16_%1, 1, 2, 16, "p", coeffs
     mov r1d, 3
 .loop16:
     TR_16x4 8 * r1, 7, [pd_64], 64, 2, 32, 8, 16, 1, 0
@@ -790,7 +790,7 @@ cglobal hevc_idct_transpose_32x32, 0, 0, 0
 ; void ff_hevc_idct_32x32_{8,10}_<opt>(int16_t *coeffs, int col_limit)
 ; %1 = bitdepth
 %macro IDCT_32x32 1
-cglobal hevc_idct_32x32_%1, 1, 6, 16, 256, coeffs
+cglobal hevc_idct_32x32_%1, 1, 6, 16, 256, "p", coeffs
     mov r1d, 7
 .loop32:
     TR_32x4 8 * r1, %1, 1

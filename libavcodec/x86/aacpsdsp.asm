@@ -32,7 +32,7 @@ SECTION .text
 ;void ff_ps_add_squares_<opt>(float *dst, const float (*src)[2], int n);
 ;*************************************************************************
 %macro PS_ADD_SQUARES 1
-cglobal ps_add_squares, 3, 3, %1, dst, src, n
+cglobal ps_add_squares, 3, 3, %1, "p", dst, "p", src, "d", n
     shl    nd, 3
     add  srcq, nq
     neg    nq
@@ -62,7 +62,7 @@ PS_ADD_SQUARES 3
 ;                                   float *src1, int n);
 ;*******************************************************************
 INIT_XMM sse
-cglobal ps_mul_pair_single, 4, 4, 4, dst, src1, src2, n
+cglobal ps_mul_pair_single, 4, 4, 4, "p", dst, "p", src1, "p", src2, "d", n
     shl      nd, 3
     add   src1q, nq
     add    dstq, nq
@@ -91,7 +91,7 @@ align 16
 ;                                   int len);
 ;***********************************************************************
 INIT_XMM sse3
-cglobal ps_stereo_interpolate, 5, 5, 6, l, r, h, h_step, n
+cglobal ps_stereo_interpolate, 5, 5, 6, "p", l, "p", r, "p", h, "p", h_step, "d", n
     movaps   m0, [hq]
     movaps   m1, [h_stepq]
     unpcklps m4, m0, m0
@@ -124,7 +124,7 @@ align 16
 ;                                       int len);
 ;***************************************************************************
 INIT_XMM sse3
-cglobal ps_stereo_interpolate_ipdopd, 5, 5, 10, l, r, h, h_step, n
+cglobal ps_stereo_interpolate_ipdopd, 5, 5, 10, "p", l, "p", r, "p", h, "p", h_step, "d", n
     movaps   m0, [hq]
     movaps   m1, [hq+mmsize]
 %if ARCH_X86_64
@@ -172,8 +172,7 @@ align 16
 ;                                   int i, int len)
 ;**********************************************************
 INIT_XMM sse
-cglobal ps_hybrid_analysis_ileave, 3, 7, 5, out, in, i, len, in0, in1, tmp
-    movsxdifnidn        iq, id
+cglobal ps_hybrid_analysis_ileave, 3, 7, 5, "p", out, "p", in, "d-", i, len, in0, in1, tmp
     mov               lend, 32 << 3
     lea                inq, [inq+iq*4]
     mov               tmpd, id
@@ -278,13 +277,12 @@ align 16
 ;                                    int i, int len)
 ;***********************************************************
 %macro HYBRID_SYNTHESIS_DEINT 0
-cglobal ps_hybrid_synthesis_deint, 3, 7, 5, out, in, i, len, out0, out1, tmp
+cglobal ps_hybrid_synthesis_deint, 3, 7, 5, "p", out, "p", in, "d-", i, len, out0, out1, tmp
 %if cpuflag(sse4)
 %define MOVH movsd
 %else
 %define MOVH movlps
 %endif
-    movsxdifnidn        iq, id
     mov               lend, 32 << 3
     lea               outq, [outq+iq*4]
     mov               tmpd, id
@@ -432,7 +430,7 @@ HYBRID_SYNTHESIS_DEINT
 %endmacro
 
 %macro PS_HYBRID_ANALYSIS 0
-cglobal ps_hybrid_analysis, 5, 5, 8, out, in, filter, stride, n
+cglobal ps_hybrid_analysis, 5, 5, 8, "p", out, "p", in, "p", filter, "p-", stride, "d", n
 %if cpuflag(sse3)
 %define MOVH movsd
 %else

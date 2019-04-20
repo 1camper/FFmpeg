@@ -111,7 +111,7 @@ SECTION .text
 %endmacro
 
 INIT_YMM avx
-cglobal fft15, 4, 6, 14, out, in, exptab, stride, stride3, stride5
+cglobal fft15, 4, 6, 14, "p", out, "p", in, "p", exptab, "p-", stride, stride3, stride5
 %define out0q inq
     shl strideq, 3
 
@@ -162,7 +162,7 @@ cglobal fft15, 4, 6, 14, out, in, exptab, stride, stride3, stride5
 %endmacro
 
 %macro POSTROTATE_FN 1
-cglobal mdct15_postreindex, 5, 7, 8 + cpuflag(avx2)*2, out, in, exp, lut, len8, offset_p, offset_n
+cglobal mdct15_postreindex, 5, 7, 8 + cpuflag(avx2)*2, "p", out, "p", in, "p", exp, "p", lut, "p-", len8, offset_p, offset_n
 
     xor offset_nq, offset_nq
     lea offset_pq, [len8q*2 - %1]

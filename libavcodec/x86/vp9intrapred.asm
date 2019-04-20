@@ -93,7 +93,7 @@ SECTION .text
 ; dc_NxN(uint8_t *dst, ptrdiff_t stride, const uint8_t *l, const uint8_t *a)
 
 %macro DC_4to8_FUNCS 0
-cglobal vp9_ipred_dc_4x4, 4, 4, 0, dst, stride, l, a
+cglobal vp9_ipred_dc_4x4, 4, 4, 0, "p", dst, "p-", stride, "p", l, "p", a
     movd                    m0, [lq]
     punpckldq               m0, [aq]
     pxor                    m1, m1
@@ -114,7 +114,7 @@ cglobal vp9_ipred_dc_4x4, 4, 4, 0, dst, stride, l, a
     movd      [dstq+strideq*1], m0
     RET
 
-cglobal vp9_ipred_dc_8x8, 4, 4, 0, dst, stride, l, a
+cglobal vp9_ipred_dc_8x8, 4, 4, 0, "p", dst, "p-", stride, "p", l, "p", a
     movq                    m0, [lq]
     movq                    m1, [aq]
     DEFINE_ARGS dst, stride, stride3
@@ -150,7 +150,7 @@ INIT_MMX ssse3
 DC_4to8_FUNCS
 
 %macro DC_16to32_FUNCS 0
-cglobal vp9_ipred_dc_16x16, 4, 4, 3, dst, stride, l, a
+cglobal vp9_ipred_dc_16x16, 4, 4, 3, "p", dst, "p-", stride, "p", l, "p", a
     mova                    m0, [lq]
     mova                    m1, [aq]
     DEFINE_ARGS dst, stride, stride3, cnt
@@ -182,7 +182,7 @@ cglobal vp9_ipred_dc_16x16, 4, 4, 3, dst, stride, l, a
     jg .loop
     RET
 
-cglobal vp9_ipred_dc_32x32, 4, 4, 5, dst, stride, l, a
+cglobal vp9_ipred_dc_32x32, 4, 4, 5, "p", dst, "p-", stride, "p", l, "p", a
     mova                    m0, [lq]
     mova                    m1, [lq+16]
     mova                    m2, [aq]
@@ -232,7 +232,7 @@ DC_16to32_FUNCS
 
 %if HAVE_AVX2_EXTERNAL
 INIT_YMM avx2
-cglobal vp9_ipred_dc_32x32, 4, 4, 3, dst, stride, l, a
+cglobal vp9_ipred_dc_32x32, 4, 4, 3, "p", dst, "p-", stride, "p", l, "p", a
     mova                    m0, [lq]
     mova                    m1, [aq]
     DEFINE_ARGS dst, stride, stride3, cnt
@@ -267,7 +267,7 @@ cglobal vp9_ipred_dc_32x32, 4, 4, 3, dst, stride, l, a
 ; dc_top/left_NxN(uint8_t *dst, ptrdiff_t stride, const uint8_t *l, const uint8_t *a)
 
 %macro DC_1D_4to8_FUNCS 2 ; dir (top or left), arg (a or l)
-cglobal vp9_ipred_dc_%1_4x4, 4, 4, 0, dst, stride, l, a
+cglobal vp9_ipred_dc_%1_4x4, 4, 4, 0, "p", dst, "p-", stride, "p", l, "p", a
     movd                    m0, [%2q]
     pxor                    m1, m1
     psadbw                  m0, m1
@@ -287,7 +287,7 @@ cglobal vp9_ipred_dc_%1_4x4, 4, 4, 0, dst, stride, l, a
     movd      [dstq+strideq*1], m0
     RET
 
-cglobal vp9_ipred_dc_%1_8x8, 4, 4, 0, dst, stride, l, a
+cglobal vp9_ipred_dc_%1_8x8, 4, 4, 0, "p", dst, "p-", stride, "p", l, "p", a
     movq                    m0, [%2q]
     DEFINE_ARGS dst, stride, stride3
     lea               stride3q, [strideq*3]
@@ -322,7 +322,7 @@ DC_1D_4to8_FUNCS top,  a
 DC_1D_4to8_FUNCS left, l
 
 %macro DC_1D_16to32_FUNCS 2; dir (top or left), arg (a or l)
-cglobal vp9_ipred_dc_%1_16x16, 4, 4, 3, dst, stride, l, a
+cglobal vp9_ipred_dc_%1_16x16, 4, 4, 3, "p", dst, "p-", stride, "p", l, "p", a
     mova                    m0, [%2q]
     DEFINE_ARGS dst, stride, stride3, cnt
     lea               stride3q, [strideq*3]
@@ -351,7 +351,7 @@ cglobal vp9_ipred_dc_%1_16x16, 4, 4, 3, dst, stride, l, a
     jg .loop
     RET
 
-cglobal vp9_ipred_dc_%1_32x32, 4, 4, 3, dst, stride, l, a
+cglobal vp9_ipred_dc_%1_32x32, 4, 4, 3, "p", dst, "p-", stride, "p", l, "p", a
     mova                    m0, [%2q]
     mova                    m1, [%2q+16]
     DEFINE_ARGS dst, stride, stride3, cnt
@@ -397,7 +397,7 @@ DC_1D_16to32_FUNCS left, l
 
 %macro DC_1D_AVX2_FUNCS 2 ; dir (top or left), arg (a or l)
 %if HAVE_AVX2_EXTERNAL
-cglobal vp9_ipred_dc_%1_32x32, 4, 4, 3, dst, stride, l, a
+cglobal vp9_ipred_dc_%1_32x32, 4, 4, 3, "p", dst, "p-", stride, "p", l, "p", a
     mova                    m0, [%2q]
     DEFINE_ARGS dst, stride, stride3, cnt
     lea               stride3q, [strideq*3]
@@ -434,7 +434,7 @@ DC_1D_AVX2_FUNCS left, l
 ; v
 
 INIT_MMX mmx
-cglobal vp9_ipred_v_8x8, 4, 4, 0, dst, stride, l, a
+cglobal vp9_ipred_v_8x8, 4, 4, 0, "p", dst, "p-", stride, "p", l, "p", a
     movq                    m0, [aq]
     DEFINE_ARGS dst, stride, stride3
     lea               stride3q, [strideq*3]
@@ -450,7 +450,7 @@ cglobal vp9_ipred_v_8x8, 4, 4, 0, dst, stride, l, a
     RET
 
 INIT_XMM sse
-cglobal vp9_ipred_v_16x16, 4, 4, 1, dst, stride, l, a
+cglobal vp9_ipred_v_16x16, 4, 4, 1, "p", dst, "p-", stride, "p", l, "p", a
     mova                    m0, [aq]
     DEFINE_ARGS dst, stride, stride3, cnt
     lea               stride3q, [strideq*3]
@@ -466,7 +466,7 @@ cglobal vp9_ipred_v_16x16, 4, 4, 1, dst, stride, l, a
     RET
 
 INIT_XMM sse
-cglobal vp9_ipred_v_32x32, 4, 4, 2, dst, stride, l, a
+cglobal vp9_ipred_v_32x32, 4, 4, 2, "p", dst, "p-", stride, "p", l, "p", a
     mova                    m0, [aq]
     mova                    m1, [aq+16]
     DEFINE_ARGS dst, stride, stride3, cnt
@@ -487,7 +487,7 @@ cglobal vp9_ipred_v_32x32, 4, 4, 2, dst, stride, l, a
     RET
 
 INIT_YMM avx
-cglobal vp9_ipred_v_32x32, 4, 4, 1, dst, stride, l, a
+cglobal vp9_ipred_v_32x32, 4, 4, 1, "p", dst, "p-", stride, "p", l, "p", a
     mova                    m0, [aq]
     DEFINE_ARGS dst, stride, stride3, cnt
     lea               stride3q, [strideq*3]
@@ -511,7 +511,7 @@ cglobal vp9_ipred_v_32x32, 4, 4, 1, dst, stride, l, a
 
 %macro H_XMM_FUNCS 2
 %if notcpuflag(avx)
-cglobal vp9_ipred_h_4x4, 3, 4, 1, dst, stride, l, stride3
+cglobal vp9_ipred_h_4x4, 3, 4, 1, "p", dst, "p-", stride, "p", l, stride3
     movd                    m0, [lq]
 %if cpuflag(ssse3)
     pshufb                  m0, [pb_4x3_4x2_4x1_4x0]
@@ -531,7 +531,7 @@ cglobal vp9_ipred_h_4x4, 3, 4, 1, dst, stride, l, stride3
     RET
 %endif
 
-cglobal vp9_ipred_h_8x8, 3, 5, %1, dst, stride, l, stride3, cnt
+cglobal vp9_ipred_h_8x8, 3, 5, %1, "p", dst, "p-", stride, "p", l, stride3, cnt
 %if cpuflag(ssse3)
     mova                    m2, [pb_8x1_8x0]
     mova                    m3, [pb_8x3_8x2]
@@ -558,7 +558,7 @@ cglobal vp9_ipred_h_8x8, 3, 5, %1, dst, stride, l, stride3, cnt
     jge .loop
     RET
 
-cglobal vp9_ipred_h_16x16, 3, 5, %2, dst, stride, l, stride3, cnt
+cglobal vp9_ipred_h_16x16, 3, 5, %2, "p", dst, "p-", stride, "p", l, stride3, cnt
 %if cpuflag(ssse3)
     mova                    m5, [pb_1]
     mova                    m6, [pb_2]
@@ -594,7 +594,7 @@ cglobal vp9_ipred_h_16x16, 3, 5, %2, dst, stride, l, stride3, cnt
     jge .loop
     RET
 
-cglobal vp9_ipred_h_32x32, 3, 5, %2, dst, stride, l, stride3, cnt
+cglobal vp9_ipred_h_32x32, 3, 5, %2, "p", dst, "p-", stride, "p", l, stride3, cnt
 %if cpuflag(ssse3)
     mova                    m5, [pb_1]
     mova                    m6, [pb_2]
@@ -644,7 +644,7 @@ H_XMM_FUNCS 4, 8
 
 %if HAVE_AVX2_EXTERNAL
 INIT_YMM avx2
-cglobal vp9_ipred_h_32x32, 3, 5, 8, dst, stride, l, stride3, cnt
+cglobal vp9_ipred_h_32x32, 3, 5, 8, "p", dst, "p-", stride, "p", l, stride3, cnt
     mova                    m5, [pb_1]
     mova                    m6, [pb_2]
     mova                    m7, [pb_3]
@@ -671,7 +671,7 @@ cglobal vp9_ipred_h_32x32, 3, 5, 8, dst, stride, l, stride3, cnt
 ; tm
 
 %macro TM_MMX_FUNCS 0
-cglobal vp9_ipred_tm_4x4, 4, 4, 0, dst, stride, l, a
+cglobal vp9_ipred_tm_4x4, 4, 4, 0, "p", dst, "p-", stride, "p", l, "p", a
     pxor                    m1, m1
     movd                    m0, [aq]
     pinsrw                  m2, [aq-1], 0
@@ -715,7 +715,7 @@ INIT_MMX ssse3
 TM_MMX_FUNCS
 
 %macro TM_XMM_FUNCS 0
-cglobal vp9_ipred_tm_8x8, 4, 4, 5, dst, stride, l, a
+cglobal vp9_ipred_tm_8x8, 4, 4, 5, "p", dst, "p-", stride, "p", l, "p", a
     pxor                    m1, m1
     movh                    m0, [aq]
     pinsrw                  m2, [aq-1], 0
@@ -753,7 +753,7 @@ cglobal vp9_ipred_tm_8x8, 4, 4, 5, dst, stride, l, a
     jge .loop
     RET
 
-cglobal vp9_ipred_tm_16x16, 4, 4, 8, dst, stride, l, a
+cglobal vp9_ipred_tm_16x16, 4, 4, 8, "p", dst, "p-", stride, "p", l, "p", a
     pxor                    m3, m3
     mova                    m0, [aq]
     pinsrw                  m2, [aq-1], 0
@@ -801,7 +801,7 @@ cglobal vp9_ipred_tm_16x16, 4, 4, 8, dst, stride, l, a
 %else
 %define mem 64
 %endif
-cglobal vp9_ipred_tm_32x32, 4, 4, 14, mem, dst, stride, l, a
+cglobal vp9_ipred_tm_32x32, 4, 4, 14, mem, "p", dst, "p-", stride, "p", l, "p", a
     pxor                    m5, m5
     pinsrw                  m4, [aq-1], 0
     mova                    m0, [aq]
@@ -900,7 +900,7 @@ TM_XMM_FUNCS
 
 %if HAVE_AVX2_EXTERNAL
 INIT_YMM avx2
-cglobal vp9_ipred_tm_32x32, 4, 4, 8, dst, stride, l, a
+cglobal vp9_ipred_tm_32x32, 4, 4, 8, "p", dst, "p-", stride, "p", l, "p", a
     pxor                    m3, m3
     pinsrw                 xm2, [aq-1], 0
     vinserti128             m2, m2, xm2, 1
@@ -944,7 +944,7 @@ cglobal vp9_ipred_tm_32x32, 4, 4, 8, dst, stride, l, a
 %endmacro
 
 %macro DL_MMX_FUNCS 0
-cglobal vp9_ipred_dl_4x4, 4, 4, 0, dst, stride, l, a
+cglobal vp9_ipred_dl_4x4, 4, 4, 0, "p", dst, "p-", stride, "p", l, "p", a
     movq                    m1, [aq]
 %if cpuflag(ssse3)
     pshufb                  m0, m1, [pb_0to5_2x7]
@@ -977,7 +977,7 @@ INIT_MMX ssse3
 DL_MMX_FUNCS
 
 %macro DL_XMM_FUNCS 0
-cglobal vp9_ipred_dl_8x8, 4, 4, 4, dst, stride, stride5, a
+cglobal vp9_ipred_dl_8x8, 4, 4, 4, "p", dst, "p-", stride, "p*", stride5, "p", a
     movq                    m0, [aq]
     lea               stride5q, [strideq*5]
 %if cpuflag(ssse3)
@@ -1012,7 +1012,7 @@ cglobal vp9_ipred_dl_8x8, 4, 4, 4, dst, stride, stride5, a
     movq      [dstq+stride5q ], m1
     RET
 
-cglobal vp9_ipred_dl_16x16, 4, 4, 6, dst, stride, l, a
+cglobal vp9_ipred_dl_16x16, 4, 4, 6, "p", dst, "p-", stride, "p", l, "p", a
     mova                    m0, [aq]
 %if cpuflag(ssse3)
     mova                    m5, [pb_1toE_2xF]
@@ -1056,7 +1056,7 @@ cglobal vp9_ipred_dl_16x16, 4, 4, 6, dst, stride, l, a
     jg .loop
     RET
 
-cglobal vp9_ipred_dl_32x32, 4, 5, 8, dst, stride, cnt, a, dst16
+cglobal vp9_ipred_dl_32x32, 4, 5, 8, "p", dst, "p-", stride, "p*", cnt, "p", a, dst16
     mova                    m0, [aq]
     mova                    m1, [aq+16]
     PALIGNR                 m2, m1, m0, 1, m4
@@ -1124,7 +1124,7 @@ DL_XMM_FUNCS
 ; dr
 
 %macro DR_MMX_FUNCS 0
-cglobal vp9_ipred_dr_4x4, 4, 4, 0, dst, stride, l, a
+cglobal vp9_ipred_dr_4x4, 4, 4, 0, "p", dst, "p-", stride, "p", l, "p", a
     movd                    m0, [lq]
     punpckldq               m0, [aq-1]
     movd                    m1, [aq+3]
@@ -1150,7 +1150,7 @@ INIT_MMX ssse3
 DR_MMX_FUNCS
 
 %macro DR_XMM_FUNCS 0
-cglobal vp9_ipred_dr_8x8, 4, 4, 4, dst, stride, l, a
+cglobal vp9_ipred_dr_8x8, 4, 4, 4, "p", dst, "p-", stride, "p", l, "p", a
     movq                    m1, [lq]
     movhps                  m1, [aq-1]
     movd                    m2, [aq+7]
@@ -1178,7 +1178,7 @@ cglobal vp9_ipred_dr_8x8, 4, 4, 4, dst, stride, l, a
     movhps    [dstq+stride3q ], m0
     RET
 
-cglobal vp9_ipred_dr_16x16, 4, 4, 6, dst, stride, l, a
+cglobal vp9_ipred_dr_16x16, 4, 4, 6, "p", dst, "p-", stride, "p", l, "p", a
     mova                    m1, [lq]
     movu                    m2, [aq-1]
     movd                    m4, [aq+15]
@@ -1209,7 +1209,7 @@ cglobal vp9_ipred_dr_16x16, 4, 4, 6, dst, stride, l, a
     jg .loop
     RET
 
-cglobal vp9_ipred_dr_32x32, 4, 4, 8, dst, stride, l, a
+cglobal vp9_ipred_dr_32x32, 4, 4, 8, "p", dst, "p-", stride, "p", l, "p", a
     mova                    m1, [lq]
     mova                    m2, [lq+16]
     movu                    m3, [aq-1]
@@ -1257,7 +1257,7 @@ DR_XMM_FUNCS
 ; vl
 
 INIT_MMX mmxext
-cglobal vp9_ipred_vl_4x4, 4, 4, 0, dst, stride, l, a
+cglobal vp9_ipred_vl_4x4, 4, 4, 0, "p", dst, "p-", stride, "p", l, "p", a
     movq                    m0, [aq]
     psrlq                   m1, m0, 8
     psrlq                   m2, m1, 8
@@ -1273,7 +1273,7 @@ cglobal vp9_ipred_vl_4x4, 4, 4, 0, dst, stride, l, a
     RET
 
 %macro VL_XMM_FUNCS 0
-cglobal vp9_ipred_vl_8x8, 4, 4, 4, dst, stride, l, a
+cglobal vp9_ipred_vl_8x8, 4, 4, 4, "p", dst, "p-", stride, "p", l, "p", a
     movq                    m0, [aq]
 %if cpuflag(ssse3)
     pshufb                  m0, [pb_0to6_9x7]
@@ -1306,7 +1306,7 @@ cglobal vp9_ipred_vl_8x8, 4, 4, 4, dst, stride, l, a
     movq      [dstq+stride3q ], m2
     RET
 
-cglobal vp9_ipred_vl_16x16, 4, 4, 5, dst, stride, l, a
+cglobal vp9_ipred_vl_16x16, 4, 4, 5, "p", dst, "p-", stride, "p", l, "p", a
     mova                    m0, [aq]
     DEFINE_ARGS dst, stride, stride3, cnt
     lea               stride3q, [strideq*3]
@@ -1352,7 +1352,7 @@ cglobal vp9_ipred_vl_16x16, 4, 4, 5, dst, stride, l, a
     jg .loop
     RET
 
-cglobal vp9_ipred_vl_32x32, 4, 4, 7, dst, stride, l, a
+cglobal vp9_ipred_vl_32x32, 4, 4, 7, "p", dst, "p-", stride, "p", l, "p", a
     mova                    m0, [aq]
     mova                    m5, [aq+16]
     DEFINE_ARGS dst, stride, dst16, cnt
@@ -1426,7 +1426,7 @@ VL_XMM_FUNCS
 ; vr
 
 %macro VR_MMX_FUNCS 0
-cglobal vp9_ipred_vr_4x4, 4, 4, 0, dst, stride, l, a
+cglobal vp9_ipred_vr_4x4, 4, 4, 0, "p", dst, "p-", stride, "p", l, "p", a
     movq                    m1, [aq-1]
     punpckldq               m2, [lq]
     movd                    m0, [aq]
@@ -1472,7 +1472,7 @@ INIT_MMX ssse3
 VR_MMX_FUNCS
 
 %macro VR_XMM_FUNCS 1 ; n_xmm_regs for 16x16
-cglobal vp9_ipred_vr_8x8, 4, 4, 5, dst, stride, l, a
+cglobal vp9_ipred_vr_8x8, 4, 4, 5, "p", dst, "p-", stride, "p", l, "p", a
     movu                    m1, [aq-1]
     movhps                  m2, [lq]
     movq                    m0, [aq]
@@ -1524,7 +1524,7 @@ cglobal vp9_ipred_vr_8x8, 4, 4, 5, dst, stride, l, a
     movhps    [dstq+stride3q ], m1
     RET
 
-cglobal vp9_ipred_vr_16x16, 4, 4, %1, dst, stride, l, a
+cglobal vp9_ipred_vr_16x16, 4, 4, %1, "p", dst, "p-", stride, "p", l, "p", a
     mova                    m0, [aq]
     movu                    m1, [aq-1]
     mova                    m2, [lq]
@@ -1561,7 +1561,7 @@ cglobal vp9_ipred_vr_16x16, 4, 4, %1, dst, stride, l, a
     jg .loop
     RET
 
-cglobal vp9_ipred_vr_32x32, 4, 4, 9, dst, stride, l, a
+cglobal vp9_ipred_vr_32x32, 4, 4, 9, "p", dst, "p-", stride, "p", l, "p", a
     mova                    m0, [aq]
     mova                    m2, [aq+16]
     movu                    m1, [aq-1]
@@ -1640,7 +1640,7 @@ VR_XMM_FUNCS 6
 ; hd
 
 INIT_MMX mmxext
-cglobal vp9_ipred_hd_4x4, 4, 4, 0, dst, stride, l, a
+cglobal vp9_ipred_hd_4x4, 4, 4, 0, "p", dst, "p-", stride, "p", l, "p", a
     movd                    m0, [lq]
     punpckldq               m0, [aq-1]
     DEFINE_ARGS dst, stride, stride3
@@ -1670,7 +1670,7 @@ cglobal vp9_ipred_hd_4x4, 4, 4, 0, dst, stride, l, a
     RET
 
 %macro HD_XMM_FUNCS 0
-cglobal vp9_ipred_hd_8x8, 4, 4, 5, dst, stride, l, a
+cglobal vp9_ipred_hd_8x8, 4, 4, 5, "p", dst, "p-", stride, "p", l, "p", a
     movq                    m0, [lq]
     movhps                  m0, [aq-1]
     DEFINE_ARGS dst, stride, stride3, dst4
@@ -1709,7 +1709,7 @@ cglobal vp9_ipred_hd_8x8, 4, 4, 5, dst, stride, l, a
     movq     [dst4q+strideq*0], m2
     RET
 
-cglobal vp9_ipred_hd_16x16, 4, 6, 7, dst, stride, l, a
+cglobal vp9_ipred_hd_16x16, 4, 6, 7, "p", dst, "p-", stride, "p", l, "p", a
     mova                    m0, [lq]
     movu                    m3, [aq-1]
     DEFINE_ARGS dst, stride, stride4, dst4, dst8, dst12
@@ -1759,7 +1759,7 @@ cglobal vp9_ipred_hd_16x16, 4, 6, 7, dst, stride, l, a
     jg .loop
     RET
 
-cglobal vp9_ipred_hd_32x32, 4, 6, 8, dst, stride, l, a
+cglobal vp9_ipred_hd_32x32, 4, 6, 8, "p", dst, "p-", stride, "p", l, "p", a
     mova                    m0, [lq]
     mova                    m1, [lq+16]
     movu                    m2, [aq-1]
@@ -1848,7 +1848,7 @@ INIT_XMM avx
 HD_XMM_FUNCS
 
 %macro HU_MMX_FUNCS 0
-cglobal vp9_ipred_hu_4x4, 3, 3, 0, dst, stride, l
+cglobal vp9_ipred_hu_4x4, 3, 3, 0, "p", dst, "p-", stride, "p", l
     movd                    m0, [lq]
 %if cpuflag(ssse3)
     pshufb                  m0, [pb_0to2_5x3]
@@ -1880,7 +1880,7 @@ INIT_MMX ssse3
 HU_MMX_FUNCS
 
 %macro HU_XMM_FUNCS 1 ; n_xmm_regs in hu_32x32
-cglobal vp9_ipred_hu_8x8, 3, 4, 4, dst, stride, l
+cglobal vp9_ipred_hu_8x8, 3, 4, 4, "p", dst, "p-", stride, "p", l
     movq                    m0, [lq]
 %if cpuflag(ssse3)
     pshufb                  m0, [pb_0to6_9x7]
@@ -1910,7 +1910,7 @@ cglobal vp9_ipred_hu_8x8, 3, 4, 4, dst, stride, l
     movhps   [dst4q+stride3q ], m2
     RET
 
-cglobal vp9_ipred_hu_16x16, 3, 4, 5, dst, stride, l
+cglobal vp9_ipred_hu_16x16, 3, 4, 5, "p", dst, "p-", stride, "p", l
     mova                    m0, [lq]
 %if cpuflag(ssse3)
     mova                    m3, [pb_2toE_3xF]
@@ -1955,7 +1955,7 @@ cglobal vp9_ipred_hu_16x16, 3, 4, 5, dst, stride, l
     jg .loop
     RET
 
-cglobal vp9_ipred_hu_32x32, 3, 7, %1, dst, stride, l
+cglobal vp9_ipred_hu_32x32, 3, 7, %1, "p", dst, "p-", stride, "p", l
     mova                    m1, [lq]
     mova                    m0, [lq+16]
     PALIGNR                 m2, m0, m1,  1, m5

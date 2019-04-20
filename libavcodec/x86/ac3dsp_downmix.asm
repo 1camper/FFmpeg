@@ -57,15 +57,17 @@ SECTION .text
     %assign matrix_elements_stack 0
 %endif
 
-cglobal ac3_downmix_%1_to_%2, 3,in_channels+1,total_mmregs,0-matrix_elements_stack*mmsize, src0, src1, len, src2, src3, src4, src5
+cglobal ac3_downmix_%1_to_%2, 3,in_channels+1,total_mmregs,0-matrix_elements_stack*mmsize, "p", src0, "p", src1, "d", len, src2, src3, src4, src5
 
 ; load matrix pointers
+%define matrix0p r1p
+%define matrix1p r3p
 %define matrix0q r1q
 %define matrix1q r3q
 %if stereo
-    mov      matrix1q, [matrix0q+gprsize]
+    mov      matrix1p, [matrix0q+ptrsize]
 %endif
-    mov      matrix0q, [matrix0q]
+    mov      matrix0p, [matrix0q]
 
 ; define matrix coeff names
 %assign %%i 0
@@ -120,11 +122,11 @@ cglobal ac3_downmix_%1_to_%2, 3,in_channels+1,total_mmregs,0-matrix_elements_sta
     ; load channel pointers to registers
 %assign %%i 1
 %rep (in_channels - 1)
-    mov         src %+ %%i %+ q, [src0q+%%i*gprsize]
+    mov         src %+ %%i %+ p, [src0q+%%i*ptrsize]
     add         src %+ %%i %+ q, lenq
     %assign %%i %%i+1
 %endrep
-    mov         src0q, [src0q]
+    mov         src0p, [src0q]
     add         src0q, lenq
     neg          lenq
 .loop:

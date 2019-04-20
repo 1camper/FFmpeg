@@ -111,8 +111,8 @@ SECTION .text
 ;                                  const float window[512], float out[32],
 ;                                  intptr_t offset, float scale)
 %macro SYNTH_FILTER 0
-cglobal synth_filter_inner, 0, 6 + 4 * ARCH_X86_64, 7 + 6 * ARCH_X86_64, \
-                              synth_buf, synth_buf2, window, out, off, scale
+cglobal synth_filter_inner, 5, 6 + 4 * ARCH_X86_64, 7 + 6 * ARCH_X86_64, \
+                              "p*", synth_buf, "p*", synth_buf2, "p*", window, "p*", out, "p-", off, scale
 %define scale m0
 %if ARCH_X86_32 || WIN64
 %if cpuflag(sse2) && notcpuflag(avx)
@@ -132,7 +132,7 @@ cglobal synth_filter_inner, 0, 6 + 4 * ARCH_X86_64, 7 + 6 * ARCH_X86_64, \
 %endif
     ; prepare inner counter limit 1
     mov          r5q, 480
-    sub          r5q, offmp
+    sub          r5q, offmq
     and          r5q, -64
     shl          r5q, 2
 %if ARCH_X86_32 || notcpuflag(avx)
@@ -157,6 +157,7 @@ cglobal synth_filter_inner, 0, 6 + 4 * ARCH_X86_64, 7 + 6 * ARCH_X86_64, \
 %if ARCH_X86_32
 %define ptr1     r0q
 %define ptr2     r1q
+%define ptr2p    r1p
 %define win      r2q
 %define j        r3q
     mov          win, windowm
@@ -168,6 +169,7 @@ cglobal synth_filter_inner, 0, 6 + 4 * ARCH_X86_64, 7 + 6 * ARCH_X86_64, \
 %else ; ARCH_X86_64
 %define ptr1     r6q
 %define ptr2     r7q ; must be loaded
+%define ptr2p    r7p
 %define win      r8q
 %define j        r9q
     SETZERO       m9
@@ -177,7 +179,7 @@ cglobal synth_filter_inner, 0, 6 + 4 * ARCH_X86_64, 7 + 6 * ARCH_X86_64, \
     lea          win, [windowq + i]
     lea         ptr1, [synth_bufq + i]
 %endif
-    mov         ptr2, synth_bufmp
+    mov         ptr2p, synth_bufmp
     ; prepare the inner loop counter
     mov            j, OFFQ
 %if ARCH_X86_32 || notcpuflag(avx)

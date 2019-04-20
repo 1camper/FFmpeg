@@ -177,7 +177,7 @@ SECTION .text
 %endmacro
 
 %macro DEFINE_IMDCT 0
-cglobal imdct36_float, 4,4,9, out, buf, in, win
+cglobal imdct36_float, 4,4,9, "p", out, "p", buf, "p", in, "p", win
 
     ; for(i=17;i>=1;i--) in[i] += in[i-1];
     LOADA64 m0, inq
@@ -410,7 +410,7 @@ INIT_XMM sse
 %endif
 
 %macro DEFINE_FOUR_IMDCT 0
-cglobal four_imdct36_float, 5,5,16, out, buf, in, win, tmp
+cglobal four_imdct36_float, 5,5,16, "p", out, "p", buf, "p", in, "p", win, "p", tmp
     movlps  m0, [inq+64]
     movhps  m0, [inq+64 +   72]
     movlps  m3, [inq+64 + 2*72]

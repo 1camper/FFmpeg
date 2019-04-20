@@ -50,7 +50,7 @@ cextern pw_1023
 
 INIT_MMX mmxext
 ; void ff_hevc_add_residual_4_8_mmxext(uint8_t *dst, int16_t *res, ptrdiff_t stride)
-cglobal hevc_add_residual_4_8, 3, 3, 6
+cglobal hevc_add_residual_4_8, 3, 3, 6, "p", dst, "p", res, "p-", stride
     ADD_RES_MMX_4_8
     add               r1, 16
     lea               r0, [r0+r2*2]
@@ -120,7 +120,7 @@ cglobal hevc_add_residual_4_8, 3, 3, 6
 
 %macro TRANSFORM_ADD_8 0
 ; void ff_hevc_add_residual_8_8_<opt>(uint8_t *dst, int16_t *res, ptrdiff_t stride)
-cglobal hevc_add_residual_8_8, 3, 4, 8
+cglobal hevc_add_residual_8_8, 3, 4, 8, "p", dst, "p", res, "p-", stride
     lea               r3, [r2*3]
     ADD_RES_SSE_8_8
     add               r1, 64
@@ -129,7 +129,7 @@ cglobal hevc_add_residual_8_8, 3, 4, 8
     RET
 
 ; void ff_hevc_add_residual_16_8_<opt>(uint8_t *dst, int16_t *res, ptrdiff_t stride)
-cglobal hevc_add_residual_16_8, 3, 5, 7
+cglobal hevc_add_residual_16_8, 3, 5, 7, "p", dst, "p", res, "p-", stride
     pxor                m0, m0
     lea                 r3, [r2*3]
     mov                r4d, 4
@@ -143,7 +143,7 @@ cglobal hevc_add_residual_16_8, 3, 5, 7
     RET
 
 ; void ff_hevc_add_residual_32_8_<opt>(uint8_t *dst, int16_t *res, ptrdiff_t stride)
-cglobal hevc_add_residual_32_8, 3, 5, 7
+cglobal hevc_add_residual_32_8, 3, 5, 7, "p", dst, "p", res, "p-", stride
     pxor                m0, m0
     mov                r4d, 16
 .loop:
@@ -164,7 +164,7 @@ TRANSFORM_ADD_8
 %if HAVE_AVX2_EXTERNAL
 INIT_YMM avx2
 ; void ff_hevc_add_residual_32_8_avx2(uint8_t *dst, int16_t *res, ptrdiff_t stride)
-cglobal hevc_add_residual_32_8, 3, 5, 7
+cglobal hevc_add_residual_32_8, 3, 5, 7, "p", dst, "p", res, "p-", stride
     pxor                 m0, m0
     lea                  r3, [r2*3]
     mov                 r4d, 8
@@ -291,7 +291,7 @@ cglobal hevc_add_residual_32_8, 3, 5, 7
 
 ; void ff_hevc_add_residual_<4|8|16|32>_10(pixel *dst, int16_t *block, ptrdiff_t stride)
 INIT_MMX mmxext
-cglobal hevc_add_residual_4_10, 3, 3, 6
+cglobal hevc_add_residual_4_10, 3, 3, 6, "p", dst, "p", res, "p-", stride
     pxor              m2, m2
     mova              m3, [max_pixels_10]
     ADD_RES_MMX_4_10  r0, r2, r1
@@ -301,7 +301,7 @@ cglobal hevc_add_residual_4_10, 3, 3, 6
     RET
 
 INIT_XMM sse2
-cglobal hevc_add_residual_8_10, 3, 4, 6
+cglobal hevc_add_residual_8_10, 3, 4, 6, "p", dst, "p", res, "p-", stride
     pxor              m4, m4
     mova              m5, [max_pixels_10]
     lea               r3, [r2*3]
@@ -312,7 +312,7 @@ cglobal hevc_add_residual_8_10, 3, 4, 6
     ADD_RES_SSE_8_10  r0, r2, r3, r1
     RET
 
-cglobal hevc_add_residual_16_10, 3, 5, 6
+cglobal hevc_add_residual_16_10, 3, 5, 6, "p", dst, "p", res, "p-", stride
     pxor              m4, m4
     mova              m5, [max_pixels_10]
 
@@ -325,7 +325,7 @@ cglobal hevc_add_residual_16_10, 3, 5, 6
     jg .loop
     RET
 
-cglobal hevc_add_residual_32_10, 3, 5, 6
+cglobal hevc_add_residual_32_10, 3, 5, 6, "p", dst, "p", res, "p-", stride
     pxor              m4, m4
     mova              m5, [max_pixels_10]
 
@@ -340,7 +340,7 @@ cglobal hevc_add_residual_32_10, 3, 5, 6
 
 %if HAVE_AVX2_EXTERNAL
 INIT_YMM avx2
-cglobal hevc_add_residual_16_10, 3, 5, 6
+cglobal hevc_add_residual_16_10, 3, 5, 6, "p", dst, "p", res, "p-", stride
     pxor               m4, m4
     mova               m5, [max_pixels_10]
     lea                r3, [r2*3]
@@ -354,7 +354,7 @@ cglobal hevc_add_residual_16_10, 3, 5, 6
     jg .loop
     RET
 
-cglobal hevc_add_residual_32_10, 3, 5, 6
+cglobal hevc_add_residual_32_10, 3, 5, 6, "p", dst, "p", res, "p-", stride
     pxor               m4, m4
     mova               m5, [max_pixels_10]
 

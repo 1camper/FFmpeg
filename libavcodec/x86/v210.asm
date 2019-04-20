@@ -34,8 +34,7 @@ SECTION .text
 %macro v210_planar_unpack 1
 
 ; v210_planar_unpack(const uint32_t *src, uint16_t *y, uint16_t *u, uint16_t *v, int width)
-cglobal v210_planar_unpack_%1, 5, 5, 7
-    movsxdifnidn r4, r4d
+cglobal v210_planar_unpack_%1, 5, 5, 7, "p", src, "p", y, "p", u, "p", v, "d-", width
     lea    r1, [r1+2*r4]
     add    r2, r4
     add    r3, r4

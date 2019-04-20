@@ -37,10 +37,10 @@ pb_zzzzzzzz67676767: db -1,-1,-1,-1,-1,-1,-1,-1, 6, 7, 6, 7, 6, 7, 6, 7
 SECTION .text
 
 ; void ff_add_median_pred_mmxext(uint8_t *dst, const uint8_t *top,
-;                                const uint8_t *diff, int w,
+;                                const uint8_t *diff, ptrdiff_t w,
 ;                                int *left, int *left_top)
 %macro MEDIAN_PRED 0
-cglobal add_median_pred, 6,6,8, dst, top, diff, w, left, left_top
+cglobal add_median_pred, 6,6,8, "p", dst, "p", top, "p", diff, "p-", w, "p", left, "p", left_top
     movu    m0, [topq]
     mova    m2, m0
     movd    m4, [left_topq]
@@ -151,7 +151,7 @@ MEDIAN_PRED
 
 ; int ff_add_left_pred(uint8_t *dst, const uint8_t *src, int w, int left)
 INIT_MMX ssse3
-cglobal add_left_pred, 3,3,7, dst, src, w, left
+cglobal add_left_pred, 3,3,7, "p", dst, "p", src, "p-", w, "d", left
 .skip_prologue:
     mova    m5, [pb_7]
     mova    m4, [pb_zzzz3333zzzzbbbb]
@@ -161,7 +161,7 @@ cglobal add_left_pred, 3,3,7, dst, src, w, left
     ADD_LEFT_LOOP 1, 1
 
 INIT_XMM ssse3
-cglobal add_left_pred_unaligned, 3,3,7, dst, src, w, left
+cglobal add_left_pred_unaligned, 3,3,7, "p", dst, "p", src, "p-", w, "d", left
     mova    m5, [pb_15]
     mova    m6, [pb_zzzzzzzz77777777]
     mova    m4, [pb_zzzz3333zzzzbbbb]
@@ -179,7 +179,7 @@ cglobal add_left_pred_unaligned, 3,3,7, dst, src, w, left
     ADD_LEFT_LOOP 0, 0
 
 %macro ADD_BYTES 0
-cglobal add_bytes, 3,4,2, dst, src, w, size
+cglobal add_bytes, 3,4,2, "p", dst, "p", src, "p-", w, size
     mov  sizeq, wq
     and  sizeq, -2*mmsize
     jz  .2
@@ -260,7 +260,7 @@ ADD_BYTES
 
 ; int add_left_pred_int16(uint16_t *dst, const uint16_t *src, unsigned mask, int w, int left)
 INIT_MMX ssse3
-cglobal add_left_pred_int16, 4,4,8, dst, src, mask, w, left
+cglobal add_left_pred_int16, 4,4,8, "p", dst, "p", src, "d", mask, "p-", w, "d", left
 .skip_prologue:
     mova    m5, [pb_67]
     mova    m3, [pb_zzzz2323zzzzabab]
@@ -271,7 +271,7 @@ cglobal add_left_pred_int16, 4,4,8, dst, src, mask, w, left
     ADD_HFYU_LEFT_LOOP_INT16 a, a
 
 INIT_XMM sse4
-cglobal add_left_pred_int16, 4,4,8, dst, src, mask, w, left
+cglobal add_left_pred_int16, 4,4,8, "p", dst, "p", src, "d", mask, "p-", w, "d", left
     mova    m5, [pb_ef]
     mova    m4, [pb_zzzzzzzz67676767]
     mova    m3, [pb_zzzz2323zzzzabab]

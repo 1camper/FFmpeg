@@ -79,9 +79,11 @@ void ff_vc1_avg_hor_16b_shift2_mmxext(uint8_t *dst, x86_reg stride,
  * Sacrifice mm6 for *9 factor.
  */
 #define VC1_SHIFT2(OP, OPNAME)\
-static void OPNAME ## vc1_shift2_mmx(uint8_t *dst, const uint8_t *src,\
+static void OPNAME ## vc1_shift2_mmx(uint8_t *dst_, const uint8_t *src_,\
                                      x86_reg stride, int rnd, x86_reg offset)\
 {\
+    x86_reg dst = (uintptr_t)dst_;\
+    x86_reg src = (uintptr_t)src_;\
     rnd = 8-rnd;\
     __asm__ volatile(\
         "mov       $8, %%"FF_REG_c"        \n\t"\
@@ -184,12 +186,13 @@ VC1_SHIFT2(OP_AVG, avg_)
  */
 #define MSPEL_FILTER13_VER_16B(NAME, A1, A2, A3, A4)                    \
 static void                                                             \
-vc1_put_ver_16b_ ## NAME ## _mmx(int16_t *dst, const uint8_t *src,      \
+vc1_put_ver_16b_ ## NAME ## _mmx(int16_t *dst_, const uint8_t *src_,    \
                                  x86_reg src_stride,                   \
                                  int rnd, int64_t shift)                \
 {                                                                       \
+    x86_reg dst = (uintptr_t)dst_;                                      \
+    x86_reg src = (uintptr_t)(src_ - src_stride);                       \
     int h = 8;                                                          \
-    src -= src_stride;                                                  \
     __asm__ volatile(                                                       \
         LOAD_ROUNDER_MMX("%5")                                          \
         "movq      "MANGLE(ff_pw_53)", %%mm5\n\t"                       \
@@ -241,11 +244,12 @@ vc1_put_ver_16b_ ## NAME ## _mmx(int16_t *dst, const uint8_t *src,      \
  */
 #define MSPEL_FILTER13_HOR_16B(NAME, A1, A2, A3, A4, OP, OPNAME)        \
 static void                                                             \
-OPNAME ## vc1_hor_16b_ ## NAME ## _mmx(uint8_t *dst, x86_reg stride,    \
-                                 const int16_t *src, int rnd)           \
+OPNAME ## vc1_hor_16b_ ## NAME ## _mmx(uint8_t *dst_, x86_reg stride,   \
+                                 const int16_t *src_, int rnd)          \
 {                                                                       \
+    x86_reg dst = (uintptr_t)dst_;                                      \
+    x86_reg src = (uintptr_t)(src_ - 1);                                \
     int h = 8;                                                          \
-    src -= 1;                                                           \
     rnd -= (-4+58+13-3)*256; /* Add -256 bias */                        \
     __asm__ volatile(                                                       \
         LOAD_ROUNDER_MMX("%4")                                          \
@@ -280,11 +284,12 @@ OPNAME ## vc1_hor_16b_ ## NAME ## _mmx(uint8_t *dst, x86_reg stride,    \
  */
 #define MSPEL_FILTER13_8B(NAME, A1, A2, A3, A4, OP, OPNAME)             \
 static void                                                             \
-OPNAME ## vc1_## NAME ## _mmx(uint8_t *dst, const uint8_t *src,         \
+OPNAME ## vc1_## NAME ## _mmx(uint8_t *dst_, const uint8_t *src_,       \
                         x86_reg stride, int rnd, x86_reg offset)      \
 {                                                                       \
+    x86_reg dst = (uintptr_t)dst_;                                      \
+    x86_reg src = (uintptr_t)(src_ - offset);                           \
     int h = 8;                                                          \
-    src -= offset;                                                      \
     rnd = 32-rnd;                                                       \
     __asm__ volatile (                                                      \
         LOAD_ROUNDER_MMX("%6")                                          \

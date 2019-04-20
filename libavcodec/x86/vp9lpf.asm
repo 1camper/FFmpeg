@@ -372,12 +372,12 @@ SECTION .text
 %endif
 
 %if UNIX64
-cglobal vp9_loop_filter_%1_%2_ %+ mmsize, 5, 9, 16, %3 + %4 + %%ext, dst, stride, E, I, H, mstride, dst2, stride3, mstride3
+cglobal vp9_loop_filter_%1_%2_ %+ mmsize, 5, 9, 16, %3 + %4 + %%ext, "p", dst, "p-", stride, "d", E, "d", I, "d", H, mstride, dst2, stride3, mstride3
 %else
 %if WIN64
-cglobal vp9_loop_filter_%1_%2_ %+ mmsize, 4, 8, 16, %3 + %4 + %%ext, dst, stride, E, I, mstride, dst2, stride3, mstride3
+cglobal vp9_loop_filter_%1_%2_ %+ mmsize, 4, 8, 16, %3 + %4 + %%ext, "p", dst, "p-", stride, "d", E, "d", I, mstride, dst2, stride3, mstride3
 %else
-cglobal vp9_loop_filter_%1_%2_ %+ mmsize, 2, 6, 16, %3 + %4 + %%ext, dst, stride, mstride, dst2, stride3, mstride3
+cglobal vp9_loop_filter_%1_%2_ %+ mmsize, 2, 6, 16, %3 + %4 + %%ext, "p", dst, "p-", stride, mstride, dst2, stride3, mstride3
 %define Ed dword r2m
 %define Id dword r3m
 %endif

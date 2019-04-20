@@ -106,7 +106,7 @@ SECTION .text
 ; void ff_put/avg_h264_chroma_mc8_*(uint8_t *dst /* align 8 */,
 ;                                   uint8_t *src /* align 1 */,
 ;                                   ptrdiff_t stride, int h, int mx, int my)
-cglobal %1_%2_chroma_mc8%3, 6, 7 + extra_regs, 0
+cglobal %1_%2_chroma_mc8%3, 6, 7 + extra_regs, 0, "p", dst, "p", src, "p-", stride, "d", h, "d", mx, "d", my
     mov          r6d, r5d
     or           r6d, r4d
     jne .at_least_one_non_zero
@@ -287,7 +287,7 @@ cglobal %1_%2_chroma_mc8%3, 6, 7 + extra_regs, 0
 %define extra_regs 1
 %endif ; PIC
 %endif ; rv40
-cglobal %1_%2_chroma_mc4, 6, 6 + extra_regs, 0
+cglobal %1_%2_chroma_mc4, 6, 6 + extra_regs, 0, "p", dst, "p", src, "p-", stride, "d", h, "d", mx, "d", my
     pxor          m7, m7
     movd          m2, r4d         ; x
     movd          m3, r5d         ; y
@@ -369,7 +369,7 @@ cglobal %1_%2_chroma_mc4, 6, 6 + extra_regs, 0
 %endmacro
 
 %macro chroma_mc2_mmx_func 2
-cglobal %1_%2_chroma_mc2, 6, 7, 0
+cglobal %1_%2_chroma_mc2, 6, 7, 0, "p", dst, "p", src, "p-", stride, "d", h, "d", mx, "d", my
     mov          r6d, r4d
     shl          r4d, 16
     sub          r4d, r6d
@@ -454,7 +454,7 @@ chroma_mc4_mmx_func avg, h264
 chroma_mc4_mmx_func avg, rv40
 
 %macro chroma_mc8_ssse3_func 2-3
-cglobal %1_%2_chroma_mc8%3, 6, 7, 8
+cglobal %1_%2_chroma_mc8%3, 6, 7, 8, "p", dst, "p", src, "p-", stride, "d", h, "d", mx, "d", my
     mov          r6d, r5d
     or           r6d, r4d
     jne .at_least_one_non_zero
@@ -599,7 +599,7 @@ cglobal %1_%2_chroma_mc8%3, 6, 7, 8
 %endmacro
 
 %macro chroma_mc4_ssse3_func 2
-cglobal %1_%2_chroma_mc4, 6, 7, 0
+cglobal %1_%2_chroma_mc4, 6, 7, 0, "p", dst, "p", src, "p-", stride, "d", h, "d", mx, "d", my
     mov           r6, r4
     shl          r4d, 8
     sub          r4d, r6d

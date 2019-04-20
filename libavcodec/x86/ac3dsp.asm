@@ -46,7 +46,7 @@ SECTION .text
 ;-----------------------------------------------------------------------------
 
 %macro AC3_EXPONENT_MIN 0
-cglobal ac3_exponent_min, 3, 4, 2, exp, reuse_blks, expn, offset
+cglobal ac3_exponent_min, 3, 4, 2, "p", exp, "d-", reuse_blks, "d", expn, offset
     shl  reuse_blksq, 8
     jz .end
     LOOP_ALIGN
@@ -117,7 +117,7 @@ AC3_EXPONENT_MIN
 %endmacro
 
 %macro AC3_MAX_MSB_ABS_INT16 1
-cglobal ac3_max_msb_abs_int16, 2,2,5, src, len
+cglobal ac3_max_msb_abs_int16, 2,2,5, "p", src, "d", len
     pxor        m2, m2
     pxor        m3, m3
 .loop:
@@ -168,7 +168,7 @@ AC3_MAX_MSB_ABS_INT16 or_abs
 ;-----------------------------------------------------------------------------
 
 %macro AC3_SHIFT 3 ; l/r, 16/32, shift instruction, instruction set
-cglobal ac3_%1shift_int%2, 3, 3, 5, src, len, shift
+cglobal ac3_%1shift_int%2, 3, 3, 5, "p", src, "d", len, "d", shift
     movd      m0, shiftd
 .loop:
     mova      m1, [srcq         ]
@@ -215,7 +215,7 @@ AC3_SHIFT r, 32, psrad
 ; The 3DNow! version is not bit-identical because pf2id uses truncation rather
 ; than round-to-nearest.
 INIT_MMX 3dnow
-cglobal float_to_fixed24, 3, 3, 0, dst, src, len
+cglobal float_to_fixed24, 3, 3, 0, "p", dst, "p", src, "d", len
     movq   m0, [pf_1_24]
 .loop:
     movq   m1, [srcq   ]
@@ -242,7 +242,7 @@ cglobal float_to_fixed24, 3, 3, 0, dst, src, len
     RET
 
 INIT_XMM sse
-cglobal float_to_fixed24, 3, 3, 3, dst, src, len
+cglobal float_to_fixed24, 3, 3, 3, "p", dst, "p", src, "d", len
     movaps     m0, [pf_1_24]
 .loop:
     movaps     m1, [srcq   ]
@@ -267,7 +267,7 @@ cglobal float_to_fixed24, 3, 3, 3, dst, src, len
     RET
 
 INIT_XMM sse2
-cglobal float_to_fixed24, 3, 3, 9, dst, src, len
+cglobal float_to_fixed24, 3, 3, 9, "p", dst, "p", src, "d", len
     movaps     m0, [pf_1_24]
 .loop:
     movaps     m1, [srcq    ]
@@ -332,7 +332,7 @@ cglobal float_to_fixed24, 3, 3, 9, dst, src, len
 %endmacro
 
 INIT_XMM sse2
-cglobal ac3_compute_mantissa_size, 1, 2, 4, mant_cnt, sum
+cglobal ac3_compute_mantissa_size, 1, 2, 4, "p", mant_cnt, sum
     movdqa      m0, [mant_cntq      ]
     movdqa      m1, [mant_cntq+ 1*16]
     paddw       m0, [mant_cntq+ 2*16]
@@ -384,7 +384,7 @@ cglobal ac3_compute_mantissa_size, 1, 2, 4, mant_cnt, sum
 %endmacro
 
 %macro AC3_EXTRACT_EXPONENTS 0
-cglobal ac3_extract_exponents, 3, 3, 4, exp, coef, len
+cglobal ac3_extract_exponents, 3, 3, 4, "p", exp, "p", coef, "d-", len
     add     expq, lenq
     lea    coefq, [coefq+4*lenq]
     neg     lenq
@@ -460,9 +460,9 @@ AC3_EXTRACT_EXPONENTS
 
 %macro APPLY_WINDOW_INT16 1 ; %1 bitexact version
 %if %1
-cglobal apply_window_int16, 4,5,6, output, input, window, offset, offset2
+cglobal apply_window_int16, 4,5,6, "p", output, "p", input, "p", window, "d-", offset, offset2
 %else
-cglobal apply_window_int16_round, 4,5,6, output, input, window, offset, offset2
+cglobal apply_window_int16_round, 4,5,6, "p", output, "p", input, "p", window, "d-", offset, offset2
 %endif
     lea     offset2q, [offsetq-mmsize]
 %if cpuflag(ssse3) && notcpuflag(atom)

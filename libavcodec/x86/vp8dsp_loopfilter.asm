@@ -268,7 +268,7 @@ SECTION .text
 %endmacro
 
 %macro SIMPLE_LOOPFILTER 2
-cglobal vp8_%1_loop_filter_simple, 3, %2, 8, dst, stride, flim, cntr
+cglobal vp8_%1_loop_filter_simple, 3, %2, 8, "p", dst, "p-", stride, "d", flim, cntr
 %if mmsize == 8 ; mmx/mmxext
     mov         cntrq, 2
 %endif
@@ -444,9 +444,9 @@ SIMPLE_LOOPFILTER h, 5
 %endif
 
 %if %2 == 8 ; chroma
-cglobal vp8_%1_loop_filter8uv_inner, 6, 6, 13, stack_size, dst, dst8, stride, flimE, flimI, hevthr
+cglobal vp8_%1_loop_filter8uv_inner, 6, 6, 13, stack_size, "p", dst, "p", dst8, "p-", stride, "d", flimE, "d", flimI, "d", hevthr
 %else ; luma
-cglobal vp8_%1_loop_filter16y_inner, 5, 5, 13, stack_size, dst, stride, flimE, flimI, hevthr
+cglobal vp8_%1_loop_filter16y_inner, 5, 5, 13, stack_size, "p", dst, "p-", stride, "d", flimE, "d", flimI, "d", hevthr
 %endif
 
 %if cpuflag(ssse3)
@@ -939,9 +939,9 @@ INNER_LOOPFILTER h,  8
 %endif
 
 %if %2 == 8 ; chroma
-cglobal vp8_%1_loop_filter8uv_mbedge, 6, 6, 15, stack_size, dst1, dst8, stride, flimE, flimI, hevthr
+cglobal vp8_%1_loop_filter8uv_mbedge, 6, 6, 15, stack_size, "p", dst1, "p", dst8, "p-", stride, "d", flimE, "d", flimI, "d", hevthr
 %else ; luma
-cglobal vp8_%1_loop_filter16y_mbedge, 5, 5, 15, stack_size, dst1, stride, flimE, flimI, hevthr
+cglobal vp8_%1_loop_filter16y_mbedge, 5, 5, 15, stack_size, "p", dst1, "p-", stride, "d", flimE, "d", flimI, "d", hevthr
 %endif
 
 %if cpuflag(ssse3)

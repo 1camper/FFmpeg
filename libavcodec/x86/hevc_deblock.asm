@@ -625,7 +625,7 @@ ALIGN 16
 ;                                   uint8_t *_no_p, uint8_t *_no_q);
 ;-----------------------------------------------------------------------------
 %macro LOOP_FILTER_CHROMA 0
-cglobal hevc_v_loop_filter_chroma_8, 3, 5, 7, pix, stride, tc, pix0, r3stride
+cglobal hevc_v_loop_filter_chroma_8, 3, 5, 7, "p", pix, "p-", stride, "p", tc, pix0, r3stride
     sub            pixq, 2
     lea       r3strideq, [3*strideq]
     mov           pix0q, pixq
@@ -635,7 +635,7 @@ cglobal hevc_v_loop_filter_chroma_8, 3, 5, 7, pix, stride, tc, pix0, r3stride
     TRANSPOSE8x4B_STORE PASS8ROWS(pix0q, pixq, strideq, r3strideq)
     RET
 
-cglobal hevc_v_loop_filter_chroma_10, 3, 5, 7, pix, stride, tc, pix0, r3stride
+cglobal hevc_v_loop_filter_chroma_10, 3, 5, 7, "p", pix, "p-", stride, "p", tc, pix0, r3stride
     sub            pixq, 4
     lea       r3strideq, [3*strideq]
     mov           pix0q, pixq
@@ -645,7 +645,7 @@ cglobal hevc_v_loop_filter_chroma_10, 3, 5, 7, pix, stride, tc, pix0, r3stride
     TRANSPOSE8x4W_STORE PASS8ROWS(pix0q, pixq, strideq, r3strideq), [pw_pixel_max_10]
     RET
 
-cglobal hevc_v_loop_filter_chroma_12, 3, 5, 7, pix, stride, tc, pix0, r3stride
+cglobal hevc_v_loop_filter_chroma_12, 3, 5, 7, "p", pix, "p-", stride, "p", tc, pix0, r3stride
     sub            pixq, 4
     lea       r3strideq, [3*strideq]
     mov           pix0q, pixq
@@ -659,7 +659,7 @@ cglobal hevc_v_loop_filter_chroma_12, 3, 5, 7, pix, stride, tc, pix0, r3stride
 ; void ff_hevc_h_loop_filter_chroma(uint8_t *_pix, ptrdiff_t _stride, int32_t *tc,
 ;                                   uint8_t *_no_p, uint8_t *_no_q);
 ;-----------------------------------------------------------------------------
-cglobal hevc_h_loop_filter_chroma_8, 3, 4, 7, pix, stride, tc, pix0
+cglobal hevc_h_loop_filter_chroma_8, 3, 4, 7, "p", pix, "p-", stride, "p", tc, pix0
     mov           pix0q, pixq
     sub           pix0q, strideq
     sub           pix0q, strideq
@@ -678,7 +678,7 @@ cglobal hevc_h_loop_filter_chroma_8, 3, 4, 7, pix, stride, tc, pix0
     movhps       [pixq], m1
     RET
 
-cglobal hevc_h_loop_filter_chroma_10, 3, 4, 7, pix, stride, tc, pix0
+cglobal hevc_h_loop_filter_chroma_10, 3, 4, 7, "p", pix, "p-", stride, "p", tc, pix0
     mov          pix0q, pixq
     sub          pix0q, strideq
     sub          pix0q, strideq
@@ -694,7 +694,7 @@ cglobal hevc_h_loop_filter_chroma_10, 3, 4, 7, pix, stride, tc, pix0
     movu        [pixq], m2
     RET
 
-cglobal hevc_h_loop_filter_chroma_12, 3, 4, 7, pix, stride, tc, pix0
+cglobal hevc_h_loop_filter_chroma_12, 3, 4, 7, "p", pix, "p-", stride, "p", tc, pix0
     mov          pix0q, pixq
     sub          pix0q, strideq
     sub          pix0q, strideq
@@ -722,7 +722,7 @@ LOOP_FILTER_CHROMA
 ; void ff_hevc_v_loop_filter_luma(uint8_t *_pix, ptrdiff_t _stride, int beta,
 ;                                 int32_t *tc, uint8_t *_no_p, uint8_t *_no_q);
 ;-----------------------------------------------------------------------------
-cglobal hevc_v_loop_filter_luma_8, 4, 14, 16, pix, stride, beta, tc, pix0, src3stride
+cglobal hevc_v_loop_filter_luma_8, 4, 14, 16, "p", pix, "p-", stride, "d", beta, "p", tc, pix0, src3stride
     sub            pixq, 4
     lea           pix0q, [3 * r1]
     mov     src3strideq, pixq
@@ -734,7 +734,7 @@ cglobal hevc_v_loop_filter_luma_8, 4, 14, 16, pix, stride, beta, tc, pix0, src3s
 .bypassluma:
     RET
 
-cglobal hevc_v_loop_filter_luma_10, 4, 14, 16, pix, stride, beta, tc, pix0, src3stride
+cglobal hevc_v_loop_filter_luma_10, 4, 14, 16, "p", pix, "p-", stride, "d", beta, "p", tc, pix0, src3stride
     sub            pixq, 8
     lea           pix0q, [3 * strideq]
     mov     src3strideq, pixq
@@ -746,7 +746,7 @@ cglobal hevc_v_loop_filter_luma_10, 4, 14, 16, pix, stride, beta, tc, pix0, src3
 .bypassluma:
     RET
 
-cglobal hevc_v_loop_filter_luma_12, 4, 14, 16, pix, stride, beta, tc, pix0, src3stride
+cglobal hevc_v_loop_filter_luma_12, 4, 14, 16, "p", pix, "p-", stride, "d", beta, "p", tc, pix0, src3stride
     sub            pixq, 8
     lea           pix0q, [3 * strideq]
     mov     src3strideq, pixq
@@ -762,7 +762,7 @@ cglobal hevc_v_loop_filter_luma_12, 4, 14, 16, pix, stride, beta, tc, pix0, src3
 ; void ff_hevc_h_loop_filter_luma(uint8_t *_pix, ptrdiff_t _stride, int beta,
 ;                                 int32_t *tc, uint8_t *_no_p, uint8_t *_no_q);
 ;-----------------------------------------------------------------------------
-cglobal hevc_h_loop_filter_luma_8, 4, 14, 16, pix, stride, beta, tc, pix0, src3stride
+cglobal hevc_h_loop_filter_luma_8, 4, 14, 16, "p", pix, "p-", stride, "d", beta, "p", tc, pix0, src3stride
     lea     src3strideq, [3 * strideq]
     mov           pix0q, pixq
     sub           pix0q, src3strideq
@@ -798,7 +798,7 @@ cglobal hevc_h_loop_filter_luma_8, 4, 14, 16, pix, stride, beta, tc, pix0, src3s
 .bypassluma:
     RET
 
-cglobal hevc_h_loop_filter_luma_10, 4, 14, 16, pix, stride, beta, tc, pix0, src3stride
+cglobal hevc_h_loop_filter_luma_10, 4, 14, 16, "p", pix, "p-", stride, "d", beta, "p", tc, pix0, src3stride
     lea                  src3strideq, [3 * strideq]
     mov                        pix0q, pixq
     sub                        pix0q, src3strideq
@@ -829,7 +829,7 @@ cglobal hevc_h_loop_filter_luma_10, 4, 14, 16, pix, stride, beta, tc, pix0, src3
 .bypassluma:
     RET
 
-cglobal hevc_h_loop_filter_luma_12, 4, 14, 16, pix, stride, beta, tc, pix0, src3stride
+cglobal hevc_h_loop_filter_luma_12, 4, 14, 16, "p", pix, "p-", stride, "d", beta, "p", tc, pix0, src3stride
     lea                  src3strideq, [3 * strideq]
     mov                        pix0q, pixq
     sub                        pix0q, src3strideq

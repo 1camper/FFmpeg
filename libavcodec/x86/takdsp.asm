@@ -29,7 +29,7 @@ pd_128: times 4 dd 128
 SECTION .text
 
 INIT_XMM sse2
-cglobal tak_decorrelate_ls, 3, 3, 2, p1, p2, length
+cglobal tak_decorrelate_ls, 3, 3, 2, "p", p1, "p", p2, "d", length
     shl                     lengthd, 2
     add                         p1q, lengthq
     add                         p2q, lengthq
@@ -45,7 +45,7 @@ cglobal tak_decorrelate_ls, 3, 3, 2, p1, p2, length
     jl .loop
     REP_RET
 
-cglobal tak_decorrelate_sr, 3, 3, 2, p1, p2, length
+cglobal tak_decorrelate_sr, 3, 3, 2, "p", p1, "p", p2, "d", length
     shl                     lengthd, 2
     add                         p1q, lengthq
     add                         p2q, lengthq
@@ -62,7 +62,7 @@ cglobal tak_decorrelate_sr, 3, 3, 2, p1, p2, length
     jl .loop
     REP_RET
 
-cglobal tak_decorrelate_sm, 3, 3, 6, p1, p2, length
+cglobal tak_decorrelate_sm, 3, 3, 6, "p", p1, "p", p2, "d", length
     shl                     lengthd, 2
     add                         p1q, lengthq
     add                         p2q, lengthq
@@ -90,7 +90,7 @@ cglobal tak_decorrelate_sm, 3, 3, 6, p1, p2, length
     REP_RET
 
 INIT_XMM sse4
-cglobal tak_decorrelate_sf, 3, 3, 5, p1, p2, length, dshift, dfactor
+cglobal tak_decorrelate_sf, 3, 3, 5, "p", p1, "p", p2, "d", length, "d", dshift, "d", dfactor
     shl             lengthd, 2
     add                 p1q, lengthq
     add                 p2q, lengthq

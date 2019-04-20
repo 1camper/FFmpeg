@@ -25,7 +25,7 @@ SECTION .text
 
 %macro SCALARPRODUCT 0
 ; int ff_scalarproduct_int16(int16_t *v1, int16_t *v2, int order)
-cglobal scalarproduct_int16, 3,3,3, v1, v2, order
+cglobal scalarproduct_int16, 3,3,3, "p", v1, "p", v2, "d", order
     add orderd, orderd
     add v1q, orderq
     add v2q, orderq
@@ -65,7 +65,7 @@ SCALARPRODUCT
 ; %4 = CLIPD function takes min/max as float instead of int (CLIPD_SSE2)
 ; %5 = suffix
 %macro VECTOR_CLIP_INT32 4-5
-cglobal vector_clip_int32%5, 5,5,%1, dst, src, min, max, len
+cglobal vector_clip_int32%5, 5,5,%1, "p", dst, "p", src, "d", min, "d", max, "d", len
 %if %4
     cvtsi2ss  m4, minm
     cvtsi2ss  m5, maxm
@@ -135,7 +135,7 @@ VECTOR_CLIP_INT32 6, 1, 0, 0
 ; void ff_vector_clipf_sse(float *dst, const float *src,
 ;                          int len, float min, float max)
 INIT_XMM sse
-cglobal vector_clipf, 3, 3, 6, dst, src, len, min, max
+cglobal vector_clipf, 3, 3, 6, "p", dst, "p", src, "d-", len, min, max
 %if ARCH_X86_32
     VBROADCASTSS m0, minm
     VBROADCASTSS m1, maxm
@@ -147,8 +147,6 @@ cglobal vector_clipf, 3, 3, 6, dst, src, len, min, max
     VBROADCASTSS m0, m0
     VBROADCASTSS m1, m1
 %endif
-
-    movsxdifnidn lenq, lend
 
 .loop:
     mova m2, [srcq + 4 * lenq - 4 * mmsize]
